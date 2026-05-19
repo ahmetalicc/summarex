@@ -1,5 +1,39 @@
-"""Audio validation and processing service.
+"""Audio validation. Format check + size check only.
 
-Validates uploaded audio files (format, size, duration) and handles optional
-FFmpeg conversion to a Whisper-compatible format. Implemented by the Backend Agent.
+Duration is derived later from Whisper's verbose_json response, so we don't probe
+files locally and we don't depend on FFmpeg in this layer.
 """
+from app.utils.exceptions import AudioValidationError
+
+ALLOWED_EXTENSIONS = {"mp3", "wav", "m4a", "webm"}
+MAX_SIZE_BYTES = 100 * 1024 * 1024  # 100 MB
+CONTENT_TYPES = {
+    "mp3": "audio/mpeg",
+    "wav": "audio/wav",
+    "m4a": "audio/mp4",
+    "webm": "audio/webm",
+}
+
+
+class AudioService:
+    @staticmethod
+    def validate(filename: str, size_bytes: int) -> str:
+        """Validate and return the lowercased extension (without the dot)."""
+        if "." not in filename:
+            raise AudioValidationError("Filename must include an extension")
+        ext = filename.rsplit(".", 1)[1].lower()
+        if ext not in ALLOWED_EXTENSIONS:
+            raise AudioValidationError(
+                f"Unsupported format '{ext}'. Allowed: {sorted(ALLOWED_EXTENSIONS)}"
+            )
+        if size_bytes <= 0:
+            raise AudioValidationError("File is empty")
+        if size_bytes > MAX_SIZE_BYTES:
+            raise AudioValidationError(
+                f"File too large: {size_bytes / 1_000_000:.1f} MB (max 100 MB)"
+            )
+        return ext
+
+    @staticmethod
+    def content_type_for(extension: str) -> str:
+        return CONTENT_TYPES.get(extension, "application/octet-stream")

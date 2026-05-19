@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     BACKEND_URL: str = "http://localhost:8000"
     FRONTEND_URL: str = "http://localhost:5173"
     ENVIRONMENT: str = "development"
+    LOG_LEVEL: str = "INFO"
 
 
 settings = Settings()

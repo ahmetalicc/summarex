@@ -31,3 +31,8 @@ class MeetingCreate(BaseModel):
 
 class MeetingUpdate(BaseModel):
     title: str | None = None
+
+
+class MeetingStatusOut(BaseModel):
+    status: MeetingStatus
+    error_message: str | None = None
