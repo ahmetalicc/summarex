@@ -6,11 +6,14 @@ __pycache__/
 backend/.venv/
 .pytest_cache/
 .coverage
+.ruff_cache/
+.mypy_cache/
 *.log
 
 # Environment
 .env
 .env.local
+.env.*.local
 
 # OS
 .DS_Store
@@ -19,6 +22,7 @@ Thumbs.db
 # Frontend build
 node_modules/
 dist/
+build/
 
 # Editor
 .vscode/
