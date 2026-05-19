@@ -1,0 +1,17 @@
+# docker-compose.yml — local development scaffold.
+# NOTE: The backend service references a Dockerfile that the DevOps Agent
+# will add in a later phase. This file is wired up structurally now so the
+# rest of the team can iterate, but `docker compose up` will fail until the
+# Dockerfile lands. See agents/devops.md.
+
+services:
+  backend:
+    build:
+      context: ./backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
