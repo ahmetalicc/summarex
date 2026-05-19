@@ -1,12 +1,15 @@
-"""Meeting CRUD + upload endpoints.
+"""Meeting CRUD + upload/record + transcript/summary/share endpoints.
 
-Upload flow (POST /upload):
+Upload/record flow (POST /upload  or  POST /record):
   1. Validate file format/size via AudioService.
   2. Generate a UUID before any DB write so audio is named deterministically.
   3. Upload audio to Supabase Storage.
   4. Insert the meeting row using the pre-generated UUID.
   5. Schedule the transcribe→summarize pipeline as a BackgroundTask.
   6. Return 202 Accepted with the meeting row.
+
+Both /upload and /record accept the same multipart payload. The frontend chooses
+the path based on source (/upload = file picker, /record = MediaRecorder stream).
 
 This order ensures that if the storage upload fails, no orphaned DB row is created.
 If the DB insert fails after a successful upload, the storage object is cleaned up.
@@ -15,12 +18,15 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, BackgroundTasks, File, Form, Query, UploadFile
+from fastapi import APIRouter, BackgroundTasks, File, Form, Query, Request, UploadFile
 
 from app.dependencies import CurrentUser
+from app.limiter import limiter
 from app.models.meeting import Meeting, MeetingStatusOut, MeetingUpdate
+from app.models.summary import Summary
+from app.models.transcript import Transcript
 from app.services.audio_service import AudioService
-from app.services.pipeline import run_meeting_pipeline
+from app.services.pipeline import run_meeting_pipeline, run_resummarize
 from app.services.supabase_service import SupabaseService
 from app.utils.exceptions import ExternalServiceError, MeetingNotFoundError
 from app.utils.logging import get_logger
@@ -31,7 +37,10 @@ router = APIRouter(prefix="/meetings", tags=["meetings"])
 
 
 @router.post("/upload", status_code=202, response_model=Meeting)
-async def upload_meeting(
+@router.post("/record", status_code=202, response_model=Meeting)
+@limiter.limit("10/hour")
+async def create_meeting_from_audio(
+    request: Request,
     current_user: CurrentUser,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
@@ -114,3 +123,57 @@ async def get_meeting_status(meeting_id: str, current_user: CurrentUser) -> dict
     if not meeting:
         raise MeetingNotFoundError()
     return {"status": meeting["status"], "error_message": meeting.get("error_message")}
+
+
+@router.get("/{meeting_id}/transcript", response_model=Transcript)
+async def get_transcript(meeting_id: str, current_user: CurrentUser) -> dict:
+    transcript = SupabaseService().get_transcript(meeting_id, str(current_user["id"]))
+    if transcript is None:
+        raise MeetingNotFoundError("Transcript not found")
+    return transcript
+
+
+@router.get("/{meeting_id}/summary", response_model=Summary)
+async def get_summary(meeting_id: str, current_user: CurrentUser) -> dict:
+    summary = SupabaseService().get_summary(meeting_id, str(current_user["id"]))
+    if summary is None:
+        raise MeetingNotFoundError("Summary not found")
+    return summary
+
+
+@router.post("/{meeting_id}/regenerate-summary", status_code=202)
+@limiter.limit("5/hour")
+async def regenerate_summary(
+    request: Request,
+    meeting_id: str,
+    current_user: CurrentUser,
+    background_tasks: BackgroundTasks,
+) -> dict:
+    svc = SupabaseService()
+    meeting = svc.get_meeting(meeting_id, str(current_user["id"]))
+    if not meeting:
+        raise MeetingNotFoundError()
+    transcript = svc.get_transcript_by_meeting_id(meeting_id)
+    if not transcript:
+        raise MeetingNotFoundError("No transcript available — run transcription first")
+    svc.delete_summary(meeting_id)
+    svc.update_meeting_status(meeting_id, "summarizing")
+    background_tasks.add_task(run_resummarize, meeting_id)
+    log.info("Queued re-summarize for meeting %s", meeting_id)
+    return {"status": "summarizing"}
+
+
+@router.post("/{meeting_id}/share", tags=["sharing"])
+async def create_share(meeting_id: str, current_user: CurrentUser) -> dict:
+    link = SupabaseService().create_shared_link(meeting_id, str(current_user["id"]))
+    if link is None:
+        raise MeetingNotFoundError()
+    token = link["token"]
+    return {"token": token, "share_path": f"/shared/{token}"}
+
+
+@router.delete("/{meeting_id}/share", status_code=204, tags=["sharing"])
+async def revoke_share(meeting_id: str, current_user: CurrentUser) -> None:
+    deleted = SupabaseService().delete_shared_link(meeting_id, str(current_user["id"]))
+    if not deleted:
+        raise MeetingNotFoundError("No active shared link for this meeting")
