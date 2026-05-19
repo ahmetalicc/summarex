@@ -1,17 +1,40 @@
-from fastapi import Header, HTTPException, status
+"""Shared FastAPI dependencies."""
+from typing import Annotated
+
+from fastapi import Depends, Header
+
+from app.lib.supabase import get_anon_client
+from app.utils.exceptions import UnauthorizedError
+from app.utils.logging import get_logger
+
+logger = get_logger(__name__)
 
 
-async def get_current_user(authorization: str | None = Header(default=None)) -> dict:
-    """Stub: Backend Agent will implement Supabase JWT verification here.
+async def get_current_user(
+    authorization: Annotated[str | None, Header()] = None,
+) -> dict:
+    """Verify the bearer JWT via Supabase and return {id, email}.
 
-    Expected final behaviour: extract the Bearer token from the Authorization
-    header, verify it against Supabase, and return the decoded user payload.
-    Raises HTTP 401 if the token is missing or invalid.
+    Raises UnauthorizedError if header is missing/malformed or token is invalid.
     """
-    if authorization is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing auth header",
-        )
-    # Placeholder shape — Backend Agent replaces this with real JWT validation.
-    return {"id": "stub-user-id", "email": "stub@example.com"}
+    if not authorization or not authorization.lower().startswith("bearer "):
+        raise UnauthorizedError("Missing or malformed Authorization header")
+
+    token = authorization.split(" ", 1)[1].strip()
+    if not token:
+        raise UnauthorizedError("Empty bearer token")
+
+    try:
+        response = get_anon_client().auth.get_user(token)
+    except Exception as exc:  # supabase SDK raises various subclasses
+        logger.warning("Supabase auth.get_user failed: %s", exc)
+        raise UnauthorizedError("Invalid or expired token") from exc
+
+    user = getattr(response, "user", None)
+    if user is None or not getattr(user, "id", None):
+        raise UnauthorizedError("Invalid or expired token")
+
+    return {"id": user.id, "email": getattr(user, "email", None)}
+
+
+CurrentUser = Annotated[dict, Depends(get_current_user)]
