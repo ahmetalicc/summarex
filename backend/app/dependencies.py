@@ -1,7 +1,8 @@
 """Shared FastAPI dependencies."""
 from typing import Annotated
 
-from fastapi import Depends, Header
+from fastapi import Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.lib.supabase import get_anon_client
 from app.utils.exceptions import UnauthorizedError
@@ -9,21 +10,20 @@ from app.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
+_bearer = HTTPBearer(auto_error=False)
+
 
 async def get_current_user(
-    authorization: Annotated[str | None, Header()] = None,
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer)] = None,
 ) -> dict:
     """Verify the bearer JWT via Supabase and return {id, email}.
 
-    Raises UnauthorizedError if header is missing/malformed or token is invalid.
+    Raises UnauthorizedError if credentials are missing or the token is invalid.
     """
-    if not authorization or not authorization.lower().startswith("bearer "):
+    if not credentials or not credentials.credentials:
         raise UnauthorizedError("Missing or malformed Authorization header")
 
-    token = authorization.split(" ", 1)[1].strip()
-    if not token:
-        raise UnauthorizedError("Empty bearer token")
-
+    token = credentials.credentials
     try:
         response = get_anon_client().auth.get_user(token)
     except Exception as exc:  # supabase SDK raises various subclasses
