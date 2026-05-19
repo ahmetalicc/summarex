@@ -56,3 +56,24 @@ def run_meeting_pipeline(meeting_id: str, audio_path: str, extension: str) -> No
     except Exception as exc:  # noqa: BLE001 — final safety net before status is lost
         log.exception("Pipeline failed (unexpected) for meeting %s", meeting_id)
         supabase.update_meeting_status(meeting_id, "error", error_message=str(exc))
+
+
+def run_resummarize(meeting_id: str) -> None:
+    """Re-summarize from existing transcript. Skips Whisper entirely."""
+    supabase = SupabaseService()
+    try:
+        supabase.update_meeting_status(meeting_id, "summarizing")
+        transcript = supabase.get_transcript_by_meeting_id(meeting_id)
+        if not transcript:
+            raise MeetingMindError("Cannot regenerate summary — no transcript exists for this meeting")
+        claude = ClaudeService()
+        payload = claude.summarize(transcript["full_text"])
+        supabase.create_summary(meeting_id=meeting_id, payload=payload)
+        supabase.update_meeting_status(meeting_id, "done")
+        log.info("Re-summarize finished for meeting %s", meeting_id)
+    except MeetingMindError as exc:
+        log.error("Re-summarize failed (domain) for meeting %s: %s", meeting_id, exc.detail)
+        supabase.update_meeting_status(meeting_id, "error", error_message=exc.detail)
+    except Exception as exc:  # noqa: BLE001
+        log.exception("Re-summarize failed (unexpected) for meeting %s", meeting_id)
+        supabase.update_meeting_status(meeting_id, "error", error_message=str(exc))
