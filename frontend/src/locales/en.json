@@ -1,12 +1,84 @@
 {
   "common": {
-    "brandName": "MeetingMind",
+    "brand": "MeetingMind",
     "tagline": "Capture every meeting. Understand every minute.",
-    "getStarted": "Get started"
+    "getStarted": "Get started",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "signedInAs": "Signed in as",
+    "dashboard": "Dashboard",
+    "record": "Record",
+    "language": "Language",
+    "theme": "Theme",
+    "toggleTheme": "Toggle theme",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
-  "landing": {},
-  "auth": {},
+  "landing": {
+    "heroEyebrow": "AI-powered meeting intelligence",
+    "heroTitle": "Every meeting, instantly understood.",
+    "heroSubtitle": "Record or upload audio. MeetingMind transcribes it, surfaces the decisions, and turns the conversation into shareable action items — in minutes, not hours.",
+    "ctaPrimary": "Try MeetingMind",
+    "ctaSecondary": "See how it works",
+    "featuresTitle": "From raw audio to clear next steps.",
+    "featuresSubtitle": "Four steps, one workflow. No more 'who owns this?' the next day.",
+    "features": {
+      "record": {
+        "title": "Record or upload",
+        "description": "Capture audio in the browser or drop a file. MP3, WAV, M4A, WebM — all handled."
+      },
+      "transcribe": {
+        "title": "Whisper-grade transcripts",
+        "description": "Accurate, timestamped, multilingual transcripts you can scrub through and search."
+      },
+      "summarize": {
+        "title": "Claude summaries",
+        "description": "Decisions, action items, sentiment, and key quotes — pulled out automatically."
+      },
+      "share": {
+        "title": "Share with one link",
+        "description": "Generate a public read-only view your team can open without an account."
+      }
+    },
+    "demoTitle": "What the AI actually gives you.",
+    "demoSubtitle": "A real-looking example so you know what to expect on the other side.",
+    "demoTranscriptLabel": "Transcript",
+    "demoSummaryLabel": "Summary",
+    "demoOverview": "Overview",
+    "demoOverviewText": "Q2 planning sync covering the pricing experiment results and rollout plan. Strong alignment on next steps.",
+    "demoDecisions": "Decisions",
+    "demoDecision1": "Roll the pricing change to 100% of users on Tuesday.",
+    "demoDecision2": "Revisit churn metrics in two weeks.",
+    "demoActions": "Action items",
+    "demoAction1Task": "Send the rollout announcement email to all customers.",
+    "demoAction1Deadline": "Due Monday",
+    "finalCtaTitle": "Stop taking notes. Start running meetings.",
+    "finalCtaSubtitle": "Free to try with your first meeting. No credit card. No setup.",
+    "finalCtaButton": "Get started free"
+  },
+  "auth": {
+    "welcomeTitle": "Welcome back",
+    "welcomeSubtitle": "Sign in to access your meetings, or create an account in seconds.",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "you@company.com",
+    "passwordPlaceholder": "••••••••",
+    "signInButton": "Sign in",
+    "signingIn": "Signing in…",
+    "signUpButton": "Create account",
+    "signingUp": "Creating account…",
+    "toSignUp": "Don't have an account? Sign up",
+    "toSignIn": "Already have an account? Sign in",
+    "forgotPassword": "Forgot your password?",
+    "sendResetLink": "Send reset link"
+  },
   "dashboard": {},
   "recording": {},
-  "meeting": {}
+  "meeting": {},
+  "footer": {
+    "rights": "All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "github": "GitHub"
+  }
 }

@@ -1,12 +1,84 @@
 {
   "common": {
-    "brandName": "MeetingMind",
+    "brand": "MeetingMind",
     "tagline": "Her toplantıyı yakala. Her dakikayı anla.",
-    "getStarted": "Başla"
+    "getStarted": "Başla",
+    "signIn": "Giriş yap",
+    "signOut": "Çıkış yap",
+    "signedInAs": "Giriş yapan",
+    "dashboard": "Panel",
+    "record": "Kaydet",
+    "language": "Dil",
+    "theme": "Tema",
+    "toggleTheme": "Tema değiştir",
+    "openMenu": "Menüyü aç",
+    "closeMenu": "Menüyü kapat"
   },
-  "landing": {},
-  "auth": {},
+  "landing": {
+    "heroEyebrow": "Yapay zekâ destekli toplantı zekâsı",
+    "heroTitle": "Her toplantı, anında anlaşılır.",
+    "heroSubtitle": "Sesi kaydet ya da yükle. MeetingMind metne döker, kararları öne çıkarır ve konuşmayı paylaşılabilir aksiyon maddelerine çevirir — saatler değil dakikalar içinde.",
+    "ctaPrimary": "MeetingMind'ı dene",
+    "ctaSecondary": "Nasıl çalıştığını gör",
+    "featuresTitle": "Ham sesten net adımlara.",
+    "featuresSubtitle": "Dört adım, tek akış. Ertesi gün 'bunu kim üstlenecekti?' soruları bitiyor.",
+    "features": {
+      "record": {
+        "title": "Kaydet ya da yükle",
+        "description": "Tarayıcıdan sesi yakala ya da dosyayı bırak. MP3, WAV, M4A, WebM — hepsi destekli."
+      },
+      "transcribe": {
+        "title": "Whisper kalitesinde döküm",
+        "description": "Zaman damgalı, çok dilli ve doğru — üzerinde gezinip aratabileceğin transkriptler."
+      },
+      "summarize": {
+        "title": "Claude özetleri",
+        "description": "Kararlar, aksiyon maddeleri, ton ve önemli alıntılar — otomatik olarak çıkarılır."
+      },
+      "share": {
+        "title": "Tek bağlantıyla paylaş",
+        "description": "Ekibinin hesapsız açabileceği herkese açık, salt-okunur bir görünüm oluştur."
+      }
+    },
+    "demoTitle": "Yapay zekâ aslında sana ne veriyor.",
+    "demoSubtitle": "Diğer tarafta seni neyin beklediğini gösteren gerçekçi bir örnek.",
+    "demoTranscriptLabel": "Transkript",
+    "demoSummaryLabel": "Özet",
+    "demoOverview": "Genel bakış",
+    "demoOverviewText": "Fiyatlama deneyinin sonuçlarını ve yayılma planını kapsayan Q2 planlama toplantısı. Sonraki adımlarda güçlü uyum.",
+    "demoDecisions": "Kararlar",
+    "demoDecision1": "Salı günü fiyat değişikliği tüm kullanıcılara açılacak.",
+    "demoDecision2": "İki hafta sonra churn metriklerine tekrar bakılacak.",
+    "demoActions": "Aksiyon maddeleri",
+    "demoAction1Task": "Tüm müşterilere yayılma duyurusu e-postasını gönder.",
+    "demoAction1Deadline": "Son tarih: Pazartesi",
+    "finalCtaTitle": "Not tutmayı bırak. Toplantıları yönetmeye başla.",
+    "finalCtaSubtitle": "İlk toplantın ücretsiz. Kredi kartı yok. Kurulum yok.",
+    "finalCtaButton": "Ücretsiz başla"
+  },
+  "auth": {
+    "welcomeTitle": "Tekrar hoş geldin",
+    "welcomeSubtitle": "Toplantılarına erişmek için giriş yap ya da saniyeler içinde hesap oluştur.",
+    "email": "E-posta",
+    "password": "Şifre",
+    "emailPlaceholder": "siz@sirket.com",
+    "passwordPlaceholder": "••••••••",
+    "signInButton": "Giriş yap",
+    "signingIn": "Giriş yapılıyor…",
+    "signUpButton": "Hesap oluştur",
+    "signingUp": "Hesap oluşturuluyor…",
+    "toSignUp": "Hesabın yok mu? Kayıt ol",
+    "toSignIn": "Zaten hesabın var mı? Giriş yap",
+    "forgotPassword": "Şifreni mi unuttun?",
+    "sendResetLink": "Sıfırlama bağlantısı gönder"
+  },
   "dashboard": {},
   "recording": {},
-  "meeting": {}
+  "meeting": {},
+  "footer": {
+    "rights": "Tüm hakları saklıdır.",
+    "privacy": "Gizlilik",
+    "terms": "Şartlar",
+    "github": "GitHub"
+  }
 }
