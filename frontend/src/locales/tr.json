@@ -1,5 +1,9 @@
 {
-  "common": {},
+  "common": {
+    "brandName": "MeetingMind",
+    "tagline": "Her toplantıyı yakala. Her dakikayı anla.",
+    "getStarted": "Başla"
+  },
   "landing": {},
   "auth": {},
   "dashboard": {},

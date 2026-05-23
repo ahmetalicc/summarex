@@ -2,6 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-bg text-text font-body antialiased;
+@layer base {
+  html {
+    font-family: theme('fontFamily.body');
+  }
+  body {
+    @apply bg-bg text-text antialiased;
+    min-height: 100dvh;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: theme('fontFamily.display');
+  }
+  code,
+  pre {
+    font-family: theme('fontFamily.mono');
+  }
+  :root {
+    color-scheme: dark;
+  }
+  .light {
+    color-scheme: light;
+  }
+}
+
+/* CSS custom properties for theme tokens — Tailwind utilities handle dark/light via
+   the `.light` class on <html>; these expose the same tokens for components that
+   need raw CSS access. */
+:root {
+  --color-bg: 10 15 28;
+  --color-bg-surface: 20 27 45;
+  --color-bg-elevated: 27 34 54;
+  --color-primary: 0 212 170;
+  --color-accent: 245 166 35;
+  --color-text: 226 232 240;
+  --color-text-muted: 148 163 184;
+  --color-border: 30 41 59;
+}
+
+.light {
+  --color-bg: 250 250 252;
+  --color-bg-surface: 255 255 255;
+  --color-bg-elevated: 244 244 246;
+  --color-primary: 0 184 148;
+  --color-accent: 217 119 6;
+  --color-text: 15 23 42;
+  --color-text-muted: 71 85 105;
+  --color-border: 226 232 240;
 }
