@@ -12,7 +12,8 @@
     "theme": "Theme",
     "toggleTheme": "Toggle theme",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "cancel": "Cancel"
   },
   "landing": {
     "heroEyebrow": "AI-powered meeting intelligence",
@@ -72,9 +73,65 @@
     "forgotPassword": "Forgot your password?",
     "sendResetLink": "Send reset link"
   },
-  "dashboard": {},
-  "recording": {},
-  "meeting": {},
+  "dashboard": {
+    "title": "Your meetings",
+    "subtitle": "Every recording you've captured or uploaded — searchable and ready to revisit.",
+    "newRecording": "New recording",
+    "searchPlaceholder": "Search by title…",
+    "emptyTitle": "No meetings yet",
+    "emptyDescription": "Record your first conversation or drop in an audio file to see it appear here once the pipeline finishes.",
+    "emptyCta": "Start your first meeting",
+    "emptySearchTitle": "No matches",
+    "emptySearchDescription": "Nothing matches that search. Try a different title or clear the box to see everything.",
+    "loadMore": "Load more",
+    "deleteConfirmTitle": "Delete this meeting?",
+    "deleteConfirmBody": "“{{title}}” and its transcript, summary, and audio file will be permanently removed. This can't be undone.",
+    "deleteConfirmAction": "Delete"
+  },
+  "recording": {
+    "title": "Start a meeting",
+    "subtitle": "Record live from your browser or upload audio you already have. Either way works.",
+    "recordTab": "Record",
+    "uploadTab": "Upload",
+    "recordHint": "Tap the mic to start. Pause or stop anytime.",
+    "uploadHint": "Drop in an audio file or pick one from your computer.",
+    "permissionDenied": "Microphone access was blocked.",
+    "permissionDeniedHelp": "Enable the mic for this site in your browser settings, then try again.",
+    "learnHow": "Learn how",
+    "startFailed": "Couldn't start recording. Please try again.",
+    "startButton": "Start recording",
+    "pauseButton": "Pause",
+    "resumeButton": "Resume",
+    "stopButton": "Stop",
+    "tryAgain": "Try again",
+    "discardButton": "Discard",
+    "saveButton": "Save & process",
+    "uploadButton": "Upload",
+    "uploading": "Uploading…",
+    "titleLabel": "Title (optional)",
+    "titlePlaceholder": "e.g. Q2 planning sync",
+    "timerLabel": "Recording duration",
+    "dragHere": "Drop your audio here",
+    "acceptHint": "Supports {{extensions}} · up to {{maxMb}} MB",
+    "browseFiles": "Browse files",
+    "invalidFile": "Unsupported format. Use MP3, WAV, M4A, or WebM.",
+    "fileEmpty": "The file is empty.",
+    "fileTooLarge": "That file is over 100 MB. Try a smaller one."
+  },
+  "meeting": {
+    "untitled": "Untitled meeting",
+    "statusQueued": "Queued",
+    "statusTranscribing": "Transcribing",
+    "statusSummarizing": "Summarizing",
+    "statusDone": "Ready",
+    "statusError": "Failed",
+    "duration": "Duration",
+    "createdAt": "Created"
+  },
+  "errors": {
+    "networkError": "Something went wrong. Check your connection and try again.",
+    "retry": "Retry"
+  },
   "footer": {
     "rights": "All rights reserved.",
     "privacy": "Privacy",

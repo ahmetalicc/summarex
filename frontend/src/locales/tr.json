@@ -12,7 +12,8 @@
     "theme": "Tema",
     "toggleTheme": "Tema değiştir",
     "openMenu": "Menüyü aç",
-    "closeMenu": "Menüyü kapat"
+    "closeMenu": "Menüyü kapat",
+    "cancel": "Vazgeç"
   },
   "landing": {
     "heroEyebrow": "Yapay zekâ destekli toplantı zekâsı",
@@ -72,9 +73,65 @@
     "forgotPassword": "Şifreni mi unuttun?",
     "sendResetLink": "Sıfırlama bağlantısı gönder"
   },
-  "dashboard": {},
-  "recording": {},
-  "meeting": {},
+  "dashboard": {
+    "title": "Toplantıların",
+    "subtitle": "Kaydettiğin ya da yüklediğin her görüşme — aranabilir ve tekrar açılmaya hazır.",
+    "newRecording": "Yeni kayıt",
+    "searchPlaceholder": "Başlığa göre ara…",
+    "emptyTitle": "Henüz toplantı yok",
+    "emptyDescription": "İlk konuşmanı kaydet ya da bir ses dosyası bırak; akış tamamlanınca burada görünecek.",
+    "emptyCta": "İlk toplantını başlat",
+    "emptySearchTitle": "Sonuç yok",
+    "emptySearchDescription": "Bu aramaya uyan bir şey yok. Farklı bir başlık dene ya da kutuyu temizle.",
+    "loadMore": "Daha fazla yükle",
+    "deleteConfirmTitle": "Bu toplantı silinsin mi?",
+    "deleteConfirmBody": "“{{title}}” ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
+    "deleteConfirmAction": "Sil"
+  },
+  "recording": {
+    "title": "Bir toplantı başlat",
+    "subtitle": "Tarayıcıdan canlı kaydet ya da elindeki sesi yükle. İkisi de işe yarar.",
+    "recordTab": "Kaydet",
+    "uploadTab": "Yükle",
+    "recordHint": "Başlamak için mikrofona dokun. Dilediğinde duraklat ya da durdur.",
+    "uploadHint": "Bir ses dosyasını sürükleyip bırak ya da bilgisayarından seç.",
+    "permissionDenied": "Mikrofon erişimi engellendi.",
+    "permissionDeniedHelp": "Tarayıcı ayarlarından bu site için mikrofonu aç ve tekrar dene.",
+    "learnHow": "Nasıl yapılır",
+    "startFailed": "Kayıt başlatılamadı. Lütfen tekrar dene.",
+    "startButton": "Kaydı başlat",
+    "pauseButton": "Duraklat",
+    "resumeButton": "Devam et",
+    "stopButton": "Durdur",
+    "tryAgain": "Tekrar dene",
+    "discardButton": "Vazgeç",
+    "saveButton": "Kaydet ve işle",
+    "uploadButton": "Yükle",
+    "uploading": "Yükleniyor…",
+    "titleLabel": "Başlık (isteğe bağlı)",
+    "titlePlaceholder": "ör. Q2 planlama toplantısı",
+    "timerLabel": "Kayıt süresi",
+    "dragHere": "Ses dosyanı buraya bırak",
+    "acceptHint": "Desteklenen: {{extensions}} · en fazla {{maxMb}} MB",
+    "browseFiles": "Dosyalara göz at",
+    "invalidFile": "Desteklenmeyen biçim. MP3, WAV, M4A veya WebM kullan.",
+    "fileEmpty": "Dosya boş.",
+    "fileTooLarge": "Dosya 100 MB'ı aşıyor. Daha küçük bir dosya dene."
+  },
+  "meeting": {
+    "untitled": "Başlıksız toplantı",
+    "statusQueued": "Sırada",
+    "statusTranscribing": "Metne dönüştürülüyor",
+    "statusSummarizing": "Özetleniyor",
+    "statusDone": "Hazır",
+    "statusError": "Başarısız",
+    "duration": "Süre",
+    "createdAt": "Oluşturma"
+  },
+  "errors": {
+    "networkError": "Bir şeyler ters gitti. Bağlantını kontrol edip tekrar dene.",
+    "retry": "Tekrar dene"
+  },
   "footer": {
     "rights": "Tüm hakları saklıdır.",
     "privacy": "Gizlilik",
