@@ -1,5 +1,9 @@
 {
-  "common": {},
+  "common": {
+    "brandName": "MeetingMind",
+    "tagline": "Capture every meeting. Understand every minute.",
+    "getStarted": "Get started"
+  },
   "landing": {},
   "auth": {},
   "dashboard": {},
