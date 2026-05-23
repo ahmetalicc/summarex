@@ -1,15 +1,279 @@
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+import { Button } from '../components/ui/Button';
+import { Card, CardContent } from '../components/ui/Card';
+import { Badge } from '../components/ui/Badge';
+import { HeroWaveform } from '../components/audio/HeroWaveform';
+import {
+  FileTextIcon,
+  MicIcon,
+  PlayIcon,
+  ShareIcon,
+  SparklesIcon,
+  UploadIcon,
+} from '../components/layout/Icons';
 
 export default function Landing() {
   const { t } = useTranslation();
+  const demoRef = useRef<HTMLDivElement>(null);
+
+  const features = [
+    { key: 'record', Icon: MicIcon },
+    { key: 'transcribe', Icon: FileTextIcon },
+    { key: 'summarize', Icon: SparklesIcon },
+    { key: 'share', Icon: ShareIcon },
+  ] as const;
+
+  const scrollToDemo = () => {
+    demoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
-    <main className="flex min-h-[100dvh] flex-col items-center justify-center gap-6 p-8 text-center">
-      <h1 className="text-4xl font-bold text-text">{t('common.brandName')}</h1>
-      <p className="text-text-muted">{t('common.tagline')}</p>
-      <Link to="/login" className="text-primary hover:text-primary-hover">
-        {t('common.getStarted')}
-      </Link>
-    </main>
+    <>
+      {/* HERO */}
+      <section className="relative isolate overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_30%,rgba(0,212,170,0.18),transparent_55%),radial-gradient(circle_at_75%_70%,rgba(245,166,35,0.12),transparent_60%)]"
+        />
+        <div className="absolute inset-x-0 top-1/2 -z-10 h-72 -translate-y-1/2">
+          <HeroWaveform />
+        </div>
+        <div className="mx-auto flex min-h-[calc(100dvh-4rem-4rem)] max-w-5xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
+            <Badge variant="info" className="mb-6">
+              {t('landing.heroEyebrow')}
+            </Badge>
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.05, ease: 'easeOut' }}
+            className="font-display text-5xl font-bold leading-[1.05] tracking-tight text-text sm:text-6xl lg:text-7xl"
+          >
+            {t('landing.heroTitle')}
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.12, ease: 'easeOut' }}
+            className="mx-auto mt-6 max-w-2xl text-base text-text-muted sm:text-lg"
+          >
+            {t('landing.heroSubtitle')}
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+            className="mt-10 flex flex-wrap items-center justify-center gap-3"
+          >
+            <Link to="/login">
+              <motion.span whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+                <Button size="lg" leftIcon={<MicIcon width={18} height={18} />}>
+                  {t('landing.ctaPrimary')}
+                </Button>
+              </motion.span>
+            </Link>
+            <motion.span whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={scrollToDemo}
+                leftIcon={<PlayIcon width={14} height={14} />}
+              >
+                {t('landing.ctaSecondary')}
+              </Button>
+            </motion.span>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+        <div className="mx-auto mb-12 max-w-2xl text-center">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">
+            {t('landing.featuresTitle')}
+          </h2>
+          <p className="mt-3 text-text-muted">{t('landing.featuresSubtitle')}</p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {features.map(({ key, Icon }, i) => (
+            <motion.div
+              key={key}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.45, delay: i * 0.08, ease: 'easeOut' }}
+            >
+              <Card hoverable className="h-full">
+                <CardContent className="flex h-full flex-col gap-3 p-6">
+                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+                    <Icon width={20} height={20} />
+                  </span>
+                  <h3 className="text-base font-semibold text-text">
+                    {t(`landing.features.${key}.title`)}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-text-muted">
+                    {t(`landing.features.${key}.description`)}
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* DEMO STRIP */}
+      <section ref={demoRef} className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+        <div className="mx-auto mb-12 max-w-2xl text-center">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">
+            {t('landing.demoTitle')}
+          </h2>
+          <p className="mt-3 text-text-muted">{t('landing.demoSubtitle')}</p>
+        </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
+            <Card glass className="h-full">
+              <CardContent className="p-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-text-muted">
+                    {t('landing.demoTranscriptLabel')}
+                  </h3>
+                  <Badge variant="info">Whisper · EN</Badge>
+                </div>
+                <div className="space-y-3 text-sm leading-relaxed">
+                  {[
+                    {
+                      time: '00:12',
+                      who: 'Maya',
+                      text: "Quick reset before we dive in — Q2 planning. I want to walk away with three decisions today.",
+                    },
+                    {
+                      time: '01:34',
+                      who: 'Diego',
+                      text: "The pricing experiment landed at +14% conversion. I'd vote we roll it to 100% next week.",
+                    },
+                    {
+                      time: '03:08',
+                      who: 'Aisha',
+                      text: "Agreed — and Maya, can you own the announcement email? I'll handle the dashboard updates.",
+                    },
+                    {
+                      time: '04:52',
+                      who: 'Maya',
+                      text: "Done. Let's lock the rollout for Tuesday and revisit churn metrics in two weeks.",
+                    },
+                  ].map((line) => (
+                    <div key={line.time} className="flex gap-3">
+                      <span className="mt-0.5 inline-flex h-6 shrink-0 items-center rounded-md border border-border/80 bg-bg-elevated px-1.5 font-mono text-[10px] text-text-muted">
+                        {line.time}
+                      </span>
+                      <p className="text-text">
+                        <span className="font-semibold text-primary">{line.who}:</span>{' '}
+                        <span className="text-text-muted">{line.text}</span>
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+          >
+            <Card glass className="h-full">
+              <CardContent className="p-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-text-muted">
+                    {t('landing.demoSummaryLabel')}
+                  </h3>
+                  <Badge variant="success">Claude · Done</Badge>
+                </div>
+                <div className="space-y-5 text-sm">
+                  <div>
+                    <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-text-muted">
+                      {t('landing.demoOverview')}
+                    </p>
+                    <p className="text-text">{t('landing.demoOverviewText')}</p>
+                  </div>
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
+                      {t('landing.demoDecisions')}
+                    </p>
+                    <ul className="space-y-1.5 text-text">
+                      <li className="flex gap-2">
+                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                        {t('landing.demoDecision1')}
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                        {t('landing.demoDecision2')}
+                      </li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
+                      {t('landing.demoActions')}
+                    </p>
+                    <div className="rounded-lg border border-border bg-bg-elevated/60 p-3">
+                      <p className="text-text">{t('landing.demoAction1Task')}</p>
+                      <div className="mt-1.5 flex items-center gap-2 text-xs text-text-muted">
+                        <Badge variant="warning" dot={false}>
+                          @Maya
+                        </Badge>
+                        <span>·</span>
+                        <span>{t('landing.demoAction1Deadline')}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="mx-auto max-w-4xl px-4 py-24 text-center sm:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="rounded-3xl border border-border bg-gradient-to-br from-bg-surface to-bg-elevated px-8 py-14 shadow-2xl"
+        >
+          <h2 className="font-display text-3xl font-bold leading-tight text-text sm:text-4xl">
+            {t('landing.finalCtaTitle')}
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-text-muted">
+            {t('landing.finalCtaSubtitle')}
+          </p>
+          <div className="mt-8 flex justify-center">
+            <Link to="/login">
+              <motion.span whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+                <Button size="lg" leftIcon={<UploadIcon width={18} height={18} />}>
+                  {t('landing.finalCtaButton')}
+                </Button>
+              </motion.span>
+            </Link>
+          </div>
+        </motion.div>
+      </section>
+    </>
   );
 }
