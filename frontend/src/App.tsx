@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { AuthGuard } from './components/auth/AuthGuard';
+import { Layout } from './components/layout/Layout';
 import { useThemeStore } from './store/themeStore';
 import { useLanguageStore } from './store/languageStore';
 import i18n from './lib/i18n';
@@ -36,34 +37,36 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/dashboard"
-        element={
-          <AuthGuard>
-            <Dashboard />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/record"
-        element={
-          <AuthGuard>
-            <RecordPage />
-          </AuthGuard>
-        }
-      />
-      <Route
-        path="/meetings/:id"
-        element={
-          <AuthGuard>
-            <MeetingDetail />
-          </AuthGuard>
-        }
-      />
-      <Route path="/shared/:token" element={<SharedMeeting />} />
-      <Route path="*" element={<NotFound />} />
+      <Route element={<Layout />}>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/dashboard"
+          element={
+            <AuthGuard>
+              <Dashboard />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/record"
+          element={
+            <AuthGuard>
+              <RecordPage />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/meetings/:id"
+          element={
+            <AuthGuard>
+              <MeetingDetail />
+            </AuthGuard>
+          }
+        />
+        <Route path="/shared/:token" element={<SharedMeeting />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
     </Routes>
   );
 }
