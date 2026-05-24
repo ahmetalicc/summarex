@@ -126,11 +126,85 @@
     "statusDone": "Hazır",
     "statusError": "Başarısız",
     "duration": "Süre",
-    "createdAt": "Oluşturma"
+    "createdAt": "Oluşturma",
+    "detailBack": "Panele dön",
+    "editTitle": "Başlığı düzenle",
+    "share": "Paylaş",
+    "regenerate": "Özeti yenile",
+    "regenerating": "Yenileniyor…",
+    "regenerateConfirmTitle": "Özet yenilensin mi?",
+    "regenerateConfirmBody": "Mevcut transkript üzerinden özet tekrar oluşturulacak. Şu anki özetin yerine geçecek.",
+    "regenerateConfirmAction": "Yenile",
+    "delete": "Sil",
+    "deleteConfirmTitle": "Bu toplantı silinsin mi?",
+    "deleteConfirmBody": "“{{title}}” ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
+    "deleteConfirmAction": "Sil",
+    "errorTitle": "Bu toplantıda bir sorun oluştu",
+    "tryAgain": "Tekrar dene",
+    "transcriptTitle": "Transkript",
+    "transcriptCopy": "Kopyala",
+    "transcriptCopied": "Kopyalandı",
+    "transcriptCopyTimestamp": "Zaman damgasını kopyala",
+    "transcriptSegmentCount_one": "{{count}} bölüm",
+    "transcriptSegmentCount_other": "{{count}} bölüm",
+    "transcriptEmpty": "Henüz bir transkript yok.",
+    "summaryTitle": "Özet",
+    "processing": {
+      "title": "Toplantı işleniyor",
+      "subtitle": "Dayan — bu genelde 1–3 dakika sürer.",
+      "steps": {
+        "uploaded": "Yüklendi",
+        "transcribing": "Ses metne dönüştürülüyor",
+        "summarizing": "Claude ile özetleniyor",
+        "done": "Tamamlandı"
+      }
+    },
+    "summary": {
+      "empty": "Burada henüz bir şey yok.",
+      "sections": {
+        "overview": "Genel bakış",
+        "decisions": "Kararlar",
+        "actionItems": "Aksiyon maddeleri",
+        "topics": "Konular",
+        "sentiment": "Ton",
+        "keyQuotes": "Önemli alıntılar"
+      },
+      "sentimentProductive": "Verimli",
+      "sentimentTense": "Gergin",
+      "sentimentCasual": "Samimi",
+      "sentimentNeutral": "Nötr",
+      "assigneeUnassigned": "Atanmamış",
+      "noDeadline": "Süre yok"
+    }
+  },
+  "share": {
+    "title": "Bu toplantıyı paylaş",
+    "description": "Bu bağlantıya sahip olan herkes “{{title}}” toplantısını giriş yapmadan açabilir.",
+    "copy": "Bağlantıyı kopyala",
+    "copied": "Kopyalandı",
+    "revoke": "Bağlantıyı iptal et",
+    "revokeConfirm": "Mevcut bağlantı geçersiz olacak. Bağlantıya sahip herkes erişimini kaybeder.",
+    "generating": "Bağlantı oluşturuluyor…",
+    "disclosure": "Sadece transkript ve özetin salt okunur görünümü paylaşılır. Ses dosyası paylaşılmaz."
+  },
+  "shared": {
+    "title": "Paylaşılan toplantı",
+    "expiredOrInvalidTitle": "Bağlantı kullanılamıyor",
+    "expiredOrInvalid": "Bu paylaşım bağlantısı geçersiz ya da iptal edilmiş.",
+    "footerLine": "MeetingMind ile paylaşıldı",
+    "footerCta": "MeetingMind'ı dene →"
+  },
+  "notFound": {
+    "title": "404",
+    "body": "Aradığın sayfayı bulamadık.",
+    "action": "Ana sayfaya dön"
   },
   "errors": {
     "networkError": "Bir şeyler ters gitti. Bağlantını kontrol edip tekrar dene.",
-    "retry": "Tekrar dene"
+    "retry": "Tekrar dene",
+    "boundaryTitle": "Bir şeyler ters gitti",
+    "boundaryBody": "Beklenmeyen bir hata uygulamayı durdurdu. Yeniden başlamak için sayfayı yenile.",
+    "reload": "Yeniden yükle"
   },
   "footer": {
     "rights": "Tüm hakları saklıdır.",

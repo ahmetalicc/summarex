@@ -126,11 +126,85 @@
     "statusDone": "Ready",
     "statusError": "Failed",
     "duration": "Duration",
-    "createdAt": "Created"
+    "createdAt": "Created",
+    "detailBack": "Back to dashboard",
+    "editTitle": "Edit title",
+    "share": "Share",
+    "regenerate": "Regenerate summary",
+    "regenerating": "Regenerating…",
+    "regenerateConfirmTitle": "Regenerate the summary?",
+    "regenerateConfirmBody": "We'll re-run the summary on the existing transcript. The current summary will be replaced.",
+    "regenerateConfirmAction": "Regenerate",
+    "delete": "Delete",
+    "deleteConfirmTitle": "Delete this meeting?",
+    "deleteConfirmBody": "“{{title}}” and its transcript, summary, and audio file will be permanently removed. This can't be undone.",
+    "deleteConfirmAction": "Delete",
+    "errorTitle": "This meeting hit a snag",
+    "tryAgain": "Try again",
+    "transcriptTitle": "Transcript",
+    "transcriptCopy": "Copy",
+    "transcriptCopied": "Copied",
+    "transcriptCopyTimestamp": "Copy timestamp",
+    "transcriptSegmentCount_one": "{{count}} segment",
+    "transcriptSegmentCount_other": "{{count}} segments",
+    "transcriptEmpty": "No transcript available yet.",
+    "summaryTitle": "Summary",
+    "processing": {
+      "title": "Processing your meeting",
+      "subtitle": "Hang tight — this usually takes 1–3 minutes.",
+      "steps": {
+        "uploaded": "Uploaded",
+        "transcribing": "Transcribing audio",
+        "summarizing": "Summarizing with Claude",
+        "done": "Done"
+      }
+    },
+    "summary": {
+      "empty": "Nothing here yet.",
+      "sections": {
+        "overview": "Overview",
+        "decisions": "Decisions",
+        "actionItems": "Action items",
+        "topics": "Topics",
+        "sentiment": "Sentiment",
+        "keyQuotes": "Key quotes"
+      },
+      "sentimentProductive": "Productive",
+      "sentimentTense": "Tense",
+      "sentimentCasual": "Casual",
+      "sentimentNeutral": "Neutral",
+      "assigneeUnassigned": "Unassigned",
+      "noDeadline": "No deadline"
+    }
+  },
+  "share": {
+    "title": "Share this meeting",
+    "description": "Anyone with this link can open “{{title}}” without signing in.",
+    "copy": "Copy link",
+    "copied": "Copied",
+    "revoke": "Revoke link",
+    "revokeConfirm": "This will invalidate the existing link. Anyone holding it will lose access.",
+    "generating": "Generating link…",
+    "disclosure": "Read-only view of the transcript and summary. No audio file is shared."
+  },
+  "shared": {
+    "title": "Shared meeting",
+    "expiredOrInvalidTitle": "Link unavailable",
+    "expiredOrInvalid": "This share link is invalid or has been revoked.",
+    "footerLine": "Shared via MeetingMind",
+    "footerCta": "Try MeetingMind →"
+  },
+  "notFound": {
+    "title": "404",
+    "body": "We couldn't find that page.",
+    "action": "Back to home"
   },
   "errors": {
     "networkError": "Something went wrong. Check your connection and try again.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "boundaryTitle": "Something went wrong",
+    "boundaryBody": "An unexpected error interrupted the app. Reload to start fresh.",
+    "reload": "Reload"
   },
   "footer": {
     "rights": "All rights reserved.",
