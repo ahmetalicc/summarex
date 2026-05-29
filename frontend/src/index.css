@@ -36,6 +36,7 @@
   --color-bg-surface: 20 27 45;
   --color-bg-elevated: 27 34 54;
   --color-primary: 0 212 170;
+  --color-primary-hover: 0 184 148;
   --color-accent: 245 166 35;
   --color-text: 226 232 240;
   --color-text-muted: 148 163 184;
@@ -47,6 +48,7 @@
   --color-bg-surface: 255 255 255;
   --color-bg-elevated: 244 244 246;
   --color-primary: 0 184 148;
+  --color-primary-hover: 0 160 130;
   --color-accent: 217 119 6;
   --color-text: 15 23 42;
   --color-text-muted: 71 85 105;

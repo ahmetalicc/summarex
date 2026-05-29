@@ -71,7 +71,18 @@
     "toSignUp": "Hesabın yok mu? Kayıt ol",
     "toSignIn": "Zaten hesabın var mı? Giriş yap",
     "forgotPassword": "Şifreni mi unuttun?",
-    "sendResetLink": "Sıfırlama bağlantısı gönder"
+    "sendResetLink": "Sıfırlama bağlantısı gönder",
+    "backToSignIn": "Girişe dön",
+    "sendingReset": "Bağlantı gönderiliyor…",
+    "checkEmailTitle": "Gelen kutunu kontrol et",
+    "checkEmailBody": "Sana bir onay bağlantısı gönderdik. Hesabını etkinleştirmek için bağlantıya tıkla, ardından giriş yapmak için geri dön.",
+    "resetSentTitle": "Sıfırlama bağlantısı gönderildi",
+    "resetSentBody": "Bu adrese ait bir hesap varsa, şifreni sıfırlamak için bir bağlantı içeren e-posta alacaksın.",
+    "errorInvalidCredentials": "E-posta veya şifre hatalı görünüyor. Lütfen tekrar dene.",
+    "errorEmailInUse": "Bu e-posta ile bir hesap zaten var. Bunun yerine giriş yapmayı dene.",
+    "errorWeakPassword": "Şifren çok kısa. En az 6 karakter kullan.",
+    "errorEmailNotConfirmed": "Lütfen önce e-postanı onayla. Etkinleştirme bağlantısı için gelen kutunu kontrol et.",
+    "errorGeneric": "Bir şeyler ters gitti. Lütfen birazdan tekrar dene."
   },
   "dashboard": {
     "title": "Toplantıların",
