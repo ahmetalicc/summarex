@@ -7,23 +7,23 @@ const config: Config = {
     extend: {
       colors: {
         bg: {
-          DEFAULT: '#0A0F1C',
-          surface: '#141B2D',
-          elevated: '#1B2236',
+          DEFAULT: 'rgb(var(--color-bg) / <alpha-value>)',
+          surface: 'rgb(var(--color-bg-surface) / <alpha-value>)',
+          elevated: 'rgb(var(--color-bg-elevated) / <alpha-value>)',
         },
         primary: {
-          DEFAULT: '#00D4AA',
-          hover: '#00B894',
+          DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)',
+          hover: 'rgb(var(--color-primary-hover) / <alpha-value>)',
         },
         accent: {
-          DEFAULT: '#F5A623',
+          DEFAULT: 'rgb(var(--color-accent) / <alpha-value>)',
         },
         text: {
-          DEFAULT: '#E2E8F0',
-          muted: '#94A3B8',
+          DEFAULT: 'rgb(var(--color-text) / <alpha-value>)',
+          muted: 'rgb(var(--color-text-muted) / <alpha-value>)',
         },
         border: {
-          DEFAULT: '#1E293B',
+          DEFAULT: 'rgb(var(--color-border) / <alpha-value>)',
         },
         success: '#10B981',
         error: '#EF4444',
