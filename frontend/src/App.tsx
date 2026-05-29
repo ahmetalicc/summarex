@@ -1,21 +1,36 @@
-import { useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Suspense, lazy, useEffect } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { AuthGuard } from './components/auth/AuthGuard';
 import { Layout } from './components/layout/Layout';
+import { RouteFallback } from './components/RouteFallback';
 import { useThemeStore } from './store/themeStore';
 import { useLanguageStore } from './store/languageStore';
 import i18n from './lib/i18n';
-import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import RecordPage from './pages/RecordPage';
-import MeetingDetail from './pages/MeetingDetail';
-import SharedMeeting from './pages/SharedMeeting';
-import NotFound from './pages/NotFound';
+
+const Landing = lazy(() => import('./pages/Landing'));
+const Login = lazy(() => import('./pages/Login'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const RecordPage = lazy(() => import('./pages/RecordPage'));
+const MeetingDetail = lazy(() => import('./pages/MeetingDetail'));
+const SharedMeeting = lazy(() => import('./pages/SharedMeeting'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+
+const PAGE_TRANSITION = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: { duration: 0.15, ease: 'easeOut' as const },
+};
+
+function PageWrapper({ children }: { children: React.ReactNode }) {
+  return <motion.div {...PAGE_TRANSITION}>{children}</motion.div>;
+}
 
 function App() {
   const theme = useThemeStore((s) => s.theme);
   const language = useLanguageStore((s) => s.language);
+  const location = useLocation();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -36,38 +51,42 @@ function App() {
   }, [language]);
 
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/dashboard"
-          element={
-            <AuthGuard>
-              <Dashboard />
-            </AuthGuard>
-          }
-        />
-        <Route
-          path="/record"
-          element={
-            <AuthGuard>
-              <RecordPage />
-            </AuthGuard>
-          }
-        />
-        <Route
-          path="/meetings/:id"
-          element={
-            <AuthGuard>
-              <MeetingDetail />
-            </AuthGuard>
-          }
-        />
-        <Route path="/shared/:token" element={<SharedMeeting />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
-    </Routes>
+    <Suspense fallback={<RouteFallback />}>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route element={<Layout />}>
+            <Route path="/" element={<PageWrapper><Landing /></PageWrapper>} />
+            <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+            <Route
+              path="/dashboard"
+              element={
+                <AuthGuard>
+                  <PageWrapper><Dashboard /></PageWrapper>
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/record"
+              element={
+                <AuthGuard>
+                  <PageWrapper><RecordPage /></PageWrapper>
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/meetings/:id"
+              element={
+                <AuthGuard>
+                  <PageWrapper><MeetingDetail /></PageWrapper>
+                </AuthGuard>
+              }
+            />
+            <Route path="/shared/:token" element={<PageWrapper><SharedMeeting /></PageWrapper>} />
+            <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
+          </Route>
+        </Routes>
+      </AnimatePresence>
+    </Suspense>
   );
 }
 
