@@ -50,6 +50,74 @@ cp .env.example .env           # then fill in VITE_* keys
 npm run dev
 ```
 
+## Deployment
+
+The backend deploys to **Render** (Docker) and the frontend to **Vercel**. Supabase is a
+hosted project — there is nothing to deploy for the database beyond applying the migrations.
+Tone here is operational: follow the steps in order.
+
+### 1. Prerequisites
+
+- A Supabase project (free tier is fine).
+- Apply the migrations in order via **Supabase Dashboard → SQL Editor**: paste and run
+  `supabase/migrations/001_*.sql` (schema + RLS), then `supabase/migrations/002_*.sql`
+  (storage bucket).
+- **Authentication → Providers → Email**: enable Email auth. Decide whether to keep
+  **"Confirm email"** ON (users must click a link before logging in) or OFF (instant login,
+  simpler for a demo). This choice affects the redirect URLs you configure in step 4.
+- Have your `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` ready.
+
+### 2. Backend → Render
+
+1. In Render, choose **New → Blueprint** and point it at this GitHub repo. Render reads
+   [`render.yaml`](render.yaml) and provisions the `meetingmind-backend` web service
+   (Docker runtime, Frankfurt region, free plan).
+2. Set the secret env vars in the dashboard (they are `sync: false` in the blueprint, so they
+   are never committed): `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
+   `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `BACKEND_URL`, `FRONTEND_URL`.
+   - **`SUPABASE_URL` must be the bare host** — e.g. `https://abcdefgh.supabase.co`. Do **not**
+     append `/rest/v1`, `/auth/v1`, or a trailing slash.
+3. The deploy URL looks like `https://meetingmind-backend.onrender.com`. The `master` branch
+   is wired for auto-deploy — every push to `master` triggers a new build.
+
+> **Free plan note:** the service sleeps after 15 minutes of inactivity; the first request
+> after sleep takes ~30–60s to wake (cold start). Upgrade to **Starter ($7/mo)** before any
+> mobile launch to remove cold starts.
+
+### 3. Frontend → Vercel
+
+1. Import the GitHub repo into Vercel and set the **Root Directory** to `frontend/`. Vercel
+   detects Vite; [`frontend/vercel.json`](frontend/vercel.json) pins the build, SPA rewrites,
+   and asset caching.
+2. Set env vars: `VITE_SUPABASE_URL` (bare host, same no-suffix rule), `VITE_SUPABASE_ANON_KEY`,
+   `VITE_API_URL` (= the Render backend URL from step 2), and `VITE_APP_URL` (set this to the
+   Vercel URL once the first deploy assigns one).
+3. SPA routing on hard-refresh (e.g. `/dashboard`, `/meetings/:id`) and long-lived asset
+   caching come from `vercel.json` automatically.
+
+### 4. Post-deploy wiring
+
+Once both services are live, close the loop so CORS and auth redirects line up:
+
+- On **Render**, set `FRONTEND_URL` to the real Vercel URL (the backend's CORS allow-list
+  depends on it) and redeploy.
+- On **Vercel**, set `VITE_APP_URL` to its own URL (auth redirect links depend on it) and
+  redeploy.
+- In **Supabase Dashboard → Authentication → URL Configuration**, add the Vercel URL to both
+  **Site URL** and **Redirect URLs** so email confirmation and password-reset links resolve
+  back to the app.
+
+### 5. Local container run (optional)
+
+To run the production backend image locally instead of `uvicorn --reload`:
+
+```bash
+docker build -t meetingmind-backend ./backend && \
+  docker run --rm --env-file backend/.env -p 8000:8000 meetingmind-backend
+```
+
+The frontend stays on `npm run dev` for hot reload during local development.
+
 ## Development Workflow
 
 This project follows the multi-agent workflow defined in [meetingmind-claude-code-prompt.md](meetingmind-claude-code-prompt.md).
