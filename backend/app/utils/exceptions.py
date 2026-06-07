@@ -1,7 +1,7 @@
 """Domain exceptions. The global handler in main.py converts these to HTTP responses."""
 
 
-class MeetingMindError(Exception):
+class SummarexError(Exception):
     status_code: int = 500
     default_detail: str = "Internal server error"
 
@@ -10,26 +10,26 @@ class MeetingMindError(Exception):
         super().__init__(self.detail)
 
 
-class UnauthorizedError(MeetingMindError):
+class UnauthorizedError(SummarexError):
     status_code = 401
     default_detail = "Authentication required"
 
 
-class ForbiddenError(MeetingMindError):
+class ForbiddenError(SummarexError):
     status_code = 403
     default_detail = "Access denied"
 
 
-class MeetingNotFoundError(MeetingMindError):
+class MeetingNotFoundError(SummarexError):
     status_code = 404
     default_detail = "Meeting not found"
 
 
-class AudioValidationError(MeetingMindError):
+class AudioValidationError(SummarexError):
     status_code = 400
     default_detail = "Invalid audio file"
 
 
-class ExternalServiceError(MeetingMindError):
+class ExternalServiceError(SummarexError):
     status_code = 502
     default_detail = "Upstream service error"
