@@ -44,6 +44,17 @@
     "demoTitle": "Yapay zekâ aslında sana ne veriyor.",
     "demoSubtitle": "Diğer tarafta seni neyin beklediğini gösteren gerçekçi bir örnek.",
     "demoTranscriptLabel": "Transkript",
+    "demoTranscript": {
+      "badge": "Whisper · TR",
+      "line1Speaker": "Maya",
+      "line1Text": "Hızlıca toparlayalım — Q2 planlaması. Bugün üç karar alarak çıkmak istiyorum.",
+      "line2Speaker": "Diego",
+      "line2Text": "Fiyatlandırma denemesi %14 dönüşüm artışıyla kapandı. Bence önümüzdeki hafta %100'e açalım.",
+      "line3Speaker": "Aisha",
+      "line3Text": "Katılıyorum — Maya, duyuru e-postasını sen üstlenebilir misin? Ben de dashboard güncellemelerini hallederim.",
+      "line4Speaker": "Maya",
+      "line4Text": "Anlaştık. Salı'ya yayın için kilitleyelim, iki hafta sonra churn metriklerine geri dönelim."
+    },
     "demoSummaryLabel": "Özet",
     "demoOverview": "Genel bakış",
     "demoOverviewText": "Fiyatlama deneyinin sonuçlarını ve yayılma planını kapsayan Q2 planlama toplantısı. Sonraki adımlarda güçlü uyum.",

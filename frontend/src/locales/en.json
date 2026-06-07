@@ -44,6 +44,17 @@
     "demoTitle": "What the AI actually gives you.",
     "demoSubtitle": "A real-looking example so you know what to expect on the other side.",
     "demoTranscriptLabel": "Transcript",
+    "demoTranscript": {
+      "badge": "Whisper · EN",
+      "line1Speaker": "Maya",
+      "line1Text": "Quick reset before we dive in — Q2 planning. I want to walk away with three decisions today.",
+      "line2Speaker": "Diego",
+      "line2Text": "The pricing experiment landed at +14% conversion. I'd vote we roll it to 100% next week.",
+      "line3Speaker": "Aisha",
+      "line3Text": "Agreed — and Maya, can you own the announcement email? I'll handle the dashboard updates.",
+      "line4Speaker": "Maya",
+      "line4Text": "Done. Let's lock the rollout for Tuesday and revisit churn metrics in two weeks."
+    },
     "demoSummaryLabel": "Summary",
     "demoOverview": "Overview",
     "demoOverviewText": "Q2 planning sync covering the pricing experiment results and rollout plan. Strong alignment on next steps.",

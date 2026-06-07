@@ -150,31 +150,17 @@ export default function Landing() {
                   <h3 className="text-sm font-semibold uppercase tracking-wider text-text-muted">
                     {t('landing.demoTranscriptLabel')}
                   </h3>
-                  <Badge variant="info">Whisper · EN</Badge>
+                  <Badge variant="info">{t('landing.demoTranscript.badge')}</Badge>
                 </div>
                 <div className="space-y-3 text-sm leading-relaxed">
-                  {[
-                    {
-                      time: '00:12',
-                      who: 'Maya',
-                      text: "Quick reset before we dive in — Q2 planning. I want to walk away with three decisions today.",
-                    },
-                    {
-                      time: '01:34',
-                      who: 'Diego',
-                      text: "The pricing experiment landed at +14% conversion. I'd vote we roll it to 100% next week.",
-                    },
-                    {
-                      time: '03:08',
-                      who: 'Aisha',
-                      text: "Agreed — and Maya, can you own the announcement email? I'll handle the dashboard updates.",
-                    },
-                    {
-                      time: '04:52',
-                      who: 'Maya',
-                      text: "Done. Let's lock the rollout for Tuesday and revisit churn metrics in two weeks.",
-                    },
-                  ].map((line) => (
+                  {(
+                    [
+                      { time: '00:12', who: t('landing.demoTranscript.line1Speaker'), text: t('landing.demoTranscript.line1Text') },
+                      { time: '01:34', who: t('landing.demoTranscript.line2Speaker'), text: t('landing.demoTranscript.line2Text') },
+                      { time: '03:08', who: t('landing.demoTranscript.line3Speaker'), text: t('landing.demoTranscript.line3Text') },
+                      { time: '04:52', who: t('landing.demoTranscript.line4Speaker'), text: t('landing.demoTranscript.line4Text') },
+                    ] as const
+                  ).map((line) => (
                     <div key={line.time} className="flex gap-3">
                       <span className="mt-0.5 inline-flex h-6 shrink-0 items-center rounded-md border border-border/80 bg-bg-elevated px-1.5 font-mono text-[10px] text-text-muted">
                         {line.time}
