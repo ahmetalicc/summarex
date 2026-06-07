@@ -57,7 +57,7 @@ async def create_meeting_from_audio(
     try:
         meeting = svc.create_meeting(
             user_id=user_id,
-            title=title or "Untitled Meeting",
+            title=title or None,
             audio_url=audio_path,
             duration_seconds=None,
             meeting_id=meeting_id,

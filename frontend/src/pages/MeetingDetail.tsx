@@ -31,6 +31,7 @@ import {
   TrashIcon,
 } from '../components/layout/Icons';
 import type { MeetingStatus } from '../types/meeting';
+import { displayTitle } from '../lib/meetingTitle';
 
 function statusKey(status: MeetingStatus): string {
   switch (status) {
@@ -88,7 +89,7 @@ export default function MeetingDetail() {
   const isError = meetingQuery.isError;
 
   const title = useMemo(
-    () => meeting?.title || t('meeting.untitled'),
+    () => displayTitle(meeting?.title, t),
     [meeting?.title, t],
   );
 
