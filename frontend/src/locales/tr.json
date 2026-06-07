@@ -96,7 +96,7 @@
     "emptySearchDescription": "Bu aramaya uyan bir şey yok. Farklı bir başlık dene ya da kutuyu temizle.",
     "loadMore": "Daha fazla yükle",
     "deleteConfirmTitle": "Bu kayıt silinsin mi?",
-    "deleteConfirmBody": ""{{title}}" ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
+    "deleteConfirmBody": "\"{{title}}\" ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
     "deleteConfirmAction": "Sil"
   },
   "recording": {
@@ -148,7 +148,7 @@
     "regenerateConfirmAction": "Yenile",
     "delete": "Sil",
     "deleteConfirmTitle": "Bu kayıt silinsin mi?",
-    "deleteConfirmBody": ""{{title}}" ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
+    "deleteConfirmBody": "\"{{title}}\" ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
     "deleteConfirmAction": "Sil",
     "errorTitle": "Bu kayıtta bir sorun oluştu",
     "tryAgain": "Tekrar dene",
@@ -190,7 +190,7 @@
   },
   "share": {
     "title": "Bu kaydı paylaş",
-    "description": "Bu bağlantıya sahip olan herkes "{{title}}" kaydını giriş yapmadan açabilir.",
+    "description": "Bu bağlantıya sahip olan herkes \"{{title}}\" kaydını giriş yapmadan açabilir.",
     "copy": "Bağlantıyı kopyala",
     "copied": "Kopyalandı",
     "revoke": "Bağlantıyı iptal et",
@@ -222,5 +222,79 @@
     "privacy": "Gizlilik",
     "terms": "Şartlar",
     "github": "GitHub"
+  },
+  "privacy": {
+    "pageTitle": "Gizlilik Politikası",
+    "lastUpdated": "Son güncelleme: 7 Haziran 2026",
+    "betaBanner": "Beta — taslak içerik, hukuki tavsiye değildir",
+    "intro": {
+      "heading": "Giriş",
+      "body": "Summarex şu an beta aşamasındadır. Bu politika, hizmetimizi kullanırken verilerinizi nasıl işlediğimizi açıklamaktadır. Basit ve dürüst tutuyoruz: verileriniz sizindir."
+    },
+    "dataCollected": {
+      "heading": "Topladığımız Veriler",
+      "body": "Hesap e-posta adresinizi, uygulama üzerinden yüklediğiniz veya kaydettiğiniz ses dosyalarını, bu seslerden üretilen transkript ve özetleri, zaman damgaları ve dosya boyutları gibi temel kullanım meta verilerini topluyoruz."
+    },
+    "howWeUseIt": {
+      "heading": "Verilerinizi Nasıl Kullanıyoruz",
+      "body": "Verileriniz yalnızca Summarex hizmetini sunmak — sesinizi metne dökmek ve özetler oluşturmak — amacıyla kullanılır. Verilerinizi satmıyor ya da reklam amaçlı kullanmıyoruz."
+    },
+    "thirdParties": {
+      "heading": "Üçüncü Taraf Sağlayıcılar",
+      "body": "Summarex aşağıdaki sağlayıcılara dayanmaktadır. Ses içeriğiniz işlenmek üzere bu hizmetlere gönderilir: Supabase (kimlik doğrulama ve dosya depolama), OpenAI Whisper (ses transkripsiyonu), Anthropic Claude (yapay zekâ özetleri)."
+    },
+    "retention": {
+      "heading": "Veri Saklama",
+      "body": "Kayıtlarınız siz silene ya da hesabınızı kapatana kadar tutulur. Bir kaydı silmek; ilgili ses dosyasını, transkripti ve özeti kalıcı olarak kaldırır."
+    },
+    "rights": {
+      "heading": "Haklarınız",
+      "body": "Panelden istediğiniz zaman herhangi bir kaydı silebilirsiniz. Tüm hesabınızı ve verilerinizi silmek için aşağıdaki e-posta adresinden bize ulaşın."
+    },
+    "contact": {
+      "heading": "İletişim",
+      "body": "Bu politika hakkında sorularınız mı var? Bize şu adresten ulaşın:"
+    }
+  },
+  "terms": {
+    "pageTitle": "Kullanım Şartları",
+    "lastUpdated": "Son güncelleme: 7 Haziran 2026",
+    "betaBanner": "Beta — taslak içerik, hukuki tavsiye değildir",
+    "intro": {
+      "heading": "Giriş",
+      "body": "Summarex, ücretsiz sunulan bir beta hizmetidir. Summarex'i kullanarak bu şartları kabul etmiş olursunuz. Hizmet; kullanılabilirlik, doğruluk veya belirli bir amaca uygunluk garantisi olmaksızın olduğu gibi sunulmaktadır."
+    },
+    "account": {
+      "heading": "Hesap",
+      "body": "Kişi başına bir hesap açılabilir. Giriş bilgilerinizi güvende tutun — hesabınız altında gerçekleşen tüm etkinliklerden siz sorumlusunuz."
+    },
+    "acceptableUse": {
+      "heading": "Kabul Edilebilir Kullanım",
+      "body": "Paylaşma hakkına sahip olmadığınız içerikleri yüklemeyin. Yasadışı, zararlı veya izinsiz kaydedilmiş ses dosyaları yüklemeyin. Bu kuralları ihlal eden içerikleri kaldırma hakkımız saklıdır."
+    },
+    "aiAccuracy": {
+      "heading": "Yapay Zekâ Doğruluğu",
+      "body": "Transkriptler ve özetler yapay zekâ tarafından oluşturulur ve hata ya da eksiklikler içerebilir. Bağımsız inceleme yapmadan bu çıktılara hukuki, tıbbi, finansal veya diğer kritik kararlar için güvenmeyin."
+    },
+    "availability": {
+      "heading": "Hizmet Sürekliliği",
+      "body": "Summarex bir beta hizmetidir; herhangi bir zamanda kesinti, veri kaybı veya erişim sorunu yaşanabilir. Herhangi bir çalışma süresi garantisi veya SLA sunmuyoruz."
+    },
+    "termination": {
+      "heading": "Hesap Askıya Alma",
+      "body": "Bu şartları ihlal eden hesapları önceden bildirim yapmaksızın askıya alabilir ya da sonlandırabiliriz."
+    },
+    "liability": {
+      "heading": "Sorumluluk Sınırı",
+      "body": "Hizmet, açık veya zımni hiçbir garanti olmaksızın \"OLDUĞU GİBİ\" sunulmaktadır. Summarex'in kullanımından doğabilecek doğrudan, dolaylı veya sonuç olarak ortaya çıkan zararlardan sorumlu değiliz."
+    },
+    "governingLaw": {
+      "heading": "Geçerli Hukuk",
+      "body": "Bu şartlar Türk hukukuna tabidir. Anlaşmazlıklar Türkiye mahkemelerinde çözüme kavuşturulur."
+    },
+    "contact": {
+      "heading": "İletişim",
+      "body": "Bu şartlar hakkında sorularınız mı var? Bize şu adresten ulaşın:"
+    }
   }
 }
