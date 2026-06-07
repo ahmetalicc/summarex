@@ -54,4 +54,4 @@ jobs:
         with:
           context: ./backend
           push: false
-          tags: meetingmind-backend:ci
+          tags: summarex-backend:ci
