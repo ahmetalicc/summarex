@@ -29,11 +29,11 @@ class ClaudeService:
         if self._client is None:
             if not settings.ANTHROPIC_API_KEY:
                 raise ExternalServiceError("ANTHROPIC_API_KEY not configured")
-            from anthropic import Anthropic
-            self._client = Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+            from anthropic import AsyncAnthropic
+            self._client = AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
         return self._client
 
-    def summarize(self, transcript_text: str) -> dict:
+    async def summarize(self, transcript_text: str) -> dict:
         """Return {overview, decisions, action_items, topics, sentiment, key_quotes, raw_response}.
 
         `raw_response` is the verbatim text Claude returned (for the raw_ai_response column).
@@ -41,7 +41,7 @@ class ClaudeService:
         client = self._ensure_client()
         started = time.monotonic()
         try:
-            response = client.messages.create(
+            response = await client.messages.create(
                 model=self.MODEL,
                 max_tokens=self.MAX_TOKENS,
                 system=SUMMARIZATION_SYSTEM_PROMPT,

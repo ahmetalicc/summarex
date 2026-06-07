@@ -17,8 +17,6 @@ _COST_PER_MINUTE_USD = 0.006
 
 
 class WhisperService:
-    MODEL = "whisper-1"
-
     def __init__(self) -> None:
         self._client = None
 
@@ -26,21 +24,27 @@ class WhisperService:
         if self._client is None:
             if not settings.OPENAI_API_KEY:
                 raise ExternalServiceError("OPENAI_API_KEY not configured")
-            from openai import OpenAI
-            self._client = OpenAI(api_key=settings.OPENAI_API_KEY)
+            from openai import AsyncOpenAI
+            self._client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
         return self._client
 
-    def transcribe(self, audio_file: BinaryIO, language: str | None = None) -> dict:
+    async def transcribe(self, audio_file: BinaryIO, language: str | None = None) -> dict:
         """Transcribe a file-like audio object.
 
         `language`: optional ISO-639-1 hint ('en' or 'tr'). If None, Whisper auto-detects.
         Returns: {full_text, language, segments, duration_seconds}.
+
+        NOTE: response_format='verbose_json' + timestamp_granularities=['segment'] requires
+        whisper-1. gpt-4o-mini-transcribe does not support this combination, so
+        OPENAI_TRANSCRIPTION_MODEL must stay 'whisper-1' while the transcript UI renders
+        per-segment timestamps.
         """
         client = self._ensure_client()
+        model = settings.OPENAI_TRANSCRIPTION_MODEL
         started = time.monotonic()
         try:
-            response = client.audio.transcriptions.create(
-                model=self.MODEL,
+            response = await client.audio.transcriptions.create(
+                model=model,
                 file=audio_file,
                 response_format="verbose_json",
                 timestamp_granularities=["segment"],
@@ -61,8 +65,8 @@ class WhisperService:
             for s in (getattr(response, "segments", None) or [])
         ]
         log.info(
-            "Whisper transcribe: api=%.2fs audio=%.2fs cost=$%.4f lang=%s->%s segments=%d",
-            api_seconds, audio_seconds, cost, raw_language, normalized_language, len(segments),
+            "Whisper transcribe: model=%s api=%.2fs audio=%.2fs cost=$%.4f lang=%s->%s segments=%d",
+            model, api_seconds, audio_seconds, cost, raw_language, normalized_language, len(segments),
         )
         return {
             "full_text": response.text,
