@@ -9,6 +9,7 @@ import { Spinner } from '../ui/Spinner';
 import { Button } from '../ui/Button';
 import { TrashIcon } from '../layout/Icons';
 import { cn } from '../../lib/utils';
+import { displayTitle } from '../../lib/meetingTitle';
 import type { Meeting, MeetingStatus } from '../../types/meeting';
 import { useDeleteMeeting } from '../../hooks/useMeetings';
 
@@ -106,7 +107,7 @@ export function MeetingCard({ meeting }: MeetingCardProps) {
         >
           <div className="flex items-start justify-between gap-3">
             <h3 className="line-clamp-1 text-base font-semibold text-text">
-              {meeting.title || t('meeting.untitled')}
+              {displayTitle(meeting.title, t)}
             </h3>
             <button
               type="button"
@@ -142,7 +143,7 @@ export function MeetingCard({ meeting }: MeetingCardProps) {
       >
         <p className="text-sm text-text-muted">
           {t('dashboard.deleteConfirmBody', {
-            title: meeting.title || t('meeting.untitled'),
+            title: displayTitle(meeting.title, t),
           })}
         </p>
         {deleteMutation.isError && (

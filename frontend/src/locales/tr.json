@@ -1,7 +1,7 @@
 {
   "common": {
     "brand": "Summarex",
-    "tagline": "Her toplantıyı yakala. Her dakikayı anla.",
+    "tagline": "Kaydet. Metne döndür. Anla.",
     "getStarted": "Başla",
     "signIn": "Giriş yap",
     "signOut": "Çıkış yap",
@@ -16,13 +16,13 @@
     "cancel": "Vazgeç"
   },
   "landing": {
-    "heroEyebrow": "Yapay zekâ destekli toplantı zekâsı",
-    "heroTitle": "Her toplantı, anında anlaşılır.",
-    "heroSubtitle": "Sesi kaydet ya da yükle. Summarex metne döker, kararları öne çıkarır ve konuşmayı paylaşılabilir aksiyon maddelerine çevirir — saatler değil dakikalar içinde.",
+    "heroEyebrow": "Yapay zekâ destekli ses zekâsı",
+    "heroTitle": "Saatler süren ses, dakikalar içinde özet.",
+    "heroSubtitle": "Canlı kaydet ya da dosya yükle. Summarex metne döker, kilit noktaları öne çıkarır ve uzun sesi — toplantılar, dersler, röportajlar, podcastler — taranabilir bir özete dönüştürür.",
     "ctaPrimary": "Summarex'i dene",
     "ctaSecondary": "Nasıl çalıştığını gör",
     "featuresTitle": "Ham sesten net adımlara.",
-    "featuresSubtitle": "Dört adım, tek akış. Ertesi gün 'bunu kim üstlenecekti?' soruları bitiyor.",
+    "featuresSubtitle": "Dört adım, tek akış. Uzun bir kayıttan gerçekten kullanabileceğin bir şeye.",
     "features": {
       "record": {
         "title": "Kaydet ya da yükle",
@@ -44,6 +44,17 @@
     "demoTitle": "Yapay zekâ aslında sana ne veriyor.",
     "demoSubtitle": "Diğer tarafta seni neyin beklediğini gösteren gerçekçi bir örnek.",
     "demoTranscriptLabel": "Transkript",
+    "demoTranscript": {
+      "badge": "Whisper · TR",
+      "line1Speaker": "Maya",
+      "line1Text": "Hızlıca toparlayalım — Q2 planlaması. Bugün üç karar alarak çıkmak istiyorum.",
+      "line2Speaker": "Diego",
+      "line2Text": "Fiyatlandırma denemesi %14 dönüşüm artışıyla kapandı. Bence önümüzdeki hafta %100'e açalım.",
+      "line3Speaker": "Aisha",
+      "line3Text": "Katılıyorum — Maya, duyuru e-postasını sen üstlenebilir misin? Ben de dashboard güncellemelerini hallederim.",
+      "line4Speaker": "Maya",
+      "line4Text": "Anlaştık. Salı'ya yayın için kilitleyelim, iki hafta sonra churn metriklerine geri dönelim."
+    },
     "demoSummaryLabel": "Özet",
     "demoOverview": "Genel bakış",
     "demoOverviewText": "Fiyatlama deneyinin sonuçlarını ve yayılma planını kapsayan Q2 planlama toplantısı. Sonraki adımlarda güçlü uyum.",
@@ -53,13 +64,13 @@
     "demoActions": "Aksiyon maddeleri",
     "demoAction1Task": "Tüm müşterilere yayılma duyurusu e-postasını gönder.",
     "demoAction1Deadline": "Son tarih: Pazartesi",
-    "finalCtaTitle": "Not tutmayı bırak. Toplantıları yönetmeye başla.",
-    "finalCtaSubtitle": "İlk toplantın ücretsiz. Kredi kartı yok. Kurulum yok.",
+    "finalCtaTitle": "Sesi ileri-geri sarmayı bırak. Önemi olanı bul.",
+    "finalCtaSubtitle": "Beta sürecinde ücretsiz. Kart bilgisi yok. Kurulum yok.",
     "finalCtaButton": "Ücretsiz başla"
   },
   "auth": {
     "welcomeTitle": "Tekrar hoş geldin",
-    "welcomeSubtitle": "Toplantılarına erişmek için giriş yap ya da saniyeler içinde hesap oluştur.",
+    "welcomeSubtitle": "Kayıtlarına erişmek için giriş yap ya da saniyeler içinde hesap oluştur.",
     "email": "E-posta",
     "password": "Şifre",
     "emailPlaceholder": "siz@sirket.com",
@@ -85,22 +96,22 @@
     "errorGeneric": "Bir şeyler ters gitti. Lütfen birazdan tekrar dene."
   },
   "dashboard": {
-    "title": "Toplantıların",
-    "subtitle": "Kaydettiğin ya da yüklediğin her görüşme — aranabilir ve tekrar açılmaya hazır.",
+    "title": "Kayıtların",
+    "subtitle": "Kaydettiğin ya da yüklediğin her kayıt — aranabilir ve tekrar açılmaya hazır.",
     "newRecording": "Yeni kayıt",
     "searchPlaceholder": "Başlığa göre ara…",
-    "emptyTitle": "Henüz toplantı yok",
-    "emptyDescription": "İlk konuşmanı kaydet ya da bir ses dosyası bırak; akış tamamlanınca burada görünecek.",
-    "emptyCta": "İlk toplantını başlat",
+    "emptyTitle": "Henüz kayıt yok",
+    "emptyDescription": "Ses kaydet ya da dosya bırak; işlem tamamlanınca burada görünecek.",
+    "emptyCta": "İlk kaydını oluştur",
     "emptySearchTitle": "Sonuç yok",
     "emptySearchDescription": "Bu aramaya uyan bir şey yok. Farklı bir başlık dene ya da kutuyu temizle.",
     "loadMore": "Daha fazla yükle",
-    "deleteConfirmTitle": "Bu toplantı silinsin mi?",
-    "deleteConfirmBody": "“{{title}}” ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
+    "deleteConfirmTitle": "Bu kayıt silinsin mi?",
+    "deleteConfirmBody": "\"{{title}}\" ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
     "deleteConfirmAction": "Sil"
   },
   "recording": {
-    "title": "Bir toplantı başlat",
+    "title": "Yeni bir kayıt başlat",
     "subtitle": "Tarayıcıdan canlı kaydet ya da elindeki sesi yükle. İkisi de işe yarar.",
     "recordTab": "Kaydet",
     "uploadTab": "Yükle",
@@ -120,7 +131,7 @@
     "uploadButton": "Yükle",
     "uploading": "Yükleniyor…",
     "titleLabel": "Başlık (isteğe bağlı)",
-    "titlePlaceholder": "ör. Q2 planlama toplantısı",
+    "titlePlaceholder": "ör. Q2 planlama kaydı",
     "timerLabel": "Kayıt süresi",
     "dragHere": "Ses dosyanı buraya bırak",
     "acceptHint": "Desteklenen: {{extensions}} · en fazla {{maxMb}} MB",
@@ -130,7 +141,7 @@
     "fileTooLarge": "Dosya 100 MB'ı aşıyor. Daha küçük bir dosya dene."
   },
   "meeting": {
-    "untitled": "Başlıksız toplantı",
+    "untitled": "Başlıksız kayıt",
     "statusQueued": "Sırada",
     "statusTranscribing": "Metne dönüştürülüyor",
     "statusSummarizing": "Özetleniyor",
@@ -147,10 +158,10 @@
     "regenerateConfirmBody": "Mevcut transkript üzerinden özet tekrar oluşturulacak. Şu anki özetin yerine geçecek.",
     "regenerateConfirmAction": "Yenile",
     "delete": "Sil",
-    "deleteConfirmTitle": "Bu toplantı silinsin mi?",
-    "deleteConfirmBody": "“{{title}}” ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
+    "deleteConfirmTitle": "Bu kayıt silinsin mi?",
+    "deleteConfirmBody": "\"{{title}}\" ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
     "deleteConfirmAction": "Sil",
-    "errorTitle": "Bu toplantıda bir sorun oluştu",
+    "errorTitle": "Bu kayıtta bir sorun oluştu",
     "tryAgain": "Tekrar dene",
     "transcriptTitle": "Transkript",
     "transcriptCopy": "Kopyala",
@@ -161,7 +172,7 @@
     "transcriptEmpty": "Henüz bir transkript yok.",
     "summaryTitle": "Özet",
     "processing": {
-      "title": "Toplantı işleniyor",
+      "title": "Kayıt işleniyor",
       "subtitle": "Dayan — bu genelde 1–3 dakika sürer.",
       "steps": {
         "uploaded": "Yüklendi",
@@ -189,8 +200,8 @@
     }
   },
   "share": {
-    "title": "Bu toplantıyı paylaş",
-    "description": "Bu bağlantıya sahip olan herkes “{{title}}” toplantısını giriş yapmadan açabilir.",
+    "title": "Bu kaydı paylaş",
+    "description": "Bu bağlantıya sahip olan herkes \"{{title}}\" kaydını giriş yapmadan açabilir.",
     "copy": "Bağlantıyı kopyala",
     "copied": "Kopyalandı",
     "revoke": "Bağlantıyı iptal et",
@@ -199,7 +210,7 @@
     "disclosure": "Sadece transkript ve özetin salt okunur görünümü paylaşılır. Ses dosyası paylaşılmaz."
   },
   "shared": {
-    "title": "Paylaşılan toplantı",
+    "title": "Paylaşılan kayıt",
     "expiredOrInvalidTitle": "Bağlantı kullanılamıyor",
     "expiredOrInvalid": "Bu paylaşım bağlantısı geçersiz ya da iptal edilmiş.",
     "footerLine": "Summarex ile paylaşıldı",
@@ -222,5 +233,79 @@
     "privacy": "Gizlilik",
     "terms": "Şartlar",
     "github": "GitHub"
+  },
+  "privacy": {
+    "pageTitle": "Gizlilik Politikası",
+    "lastUpdated": "Son güncelleme: 7 Haziran 2026",
+    "betaBanner": "Beta — taslak içerik, hukuki tavsiye değildir",
+    "intro": {
+      "heading": "Giriş",
+      "body": "Summarex şu an beta aşamasındadır. Bu politika, hizmetimizi kullanırken verilerinizi nasıl işlediğimizi açıklamaktadır. Basit ve dürüst tutuyoruz: verileriniz sizindir."
+    },
+    "dataCollected": {
+      "heading": "Topladığımız Veriler",
+      "body": "Hesap e-posta adresinizi, uygulama üzerinden yüklediğiniz veya kaydettiğiniz ses dosyalarını, bu seslerden üretilen transkript ve özetleri, zaman damgaları ve dosya boyutları gibi temel kullanım meta verilerini topluyoruz."
+    },
+    "howWeUseIt": {
+      "heading": "Verilerinizi Nasıl Kullanıyoruz",
+      "body": "Verileriniz yalnızca Summarex hizmetini sunmak — sesinizi metne dökmek ve özetler oluşturmak — amacıyla kullanılır. Verilerinizi satmıyor ya da reklam amaçlı kullanmıyoruz."
+    },
+    "thirdParties": {
+      "heading": "Üçüncü Taraf Sağlayıcılar",
+      "body": "Summarex aşağıdaki sağlayıcılara dayanmaktadır. Ses içeriğiniz işlenmek üzere bu hizmetlere gönderilir: Supabase (kimlik doğrulama ve dosya depolama), OpenAI Whisper (ses transkripsiyonu), Anthropic Claude (yapay zekâ özetleri)."
+    },
+    "retention": {
+      "heading": "Veri Saklama",
+      "body": "Kayıtlarınız siz silene ya da hesabınızı kapatana kadar tutulur. Bir kaydı silmek; ilgili ses dosyasını, transkripti ve özeti kalıcı olarak kaldırır."
+    },
+    "rights": {
+      "heading": "Haklarınız",
+      "body": "Panelden istediğiniz zaman herhangi bir kaydı silebilirsiniz. Tüm hesabınızı ve verilerinizi silmek için aşağıdaki e-posta adresinden bize ulaşın."
+    },
+    "contact": {
+      "heading": "İletişim",
+      "body": "Bu politika hakkında sorularınız mı var? Bize şu adresten ulaşın:"
+    }
+  },
+  "terms": {
+    "pageTitle": "Kullanım Şartları",
+    "lastUpdated": "Son güncelleme: 7 Haziran 2026",
+    "betaBanner": "Beta — taslak içerik, hukuki tavsiye değildir",
+    "intro": {
+      "heading": "Giriş",
+      "body": "Summarex, ücretsiz sunulan bir beta hizmetidir. Summarex'i kullanarak bu şartları kabul etmiş olursunuz. Hizmet; kullanılabilirlik, doğruluk veya belirli bir amaca uygunluk garantisi olmaksızın olduğu gibi sunulmaktadır."
+    },
+    "account": {
+      "heading": "Hesap",
+      "body": "Kişi başına bir hesap açılabilir. Giriş bilgilerinizi güvende tutun — hesabınız altında gerçekleşen tüm etkinliklerden siz sorumlusunuz."
+    },
+    "acceptableUse": {
+      "heading": "Kabul Edilebilir Kullanım",
+      "body": "Paylaşma hakkına sahip olmadığınız içerikleri yüklemeyin. Yasadışı, zararlı veya izinsiz kaydedilmiş ses dosyaları yüklemeyin. Bu kuralları ihlal eden içerikleri kaldırma hakkımız saklıdır."
+    },
+    "aiAccuracy": {
+      "heading": "Yapay Zekâ Doğruluğu",
+      "body": "Transkriptler ve özetler yapay zekâ tarafından oluşturulur ve hata ya da eksiklikler içerebilir. Bağımsız inceleme yapmadan bu çıktılara hukuki, tıbbi, finansal veya diğer kritik kararlar için güvenmeyin."
+    },
+    "availability": {
+      "heading": "Hizmet Sürekliliği",
+      "body": "Summarex bir beta hizmetidir; herhangi bir zamanda kesinti, veri kaybı veya erişim sorunu yaşanabilir. Herhangi bir çalışma süresi garantisi veya SLA sunmuyoruz."
+    },
+    "termination": {
+      "heading": "Hesap Askıya Alma",
+      "body": "Bu şartları ihlal eden hesapları önceden bildirim yapmaksızın askıya alabilir ya da sonlandırabiliriz."
+    },
+    "liability": {
+      "heading": "Sorumluluk Sınırı",
+      "body": "Hizmet, açık veya zımni hiçbir garanti olmaksızın \"OLDUĞU GİBİ\" sunulmaktadır. Summarex'in kullanımından doğabilecek doğrudan, dolaylı veya sonuç olarak ortaya çıkan zararlardan sorumlu değiliz."
+    },
+    "governingLaw": {
+      "heading": "Geçerli Hukuk",
+      "body": "Bu şartlar Türk hukukuna tabidir. Anlaşmazlıklar Türkiye mahkemelerinde çözüme kavuşturulur."
+    },
+    "contact": {
+      "heading": "İletişim",
+      "body": "Bu şartlar hakkında sorularınız mı var? Bize şu adresten ulaşın:"
+    }
   }
 }

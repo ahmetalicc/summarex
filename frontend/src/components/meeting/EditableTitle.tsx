@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/utils';
+import { displayTitle } from '../../lib/meetingTitle';
 
 interface EditableTitleProps {
   value: string;
@@ -92,7 +93,7 @@ export function EditableTitle({
         className,
       )}
     >
-      <span className="truncate">{value || placeholder || t('meeting.untitled')}</span>
+      <span className="truncate">{displayTitle(value, t) || placeholder}</span>
       {!disabled && (
         <span className="text-xs text-text-muted opacity-0 transition-opacity group-hover:opacity-100">
           {t('meeting.editTitle')}

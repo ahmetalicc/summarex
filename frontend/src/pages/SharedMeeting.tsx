@@ -8,6 +8,7 @@ import { Skeleton } from '../components/ui/Skeleton';
 import { Badge } from '../components/ui/Badge';
 import { AlertTriangleIcon } from '../components/layout/Icons';
 import { formatSeconds } from '../lib/format';
+import { displayTitle } from '../lib/meetingTitle';
 import type { ApiError } from '../lib/apiClient';
 
 export default function SharedMeeting() {
@@ -77,7 +78,7 @@ export default function SharedMeeting() {
               {t('shared.title')}
             </Badge>
             <h1 className="font-display text-3xl font-bold text-text sm:text-4xl">
-              {query.data.title ?? t('meeting.untitled')}
+              {displayTitle(query.data.title, t)}
             </h1>
             <div className="flex flex-wrap items-center gap-3 text-sm text-text-muted">
               {query.data.created_at && (

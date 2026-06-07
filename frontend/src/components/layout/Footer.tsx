@@ -1,8 +1,9 @@
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Brand } from './Brand';
 import { GitHubIcon } from './Icons';
 
-const GITHUB_URL = 'https://github.com/ahmetalicc/meetingmind';
+const GITHUB_URL = 'https://github.com/ahmetalicc/summarex.git';
 
 export function Footer() {
   const { t } = useTranslation();
@@ -15,12 +16,12 @@ export function Footer() {
           <span className="text-xs">© {year} · {t('footer.rights')}</span>
         </div>
         <div className="flex items-center gap-5">
-          <a href="#" className="text-xs transition-colors hover:text-text">
+          <Link to="/privacy" className="text-xs transition-colors hover:text-text">
             {t('footer.privacy')}
-          </a>
-          <a href="#" className="text-xs transition-colors hover:text-text">
+          </Link>
+          <Link to="/terms" className="text-xs transition-colors hover:text-text">
             {t('footer.terms')}
-          </a>
+          </Link>
           <a
             href={GITHUB_URL}
             target="_blank"

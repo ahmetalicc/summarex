@@ -70,17 +70,18 @@ class SupabaseService:
     def create_meeting(
         self,
         user_id: str,
-        title: str,
+        title: str | None,
         audio_url: str,
         duration_seconds: float | None,
         meeting_id: str | None = None,
     ) -> dict:
         row: dict = {
             "user_id": user_id,
-            "title": title,
             "audio_url": audio_url,
             "status": "queued",
         }
+        if title is not None:
+            row["title"] = title
         if meeting_id is not None:
             row["id"] = meeting_id
         if duration_seconds is not None:
