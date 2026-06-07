@@ -1,6 +1,6 @@
 {
   "common": {
-    "brand": "MeetingMind",
+    "brand": "Summarex",
     "tagline": "Capture every meeting. Understand every minute.",
     "getStarted": "Get started",
     "signIn": "Sign in",
@@ -18,8 +18,8 @@
   "landing": {
     "heroEyebrow": "AI-powered meeting intelligence",
     "heroTitle": "Every meeting, instantly understood.",
-    "heroSubtitle": "Record or upload audio. MeetingMind transcribes it, surfaces the decisions, and turns the conversation into shareable action items — in minutes, not hours.",
-    "ctaPrimary": "Try MeetingMind",
+    "heroSubtitle": "Record or upload audio. Summarex transcribes it, surfaces the decisions, and turns the conversation into shareable action items — in minutes, not hours.",
+    "ctaPrimary": "Try Summarex",
     "ctaSecondary": "See how it works",
     "featuresTitle": "From raw audio to clear next steps.",
     "featuresSubtitle": "Four steps, one workflow. No more 'who owns this?' the next day.",
@@ -202,8 +202,8 @@
     "title": "Shared meeting",
     "expiredOrInvalidTitle": "Link unavailable",
     "expiredOrInvalid": "This share link is invalid or has been revoked.",
-    "footerLine": "Shared via MeetingMind",
-    "footerCta": "Try MeetingMind →"
+    "footerLine": "Shared via Summarex",
+    "footerCta": "Try Summarex →"
   },
   "notFound": {
     "title": "404",

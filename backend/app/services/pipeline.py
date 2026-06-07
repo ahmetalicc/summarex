@@ -13,7 +13,7 @@ from io import BytesIO
 from app.services.claude_service import ClaudeService
 from app.services.supabase_service import SupabaseService
 from app.services.whisper_service import WhisperService
-from app.utils.exceptions import MeetingMindError
+from app.utils.exceptions import SummarexError
 from app.utils.logging import get_logger
 
 log = get_logger(__name__)
@@ -50,7 +50,7 @@ def run_meeting_pipeline(meeting_id: str, audio_path: str, extension: str) -> No
 
         supabase.update_meeting_status(meeting_id, "done")
         log.info("Pipeline finished for meeting %s", meeting_id)
-    except MeetingMindError as exc:
+    except SummarexError as exc:
         log.error("Pipeline failed (domain) for meeting %s: %s", meeting_id, exc.detail)
         supabase.update_meeting_status(meeting_id, "error", error_message=exc.detail)
     except Exception as exc:  # noqa: BLE001 — final safety net before status is lost
@@ -65,13 +65,13 @@ def run_resummarize(meeting_id: str) -> None:
         supabase.update_meeting_status(meeting_id, "summarizing")
         transcript = supabase.get_transcript_by_meeting_id(meeting_id)
         if not transcript:
-            raise MeetingMindError("Cannot regenerate summary — no transcript exists for this meeting")
+            raise SummarexError("Cannot regenerate summary — no transcript exists for this meeting")
         claude = ClaudeService()
         payload = claude.summarize(transcript["full_text"])
         supabase.create_summary(meeting_id=meeting_id, payload=payload)
         supabase.update_meeting_status(meeting_id, "done")
         log.info("Re-summarize finished for meeting %s", meeting_id)
-    except MeetingMindError as exc:
+    except SummarexError as exc:
         log.error("Re-summarize failed (domain) for meeting %s: %s", meeting_id, exc.detail)
         supabase.update_meeting_status(meeting_id, "error", error_message=exc.detail)
     except Exception as exc:  # noqa: BLE001

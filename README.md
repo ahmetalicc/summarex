@@ -1,4 +1,4 @@
-# MeetingMind
+# Summarex
 
 > AI-powered meeting assistant — record or upload audio, get structured summaries, decisions, and action items.
 
@@ -13,7 +13,7 @@
 ## Project Structure
 
 ```
-MeetingMind/
+Summarex/
 ├── frontend/          # React + Vite SPA
 ├── backend/           # FastAPI application
 ├── supabase/          # SQL migrations and RLS policies
@@ -70,14 +70,14 @@ Tone here is operational: follow the steps in order.
 ### 2. Backend → Render
 
 1. In Render, choose **New → Blueprint** and point it at this GitHub repo. Render reads
-   [`render.yaml`](render.yaml) and provisions the `meetingmind-backend` web service
+   [`render.yaml`](render.yaml) and provisions the `summarex-backend` web service
    (Docker runtime, Frankfurt region, free plan).
 2. Set the secret env vars in the dashboard (they are `sync: false` in the blueprint, so they
    are never committed): `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
    `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `BACKEND_URL`, `FRONTEND_URL`.
    - **`SUPABASE_URL` must be the bare host** — e.g. `https://abcdefgh.supabase.co`. Do **not**
      append `/rest/v1`, `/auth/v1`, or a trailing slash.
-3. The deploy URL looks like `https://meetingmind-backend.onrender.com`. The `master` branch
+3. The deploy URL looks like `https://summarex-backend.onrender.com`. The `master` branch
    is wired for auto-deploy — every push to `master` triggers a new build.
 
 > **Free plan note:** the service sleeps after 15 minutes of inactivity; the first request
@@ -112,8 +112,8 @@ Once both services are live, close the loop so CORS and auth redirects line up:
 To run the production backend image locally instead of `uvicorn --reload`:
 
 ```bash
-docker build -t meetingmind-backend ./backend && \
-  docker run --rm --env-file backend/.env -p 8000:8000 meetingmind-backend
+docker build -t summarex-backend ./backend && \
+  docker run --rm --env-file backend/.env -p 8000:8000 summarex-backend
 ```
 
 The frontend stays on `npm run dev` for hot reload during local development.

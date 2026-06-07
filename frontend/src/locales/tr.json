@@ -1,6 +1,6 @@
 {
   "common": {
-    "brand": "MeetingMind",
+    "brand": "Summarex",
     "tagline": "Her toplantıyı yakala. Her dakikayı anla.",
     "getStarted": "Başla",
     "signIn": "Giriş yap",
@@ -18,8 +18,8 @@
   "landing": {
     "heroEyebrow": "Yapay zekâ destekli toplantı zekâsı",
     "heroTitle": "Her toplantı, anında anlaşılır.",
-    "heroSubtitle": "Sesi kaydet ya da yükle. MeetingMind metne döker, kararları öne çıkarır ve konuşmayı paylaşılabilir aksiyon maddelerine çevirir — saatler değil dakikalar içinde.",
-    "ctaPrimary": "MeetingMind'ı dene",
+    "heroSubtitle": "Sesi kaydet ya da yükle. Summarex metne döker, kararları öne çıkarır ve konuşmayı paylaşılabilir aksiyon maddelerine çevirir — saatler değil dakikalar içinde.",
+    "ctaPrimary": "Summarex'i dene",
     "ctaSecondary": "Nasıl çalıştığını gör",
     "featuresTitle": "Ham sesten net adımlara.",
     "featuresSubtitle": "Dört adım, tek akış. Ertesi gün 'bunu kim üstlenecekti?' soruları bitiyor.",
@@ -202,8 +202,8 @@
     "title": "Paylaşılan toplantı",
     "expiredOrInvalidTitle": "Bağlantı kullanılamıyor",
     "expiredOrInvalid": "Bu paylaşım bağlantısı geçersiz ya da iptal edilmiş.",
-    "footerLine": "MeetingMind ile paylaşıldı",
-    "footerCta": "MeetingMind'ı dene →"
+    "footerLine": "Summarex ile paylaşıldı",
+    "footerCta": "Summarex'i dene →"
   },
   "notFound": {
     "title": "404",

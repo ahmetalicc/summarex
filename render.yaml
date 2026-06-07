@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: meetingmind-backend
+    name: summarex-backend
     runtime: docker
     plan: free
     region: frankfurt
