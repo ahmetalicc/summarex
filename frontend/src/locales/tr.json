@@ -59,7 +59,7 @@
   },
   "auth": {
     "welcomeTitle": "Tekrar hoş geldin",
-    "welcomeSubtitle": "Toplantılarına erişmek için giriş yap ya da saniyeler içinde hesap oluştur.",
+    "welcomeSubtitle": "Kayıtlarına erişmek için giriş yap ya da saniyeler içinde hesap oluştur.",
     "email": "E-posta",
     "password": "Şifre",
     "emailPlaceholder": "siz@sirket.com",
@@ -85,22 +85,22 @@
     "errorGeneric": "Bir şeyler ters gitti. Lütfen birazdan tekrar dene."
   },
   "dashboard": {
-    "title": "Toplantıların",
-    "subtitle": "Kaydettiğin ya da yüklediğin her görüşme — aranabilir ve tekrar açılmaya hazır.",
+    "title": "Kayıtların",
+    "subtitle": "Kaydettiğin ya da yüklediğin her kayıt — aranabilir ve tekrar açılmaya hazır.",
     "newRecording": "Yeni kayıt",
     "searchPlaceholder": "Başlığa göre ara…",
-    "emptyTitle": "Henüz toplantı yok",
-    "emptyDescription": "İlk konuşmanı kaydet ya da bir ses dosyası bırak; akış tamamlanınca burada görünecek.",
-    "emptyCta": "İlk toplantını başlat",
+    "emptyTitle": "Henüz kayıt yok",
+    "emptyDescription": "Ses kaydet ya da dosya bırak; işlem tamamlanınca burada görünecek.",
+    "emptyCta": "İlk kaydını oluştur",
     "emptySearchTitle": "Sonuç yok",
     "emptySearchDescription": "Bu aramaya uyan bir şey yok. Farklı bir başlık dene ya da kutuyu temizle.",
     "loadMore": "Daha fazla yükle",
-    "deleteConfirmTitle": "Bu toplantı silinsin mi?",
+    "deleteConfirmTitle": "Bu kayıt silinsin mi?",
     "deleteConfirmBody": ""{{title}}" ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
     "deleteConfirmAction": "Sil"
   },
   "recording": {
-    "title": "Bir toplantı başlat",
+    "title": "Yeni bir kayıt başlat",
     "subtitle": "Tarayıcıdan canlı kaydet ya da elindeki sesi yükle. İkisi de işe yarar.",
     "recordTab": "Kaydet",
     "uploadTab": "Yükle",
@@ -120,7 +120,7 @@
     "uploadButton": "Yükle",
     "uploading": "Yükleniyor…",
     "titleLabel": "Başlık (isteğe bağlı)",
-    "titlePlaceholder": "ör. Q2 planlama toplantısı",
+    "titlePlaceholder": "ör. Q2 planlama kaydı",
     "timerLabel": "Kayıt süresi",
     "dragHere": "Ses dosyanı buraya bırak",
     "acceptHint": "Desteklenen: {{extensions}} · en fazla {{maxMb}} MB",
@@ -130,7 +130,7 @@
     "fileTooLarge": "Dosya 100 MB'ı aşıyor. Daha küçük bir dosya dene."
   },
   "meeting": {
-    "untitled": "Başlıksız toplantı",
+    "untitled": "Başlıksız kayıt",
     "statusQueued": "Sırada",
     "statusTranscribing": "Metne dönüştürülüyor",
     "statusSummarizing": "Özetleniyor",
@@ -147,10 +147,10 @@
     "regenerateConfirmBody": "Mevcut transkript üzerinden özet tekrar oluşturulacak. Şu anki özetin yerine geçecek.",
     "regenerateConfirmAction": "Yenile",
     "delete": "Sil",
-    "deleteConfirmTitle": "Bu toplantı silinsin mi?",
+    "deleteConfirmTitle": "Bu kayıt silinsin mi?",
     "deleteConfirmBody": ""{{title}}" ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
     "deleteConfirmAction": "Sil",
-    "errorTitle": "Bu toplantıda bir sorun oluştu",
+    "errorTitle": "Bu kayıtta bir sorun oluştu",
     "tryAgain": "Tekrar dene",
     "transcriptTitle": "Transkript",
     "transcriptCopy": "Kopyala",
@@ -161,7 +161,7 @@
     "transcriptEmpty": "Henüz bir transkript yok.",
     "summaryTitle": "Özet",
     "processing": {
-      "title": "Toplantı işleniyor",
+      "title": "Kayıt işleniyor",
       "subtitle": "Dayan — bu genelde 1–3 dakika sürer.",
       "steps": {
         "uploaded": "Yüklendi",
@@ -189,8 +189,8 @@
     }
   },
   "share": {
-    "title": "Bu toplantıyı paylaş",
-    "description": "Bu bağlantıya sahip olan herkes "{{title}}" toplantısını giriş yapmadan açabilir.",
+    "title": "Bu kaydı paylaş",
+    "description": "Bu bağlantıya sahip olan herkes "{{title}}" kaydını giriş yapmadan açabilir.",
     "copy": "Bağlantıyı kopyala",
     "copied": "Kopyalandı",
     "revoke": "Bağlantıyı iptal et",
@@ -199,7 +199,7 @@
     "disclosure": "Sadece transkript ve özetin salt okunur görünümü paylaşılır. Ses dosyası paylaşılmaz."
   },
   "shared": {
-    "title": "Paylaşılan toplantı",
+    "title": "Paylaşılan kayıt",
     "expiredOrInvalidTitle": "Bağlantı kullanılamıyor",
     "expiredOrInvalid": "Bu paylaşım bağlantısı geçersiz ya da iptal edilmiş.",
     "footerLine": "Summarex ile paylaşıldı",
