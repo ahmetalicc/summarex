@@ -8,6 +8,7 @@ KNOWN LIMITATION (MVP): FastAPI BackgroundTasks does not survive a server
 restart. If the worker process dies mid-pipeline, the meeting stays stuck
 on its last status. Production fix is Celery/Arq/RQ — out of scope for MVP.
 """
+import asyncio
 from io import BytesIO
 
 from app.services.claude_service import ClaudeService
@@ -19,17 +20,17 @@ from app.utils.logging import get_logger
 log = get_logger(__name__)
 
 
-def run_meeting_pipeline(meeting_id: str, audio_path: str, extension: str) -> None:
+async def run_meeting_pipeline(meeting_id: str, audio_path: str, extension: str) -> None:
     """Download audio, transcribe with Whisper, summarize with Claude, persist results."""
     supabase = SupabaseService()
     try:
         supabase.update_meeting_status(meeting_id, "transcribing")
-        audio_bytes = supabase.download_audio(audio_path)
+        audio_bytes = await asyncio.to_thread(supabase.download_audio, audio_path)
 
         buf = BytesIO(audio_bytes)
         buf.name = f"audio.{extension}"  # OpenAI SDK uses .name for MIME sniffing
         whisper = WhisperService()
-        whisper_result = whisper.transcribe(buf)
+        whisper_result = await whisper.transcribe(buf)
 
         supabase.create_transcript(
             meeting_id=meeting_id,
@@ -45,7 +46,7 @@ def run_meeting_pipeline(meeting_id: str, audio_path: str, extension: str) -> No
 
         supabase.update_meeting_status(meeting_id, "summarizing")
         claude = ClaudeService()
-        summary_payload = claude.summarize(whisper_result["full_text"])
+        summary_payload = await claude.summarize(whisper_result["full_text"])
         supabase.create_summary(meeting_id=meeting_id, payload=summary_payload)
 
         supabase.update_meeting_status(meeting_id, "done")
@@ -58,7 +59,7 @@ def run_meeting_pipeline(meeting_id: str, audio_path: str, extension: str) -> No
         supabase.update_meeting_status(meeting_id, "error", error_message=str(exc))
 
 
-def run_resummarize(meeting_id: str) -> None:
+async def run_resummarize(meeting_id: str) -> None:
     """Re-summarize from existing transcript. Skips Whisper entirely."""
     supabase = SupabaseService()
     try:
@@ -67,7 +68,7 @@ def run_resummarize(meeting_id: str) -> None:
         if not transcript:
             raise SummarexError("Cannot regenerate summary — no transcript exists for this meeting")
         claude = ClaudeService()
-        payload = claude.summarize(transcript["full_text"])
+        payload = await claude.summarize(transcript["full_text"])
         supabase.create_summary(meeting_id=meeting_id, payload=payload)
         supabase.update_meeting_status(meeting_id, "done")
         log.info("Re-summarize finished for meeting %s", meeting_id)
