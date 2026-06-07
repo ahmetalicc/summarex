@@ -1,7 +1,7 @@
 {
   "common": {
     "brand": "Summarex",
-    "tagline": "Capture every meeting. Understand every minute.",
+    "tagline": "Record it. Transcribe it. Understand it.",
     "getStarted": "Get started",
     "signIn": "Sign in",
     "signOut": "Sign out",
@@ -16,13 +16,13 @@
     "cancel": "Cancel"
   },
   "landing": {
-    "heroEyebrow": "AI-powered meeting intelligence",
-    "heroTitle": "Every meeting, instantly understood.",
-    "heroSubtitle": "Record or upload audio. Summarex transcribes it, surfaces the decisions, and turns the conversation into shareable action items — in minutes, not hours.",
+    "heroEyebrow": "AI-powered audio intelligence",
+    "heroTitle": "Hours of audio, summarized in minutes.",
+    "heroSubtitle": "Record live or upload a file. Summarex transcribes it, surfaces the key points, and turns long audio — meetings, lectures, interviews, podcasts — into something you can skim and share.",
     "ctaPrimary": "Try Summarex",
     "ctaSecondary": "See how it works",
     "featuresTitle": "From raw audio to clear next steps.",
-    "featuresSubtitle": "Four steps, one workflow. No more 'who owns this?' the next day.",
+    "featuresSubtitle": "Four steps, one workflow. From a long recording to something you can actually use.",
     "features": {
       "record": {
         "title": "Record or upload",
@@ -53,8 +53,8 @@
     "demoActions": "Action items",
     "demoAction1Task": "Send the rollout announcement email to all customers.",
     "demoAction1Deadline": "Due Monday",
-    "finalCtaTitle": "Stop taking notes. Start running meetings.",
-    "finalCtaSubtitle": "Free to try with your first meeting. No credit card. No setup.",
+    "finalCtaTitle": "Stop scrubbing audio. Start finding what matters.",
+    "finalCtaSubtitle": "Free during beta. No credit card. No setup.",
     "finalCtaButton": "Get started free"
   },
   "auth": {

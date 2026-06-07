@@ -1,7 +1,7 @@
 {
   "common": {
     "brand": "Summarex",
-    "tagline": "Her toplantıyı yakala. Her dakikayı anla.",
+    "tagline": "Kaydet. Metne döndür. Anla.",
     "getStarted": "Başla",
     "signIn": "Giriş yap",
     "signOut": "Çıkış yap",
@@ -16,13 +16,13 @@
     "cancel": "Vazgeç"
   },
   "landing": {
-    "heroEyebrow": "Yapay zekâ destekli toplantı zekâsı",
-    "heroTitle": "Her toplantı, anında anlaşılır.",
-    "heroSubtitle": "Sesi kaydet ya da yükle. Summarex metne döker, kararları öne çıkarır ve konuşmayı paylaşılabilir aksiyon maddelerine çevirir — saatler değil dakikalar içinde.",
+    "heroEyebrow": "Yapay zekâ destekli ses zekâsı",
+    "heroTitle": "Saatler süren ses, dakikalar içinde özet.",
+    "heroSubtitle": "Canlı kaydet ya da dosya yükle. Summarex metne döker, kilit noktaları öne çıkarır ve uzun sesi — toplantılar, dersler, röportajlar, podcastler — taranabilir bir özete dönüştürür.",
     "ctaPrimary": "Summarex'i dene",
     "ctaSecondary": "Nasıl çalıştığını gör",
     "featuresTitle": "Ham sesten net adımlara.",
-    "featuresSubtitle": "Dört adım, tek akış. Ertesi gün 'bunu kim üstlenecekti?' soruları bitiyor.",
+    "featuresSubtitle": "Dört adım, tek akış. Uzun bir kayıttan gerçekten kullanabileceğin bir şeye.",
     "features": {
       "record": {
         "title": "Kaydet ya da yükle",
@@ -53,8 +53,8 @@
     "demoActions": "Aksiyon maddeleri",
     "demoAction1Task": "Tüm müşterilere yayılma duyurusu e-postasını gönder.",
     "demoAction1Deadline": "Son tarih: Pazartesi",
-    "finalCtaTitle": "Not tutmayı bırak. Toplantıları yönetmeye başla.",
-    "finalCtaSubtitle": "İlk toplantın ücretsiz. Kredi kartı yok. Kurulum yok.",
+    "finalCtaTitle": "Sesi ileri-geri sarmayı bırak. Önemi olanı bul.",
+    "finalCtaSubtitle": "Beta sürecinde ücretsiz. Kart bilgisi yok. Kurulum yok.",
     "finalCtaButton": "Ücretsiz başla"
   },
   "auth": {
@@ -96,7 +96,7 @@
     "emptySearchDescription": "Bu aramaya uyan bir şey yok. Farklı bir başlık dene ya da kutuyu temizle.",
     "loadMore": "Daha fazla yükle",
     "deleteConfirmTitle": "Bu toplantı silinsin mi?",
-    "deleteConfirmBody": "“{{title}}” ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
+    "deleteConfirmBody": ""{{title}}" ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
     "deleteConfirmAction": "Sil"
   },
   "recording": {
@@ -148,7 +148,7 @@
     "regenerateConfirmAction": "Yenile",
     "delete": "Sil",
     "deleteConfirmTitle": "Bu toplantı silinsin mi?",
-    "deleteConfirmBody": "“{{title}}” ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
+    "deleteConfirmBody": ""{{title}}" ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
     "deleteConfirmAction": "Sil",
     "errorTitle": "Bu toplantıda bir sorun oluştu",
     "tryAgain": "Tekrar dene",
@@ -190,7 +190,7 @@
   },
   "share": {
     "title": "Bu toplantıyı paylaş",
-    "description": "Bu bağlantıya sahip olan herkes “{{title}}” toplantısını giriş yapmadan açabilir.",
+    "description": "Bu bağlantıya sahip olan herkes "{{title}}" toplantısını giriş yapmadan açabilir.",
     "copy": "Bağlantıyı kopyala",
     "copied": "Kopyalandı",
     "revoke": "Bağlantıyı iptal et",
