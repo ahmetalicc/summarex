@@ -23,7 +23,7 @@ export interface MeetingStatusResponse {
 
 export interface PublicTranscript {
   full_text: string;
-  segments: TranscriptSegment[];
+  segments?: TranscriptSegment[] | null;
   language: Language | null;
 }
 

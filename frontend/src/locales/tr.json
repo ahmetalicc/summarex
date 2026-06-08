@@ -170,6 +170,7 @@
     "transcriptSegmentCount_one": "{{count}} bölüm",
     "transcriptSegmentCount_other": "{{count}} bölüm",
     "transcriptEmpty": "Henüz bir transkript yok.",
+    "transcriptPlainNotice": "Düz transkript — belirli bir ana atlamak için sesi açın.",
     "summaryTitle": "Özet",
     "processing": {
       "title": "Kayıt işleniyor",

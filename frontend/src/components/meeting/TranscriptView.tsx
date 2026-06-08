@@ -12,11 +12,26 @@ interface TranscriptViewProps {
   className?: string;
 }
 
+function splitIntoParagraphs(text: string): string[] {
+  const byNewline = text.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
+  if (byNewline.length > 1) return byNewline;
+  // Split on sentence boundaries then group into ~3-sentence chunks
+  const sentences = text.replace(/([.!?])\s+/g, '$1\n').split('\n').map(s => s.trim()).filter(Boolean);
+  if (sentences.length <= 3) return [text];
+  const CHUNK = 3;
+  const out: string[] = [];
+  for (let i = 0; i < sentences.length; i += CHUNK) {
+    out.push(sentences.slice(i, i + CHUNK).join(' '));
+  }
+  return out;
+}
+
 export function TranscriptView({ transcript, className }: TranscriptViewProps) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState<'all' | string | null>(null);
 
   const segments = transcript.segments ?? [];
+  const hasSegments = segments.length > 0;
 
   const handleCopyAll = async () => {
     try {
@@ -53,9 +68,11 @@ export function TranscriptView({ transcript, className }: TranscriptViewProps) {
           <Badge variant="info" dot={false} className="uppercase">
             {(transcript.language ?? 'auto').toString()}
           </Badge>
-          <span className="text-xs text-text-muted">
-            {t('meeting.transcriptSegmentCount', { count: segments.length })}
-          </span>
+          {hasSegments && (
+            <span className="text-xs text-text-muted">
+              {t('meeting.transcriptSegmentCount', { count: segments.length })}
+            </span>
+          )}
         </div>
         <button
           type="button"
@@ -77,7 +94,7 @@ export function TranscriptView({ transcript, className }: TranscriptViewProps) {
       </header>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        {segments.length > 0 ? (
+        {hasSegments ? (
           <ol className="space-y-2">
             {segments.map((seg, idx) => {
               const key = `${idx}-${seg.start}`;
@@ -103,10 +120,18 @@ export function TranscriptView({ transcript, className }: TranscriptViewProps) {
               );
             })}
           </ol>
+        ) : transcript.full_text ? (
+          <div className="space-y-4">
+            <p className="text-xs text-text-muted">{t('meeting.transcriptPlainNotice')}</p>
+            {splitIntoParagraphs(transcript.full_text).map((para, i) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <p key={i} className="text-sm leading-relaxed text-text">
+                {para}
+              </p>
+            ))}
+          </div>
         ) : (
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-text">
-            {transcript.full_text || t('meeting.transcriptEmpty')}
-          </p>
+          <p className="text-sm text-text-muted">{t('meeting.transcriptEmpty')}</p>
         )}
       </div>
     </section>

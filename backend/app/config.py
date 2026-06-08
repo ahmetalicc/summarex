@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     SUPABASE_ANON_KEY: str = ""
     SUPABASE_SERVICE_ROLE_KEY: str = ""
     OPENAI_API_KEY: str = ""
-    OPENAI_TRANSCRIPTION_MODEL: str = "whisper-1"
+    OPENAI_TRANSCRIPTION_MODEL: str = "gpt-4o-mini-transcribe"
     ANTHROPIC_API_KEY: str = ""
     BACKEND_URL: str = "http://localhost:8000"
     FRONTEND_URL: str = "http://localhost:5173"

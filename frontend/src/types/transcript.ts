@@ -10,7 +10,7 @@ export interface Transcript {
   id: string;
   meeting_id: string;
   full_text: string;
-  segments: TranscriptSegment[];
+  segments?: TranscriptSegment[] | null;
   language: Language | null;
   created_at: string;
 }

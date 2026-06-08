@@ -170,6 +170,7 @@
     "transcriptSegmentCount_one": "{{count}} segment",
     "transcriptSegmentCount_other": "{{count}} segments",
     "transcriptEmpty": "No transcript available yet.",
+    "transcriptPlainNotice": "Plain transcript — open the audio to skip to specific moments.",
     "summaryTitle": "Summary",
     "processing": {
       "title": "Processing your recording",
