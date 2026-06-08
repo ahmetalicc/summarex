@@ -169,7 +169,7 @@ class SupabaseService:
     # ── Transcripts DB ────────────────────────────────────────────────────────
 
     def create_transcript(
-        self, meeting_id: str, full_text: str, language: str, segments: list[dict] | None
+        self, meeting_id: str, full_text: str, language: str, segments: list[dict]
     ) -> dict:
         try:
             result = (
