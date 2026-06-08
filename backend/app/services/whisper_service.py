@@ -45,7 +45,8 @@ class WhisperService:
         `language`: optional ISO-639-1 hint ('en' or 'tr'). If None, auto-detected.
         Returns: {full_text, language, segments, duration_seconds}.
           - segments is a list of {start, end, text} dicts for whisper-1.
-          - segments is None for gpt-4o-mini-transcribe / gpt-4o-transcribe.
+          - segments is [] for gpt-4o-mini-transcribe / gpt-4o-transcribe (empty
+            list satisfies the NOT NULL constraint on the transcripts.segments column).
         """
         client = self._ensure_client()
         model = settings.OPENAI_TRANSCRIPTION_MODEL
@@ -77,14 +78,14 @@ class WhisperService:
         if verbose:
             audio_seconds = float(getattr(response, "duration", 0.0) or 0.0)
             raw_language = (getattr(response, "language", None) or "").lower()
-            segments: list[dict] | None = [
+            segments: list[dict] = [
                 {"start": float(s.start), "end": float(s.end), "text": s.text}
                 for s in (getattr(response, "segments", None) or [])
             ]
         else:
             audio_seconds = 0.0
             raw_language = (getattr(response, "language", None) or "").lower()
-            segments = None
+            segments = []
 
         normalized_language = _LANGUAGE_NORMALIZE.get(raw_language, "en")
         cost = (audio_seconds / 60.0) * _COST_PER_MINUTE_USD
@@ -92,7 +93,7 @@ class WhisperService:
         log.info(
             "Whisper transcribe: model=%s api=%.2fs audio=%.2fs cost=$%.4f lang=%s->%s segments=%s",
             model, api_seconds, audio_seconds, cost, raw_language, normalized_language,
-            len(segments) if segments is not None else "none",
+            len(segments),
         )
         return {
             "full_text": response.text,
