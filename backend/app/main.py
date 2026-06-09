@@ -28,11 +28,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(meetings.router, prefix="/api")
-app.include_router(transcription.router, prefix="/api")
-app.include_router(summary.router, prefix="/api")
-app.include_router(share.router, prefix="/api")
-app.include_router(health.router, prefix="/api")
+app.include_router(meetings.router, prefix="/api/v1")
+app.include_router(transcription.router, prefix="/api/v1")
+app.include_router(summary.router, prefix="/api/v1")
+app.include_router(share.router, prefix="/api/v1")
+app.include_router(health.router, prefix="/api/v1")
 
 
 @app.exception_handler(SummarexError)

@@ -30,7 +30,7 @@ EXPOSE 8000
 # Probe the mounted health router. Uses urllib so no extra deps are needed.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
     CMD python -c "import os,urllib.request,sys; \
-url='http://localhost:%s/api/health' % os.environ.get('PORT','8000'); \
+url='http://localhost:%s/api/v1/health' % os.environ.get('PORT','8000'); \
 sys.exit(0 if urllib.request.urlopen(url, timeout=4).status == 200 else 1)"
 
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

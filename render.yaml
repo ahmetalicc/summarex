@@ -7,7 +7,7 @@ services:
     branch: develop
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    healthCheckPath: /api/health
+    healthCheckPath: /api/v1/health
     envVars:
       - key: PYTHON_VERSION
         value: "3.12"
