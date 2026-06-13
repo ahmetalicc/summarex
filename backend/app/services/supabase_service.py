@@ -53,6 +53,13 @@ class SupabaseService:
         except Exception as exc:
             log.warning("Storage delete failed for %s (ignored): %s", path, exc)
 
+    def clear_audio_url(self, meeting_id: str) -> None:
+        """Null out audio_url after the original file is deleted. Swallows errors — cleanup must not crash the pipeline."""
+        try:
+            self._ensure_client().table("meetings").update({"audio_url": None}).eq("id", meeting_id).execute()
+        except Exception as exc:
+            log.warning("Failed to clear audio_url for meeting %s (ignored): %s", meeting_id, exc)
+
     def create_signed_audio_url(self, path: str, expires_in_seconds: int = 3600) -> str:
         try:
             result = self._ensure_client().storage.from_(BUCKET).create_signed_url(

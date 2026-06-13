@@ -57,6 +57,12 @@ async def run_meeting_pipeline(meeting_id: str, audio_path: str, extension: str)
     except Exception as exc:  # noqa: BLE001 — final safety net before status is lost
         log.exception("Pipeline failed (unexpected) for meeting %s", meeting_id)
         supabase.update_meeting_status(meeting_id, "error", error_message=str(exc))
+    finally:
+        # Privacy: the original audio is never retained past processing. Delete it and
+        # null the stored path regardless of success or failure — there is no re-transcribe
+        # path that needs it (re-summarize works from the saved transcript).
+        await asyncio.to_thread(supabase.delete_audio, audio_path)
+        supabase.clear_audio_url(meeting_id)
 
 
 async def run_resummarize(meeting_id: str) -> None:

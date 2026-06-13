@@ -237,7 +237,7 @@
   },
   "privacy": {
     "pageTitle": "Privacy Policy",
-    "lastUpdated": "Last updated: 2026-06-07",
+    "lastUpdated": "Last updated: 2026-06-13",
     "betaBanner": "Beta — placeholder content, not legal advice",
     "intro": {
       "heading": "Introduction",
@@ -245,7 +245,7 @@
     },
     "dataCollected": {
       "heading": "Data We Collect",
-      "body": "We collect your account email address, audio recordings you upload or capture through the app, the transcripts and summaries we generate from your audio, and basic usage metadata such as timestamps and file sizes."
+      "body": "We collect your account email address, the transcripts and summaries we generate from your audio, and basic usage metadata such as timestamps and file sizes. Audio you upload or record is processed transiently and is permanently deleted from our storage as soon as the transcript and summary are generated."
     },
     "howWeUseIt": {
       "heading": "How We Use Your Data",
@@ -257,7 +257,7 @@
     },
     "retention": {
       "heading": "Data Retention",
-      "body": "Your recordings are kept until you delete them or close your account. Deleting a recording permanently removes its audio file, transcript, and summary."
+      "body": "We do not retain your original audio. As soon as processing finishes, the audio file is permanently deleted from our storage — only the transcript and summary remain. Those are kept until you delete them or close your account, and deleting a recording permanently removes its transcript and summary."
     },
     "rights": {
       "heading": "Your Rights",

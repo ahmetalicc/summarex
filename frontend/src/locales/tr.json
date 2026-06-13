@@ -237,7 +237,7 @@
   },
   "privacy": {
     "pageTitle": "Gizlilik Politikası",
-    "lastUpdated": "Son güncelleme: 7 Haziran 2026",
+    "lastUpdated": "Son güncelleme: 13 Haziran 2026",
     "betaBanner": "Beta — taslak içerik, hukuki tavsiye değildir",
     "intro": {
       "heading": "Giriş",
@@ -245,7 +245,7 @@
     },
     "dataCollected": {
       "heading": "Topladığımız Veriler",
-      "body": "Hesap e-posta adresinizi, uygulama üzerinden yüklediğiniz veya kaydettiğiniz ses dosyalarını, bu seslerden üretilen transkript ve özetleri, zaman damgaları ve dosya boyutları gibi temel kullanım meta verilerini topluyoruz."
+      "body": "Hesap e-posta adresinizi, seslerinizden ürettiğimiz transkript ve özetleri, zaman damgaları ve dosya boyutları gibi temel kullanım meta verilerini topluyoruz. Yüklediğiniz veya kaydettiğiniz sesler yalnızca geçici olarak işlenir ve transkript ile özet üretilir üretilmez depolamamızdan kalıcı olarak silinir."
     },
     "howWeUseIt": {
       "heading": "Verilerinizi Nasıl Kullanıyoruz",
@@ -257,7 +257,7 @@
     },
     "retention": {
       "heading": "Veri Saklama",
-      "body": "Kayıtlarınız siz silene ya da hesabınızı kapatana kadar tutulur. Bir kaydı silmek; ilgili ses dosyasını, transkripti ve özeti kalıcı olarak kaldırır."
+      "body": "Orijinal sesinizi saklamıyoruz. İşleme tamamlanır tamamlanmaz ses dosyası depolamamızdan kalıcı olarak silinir — yalnızca transkript ve özet kalır. Bunlar da siz silene ya da hesabınızı kapatana kadar tutulur; bir kaydı silmek ilgili transkript ve özeti kalıcı olarak kaldırır."
     },
     "rights": {
       "heading": "Haklarınız",
