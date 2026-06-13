@@ -8,6 +8,8 @@
     "signedInAs": "Giriş yapan",
     "dashboard": "Panel",
     "record": "Kaydet",
+    "summarize": "Özetle",
+    "transcribe": "Yazıya dök",
     "language": "Dil",
     "theme": "Tema",
     "toggleTheme": "Tema değiştir",
@@ -140,6 +142,14 @@
     "fileEmpty": "Dosya boş.",
     "fileTooLarge": "Dosya 100 MB'ı aşıyor. Daha küçük bir dosya dene."
   },
+  "summarize": {
+    "title": "Sesi özetle",
+    "subtitle": "Canlı kaydet veya dosya yükle. Summarex sesi metne döker ve önemli noktaları çıkarır — kararlar, aksiyon maddeleri ve daha fazlası."
+  },
+  "transcribe": {
+    "title": "Sesi yazıya dök",
+    "subtitle": "Canlı kaydet veya dosya yükle; doğru ve aranabilir bir transkript al. Özeti dilediğin zaman sonradan ekleyebilirsin."
+  },
   "meeting": {
     "untitled": "Başlıksız kayıt",
     "statusQueued": "Sırada",
@@ -158,6 +168,9 @@
     "regenerateConfirmTitle": "Özet yenilensin mi?",
     "regenerateConfirmBody": "Mevcut transkript üzerinden özet tekrar oluşturulacak. Şu anki özetin yerine geçecek.",
     "regenerateConfirmAction": "Yenile",
+    "generateSummary": "Özet çıkar",
+    "summarizeCtaTitle": "Özet ister misin?",
+    "summarizeCtaBody": "Bu transkripti genel bakış, kararlar, aksiyon maddeleri ve önemli alıntılara dönüştür — Claude ile.",
     "delete": "Sil",
     "deleteConfirmTitle": "Bu kayıt silinsin mi?",
     "deleteConfirmBody": "\"{{title}}\" ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",

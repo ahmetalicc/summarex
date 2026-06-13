@@ -28,6 +28,7 @@ import {
   ChevronLeftIcon,
   RefreshIcon,
   ShareIcon,
+  SparklesIcon,
   TrashIcon,
 } from '../components/layout/Icons';
 import type { MeetingStatus } from '../types/meeting';
@@ -228,9 +229,11 @@ export default function MeetingDetail() {
               </div>
             )}
 
-            {liveStatus !== 'error' && liveStatus !== 'done' && (
-              <ProcessingPanel status={liveStatus} />
-            )}
+            {liveStatus !== 'error' &&
+              liveStatus !== 'done' &&
+              liveStatus !== 'transcribed' && (
+                <ProcessingPanel status={liveStatus} />
+              )}
 
             {liveStatus === 'done' && (
               <div className="grid h-[calc(100dvh-18rem)] min-h-[480px] gap-4 md:grid-cols-2">
@@ -256,6 +259,51 @@ export default function MeetingDetail() {
                     <div className="rounded-2xl border border-error/40 bg-error/10 p-5 text-sm text-error">
                       {summaryQuery.error?.message ?? t('errors.networkError')}
                     </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {liveStatus === 'transcribed' && (
+              <div className="grid h-[calc(100dvh-18rem)] min-h-[480px] gap-4 md:grid-cols-2">
+                <div className="min-h-0">
+                  {transcriptQuery.isLoading && (
+                    <Skeleton className="h-full w-full rounded-2xl" />
+                  )}
+                  {transcriptQuery.data && (
+                    <TranscriptView transcript={transcriptQuery.data} />
+                  )}
+                  {transcriptQuery.isError && (
+                    <div className="rounded-2xl border border-error/40 bg-error/10 p-5 text-sm text-error">
+                      {transcriptQuery.error?.message ?? t('errors.networkError')}
+                    </div>
+                  )}
+                </div>
+                <div className="flex min-h-0 flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-bg-surface/50 p-8 text-center backdrop-blur">
+                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary">
+                    <SparklesIcon width={24} height={24} />
+                  </span>
+                  <div>
+                    <h2 className="font-display text-lg font-semibold text-text">
+                      {t('meeting.summarizeCtaTitle')}
+                    </h2>
+                    <p className="mx-auto mt-1 max-w-sm text-sm text-text-muted">
+                      {t('meeting.summarizeCtaBody')}
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => void regenerateMutation.mutateAsync()}
+                    isLoading={regenerateMutation.isPending}
+                    leftIcon={
+                      !regenerateMutation.isPending && <SparklesIcon width={16} height={16} />
+                    }
+                  >
+                    {t('meeting.generateSummary')}
+                  </Button>
+                  {regenerateMutation.isError && (
+                    <p className="text-sm text-error">
+                      {regenerateMutation.error?.message ?? t('errors.networkError')}
+                    </p>
                   )}
                 </div>
               </div>
