@@ -144,7 +144,11 @@
   },
   "summarize": {
     "title": "Summarize audio",
-    "subtitle": "Record live or upload a file. Summarex transcribes it and pulls out the key points — decisions, action items, and more."
+    "subtitle": "Record live or upload a file. Summarex transcribes it and pulls out the key points — decisions, action items, and more.",
+    "pickerTitle": "Or summarize an existing transcript",
+    "pickerSubtitle": "Pick one of your transcripts and turn it into a summary — no need to re-upload audio.",
+    "pickerEmpty": "No transcripts waiting for a summary. Transcribe some audio first, then come back here.",
+    "pickerAction": "Summarize"
   },
   "transcribe": {
     "title": "Transcribe audio",

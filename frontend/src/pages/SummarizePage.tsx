@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { AudioCapture } from '../components/audio/AudioCapture';
+import { TranscriptPicker } from '../components/meeting/TranscriptPicker';
 
 export default function SummarizePage() {
   const { t } = useTranslation();
@@ -13,7 +14,18 @@ export default function SummarizePage() {
           {t('summarize.subtitle')}
         </p>
       </header>
+
       <AudioCapture mode="summary" />
+
+      <div className="mt-14">
+        <div className="mb-4">
+          <h2 className="font-display text-lg font-semibold text-text">
+            {t('summarize.pickerTitle')}
+          </h2>
+          <p className="mt-1 text-sm text-text-muted">{t('summarize.pickerSubtitle')}</p>
+        </div>
+        <TranscriptPicker />
+      </div>
     </section>
   );
 }

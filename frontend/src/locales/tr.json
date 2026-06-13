@@ -144,7 +144,11 @@
   },
   "summarize": {
     "title": "Sesi özetle",
-    "subtitle": "Canlı kaydet veya dosya yükle. Summarex sesi metne döker ve önemli noktaları çıkarır — kararlar, aksiyon maddeleri ve daha fazlası."
+    "subtitle": "Canlı kaydet veya dosya yükle. Summarex sesi metne döker ve önemli noktaları çıkarır — kararlar, aksiyon maddeleri ve daha fazlası.",
+    "pickerTitle": "Veya mevcut bir transkripti özetle",
+    "pickerSubtitle": "Transkriptlerinden birini seç ve özete dönüştür — sesi yeniden yüklemene gerek yok.",
+    "pickerEmpty": "Özet bekleyen transkript yok. Önce bir sesi yazıya dök, sonra buraya dön.",
+    "pickerAction": "Özetle"
   },
   "transcribe": {
     "title": "Sesi yazıya dök",
