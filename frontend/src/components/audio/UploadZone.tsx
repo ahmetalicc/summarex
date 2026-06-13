@@ -6,6 +6,7 @@ import { Input } from '../ui/Input';
 import { Spinner } from '../ui/Spinner';
 import { FilePlusIcon, UploadIcon } from '../layout/Icons';
 import { useUploadAudio } from '../../hooks/useAudioUpload';
+import type { ProcessingMode } from '../../types/meeting';
 
 const ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'webm'] as const;
 const ACCEPT_ATTR = '.mp3,.wav,.m4a,.webm,audio/*';
@@ -22,7 +23,7 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function UploadZone() {
+export function UploadZone({ mode = 'summary' }: { mode?: ProcessingMode }) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -95,7 +96,7 @@ export function UploadZone() {
 
   const handleUpload = () => {
     if (!file) return;
-    uploadMutation.mutate({ file, title: title.trim() || undefined });
+    uploadMutation.mutate({ file, title: title.trim() || undefined, mode });
   };
 
   return (

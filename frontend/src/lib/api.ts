@@ -1,6 +1,6 @@
 import { apiClient } from './apiClient';
 import { API_PATHS } from './apiPaths';
-import type { Meeting, MeetingUpdate } from '../types/meeting';
+import type { Meeting, MeetingUpdate, ProcessingMode } from '../types/meeting';
 import type { Transcript } from '../types/transcript';
 import type { Summary } from '../types/summary';
 import type {
@@ -47,12 +47,14 @@ export function deleteMeeting(id: string): Promise<Meeting> {
 
 export interface UploadAudioOptions {
   title?: string;
+  mode?: ProcessingMode;
 }
 
 function buildAudioForm(file: Blob, filename: string, opts: UploadAudioOptions): FormData {
   const form = new FormData();
   form.append('file', file, filename);
   if (opts.title) form.append('title', opts.title);
+  if (opts.mode) form.append('mode', opts.mode);
   return form;
 }
 

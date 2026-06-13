@@ -16,6 +16,7 @@ import {
   StopIcon,
 } from '../layout/Icons';
 import { cn } from '../../lib/utils';
+import type { ProcessingMode } from '../../types/meeting';
 
 function formatDuration(ms: number): string {
   const total = Math.floor(ms / 1000);
@@ -27,7 +28,7 @@ function formatDuration(ms: number): string {
 const PERMISSION_HELP_URL =
   'https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#privacy_and_security';
 
-export function AudioRecorder() {
+export function AudioRecorder({ mode = 'summary' }: { mode?: ProcessingMode }) {
   const { t } = useTranslation();
   const { analyser, start, pause, resume, stop, reset } = useRecorder();
   const state = useRecordingStore((s) => s.state);
@@ -64,7 +65,7 @@ export function AudioRecorder() {
 
   const handleSave = () => {
     if (!blob) return;
-    recordMutation.mutate({ blob, title: title.trim() || undefined });
+    recordMutation.mutate({ blob, title: title.trim() || undefined, mode });
   };
 
   const ringColor = isError
