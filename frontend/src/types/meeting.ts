@@ -1,4 +1,5 @@
-export type MeetingStatus = 'queued' | 'transcribing' | 'summarizing' | 'done' | 'error';
+export type MeetingStatus = 'queued' | 'transcribing' | 'transcribed' | 'summarizing' | 'done' | 'error';
+export type ProcessingMode = 'summary' | 'transcript';
 export type Language = 'en' | 'tr';
 
 export interface Meeting {

@@ -145,6 +145,7 @@
     "statusQueued": "Sırada",
     "statusTranscribing": "Metne dönüştürülüyor",
     "statusSummarizing": "Özetleniyor",
+    "statusTranscribed": "Transkript hazır",
     "statusDone": "Hazır",
     "statusError": "Başarısız",
     "duration": "Süre",

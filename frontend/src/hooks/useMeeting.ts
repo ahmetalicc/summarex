@@ -12,7 +12,7 @@ import type { Transcript } from '../types/transcript';
 import type { Summary } from '../types/summary';
 import type { MeetingStatusResponse } from '../types/share';
 
-const TERMINAL: MeetingStatus[] = ['done', 'error'];
+const TERMINAL: MeetingStatus[] = ['done', 'transcribed', 'error'];
 const ACTIVE: MeetingStatus[] = ['queued', 'transcribing', 'summarizing'];
 
 export function useMeeting(id: string | undefined) {
@@ -48,6 +48,9 @@ export function useMeetingStatus(
       void queryClient.invalidateQueries({ queryKey: queryKeys.meetings.detail(id) });
       void queryClient.invalidateQueries({ queryKey: queryKeys.meetings.transcript(id) });
       void queryClient.invalidateQueries({ queryKey: queryKeys.meetings.summary(id) });
+    } else if (query.data.status === 'transcribed') {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.meetings.detail(id) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.meetings.transcript(id) });
     } else if (query.data.status === 'error') {
       void queryClient.invalidateQueries({ queryKey: queryKeys.meetings.detail(id) });
     }

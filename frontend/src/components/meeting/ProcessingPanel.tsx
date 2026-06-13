@@ -22,6 +22,8 @@ function stepIndex(status: MeetingStatus): number {
       return 0;
     case 'transcribing':
       return 1;
+    case 'transcribed':
+      return 2;
     case 'summarizing':
       return 2;
     case 'done':

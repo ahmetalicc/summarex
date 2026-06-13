@@ -23,6 +23,8 @@ function statusKey(status: MeetingStatus): string {
       return 'meeting.statusQueued';
     case 'transcribing':
       return 'meeting.statusTranscribing';
+    case 'transcribed':
+      return 'meeting.statusTranscribed';
     case 'summarizing':
       return 'meeting.statusSummarizing';
     case 'done':

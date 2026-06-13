@@ -46,6 +46,8 @@ export function statusToBadgeVariant(status: MeetingStatus): BadgeVariant {
       return 'neutral';
     case 'transcribing':
       return 'info';
+    case 'transcribed':
+      return 'success';
     case 'summarizing':
       return 'warning';
     case 'done':
