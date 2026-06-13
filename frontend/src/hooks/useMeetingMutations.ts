@@ -38,3 +38,18 @@ export function useRegenerateSummary(id: string) {
     },
   });
 }
+
+export function useSummarizeMeeting() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  return useMutation<{ status: string }, Error, string>({
+    mutationFn: (id) => regenerateSummary(id),
+    onSuccess: (_data, id) => {
+      queryClient.removeQueries({ queryKey: queryKeys.meetings.summary(id) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.meetings.status(id) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.meetings.detail(id) });
+      void queryClient.invalidateQueries({ queryKey: ['meetings'] });
+      navigate(`/meetings/${id}`);
+    },
+  });
+}
