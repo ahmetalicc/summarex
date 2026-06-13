@@ -6,7 +6,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
-MeetingStatus = Literal["queued", "transcribing", "summarizing", "done", "error"]
+MeetingStatus = Literal["queued", "transcribing", "transcribed", "summarizing", "done", "error"]
 Language = Literal["en", "tr"]
 
 
