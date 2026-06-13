@@ -16,6 +16,8 @@ If the DB insert fails after a successful upload, the storage object is cleaned 
 """
 from __future__ import annotations
 
+from typing import Literal
+
 import uuid
 
 from fastapi import APIRouter, BackgroundTasks, File, Form, Query, Request, UploadFile
@@ -26,7 +28,7 @@ from app.models.meeting import Meeting, MeetingStatusOut, MeetingUpdate
 from app.models.summary import Summary
 from app.models.transcript import Transcript
 from app.services.audio_service import AudioService
-from app.services.pipeline import run_meeting_pipeline, run_resummarize
+from app.services.pipeline import run_meeting_pipeline, run_resummarize, run_transcription
 from app.services.supabase_service import SupabaseService
 from app.utils.exceptions import ExternalServiceError, MeetingNotFoundError
 from app.utils.logging import get_logger
@@ -45,6 +47,7 @@ async def create_meeting_from_audio(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     title: str | None = Form(None),
+    mode: Literal["summary", "transcript"] = Form("summary"),
 ) -> dict:
     user_id = str(current_user["id"])
     file_bytes = await file.read()
@@ -66,8 +69,12 @@ async def create_meeting_from_audio(
         svc.delete_audio(audio_path)
         raise
 
-    background_tasks.add_task(run_meeting_pipeline, meeting_id, audio_path, ext)
-    log.info("Queued pipeline for meeting %s (user %s)", meeting_id, user_id)
+    if mode == "transcript":
+        background_tasks.add_task(run_transcription, meeting_id, audio_path, ext)
+        log.info("Queued transcription for meeting %s (user %s)", meeting_id, user_id)
+    else:
+        background_tasks.add_task(run_meeting_pipeline, meeting_id, audio_path, ext)
+        log.info("Queued summarize pipeline for meeting %s (user %s)", meeting_id, user_id)
     return meeting
 
 
