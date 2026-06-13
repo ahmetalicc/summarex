@@ -50,7 +50,7 @@ export function UserMenu() {
           'inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-bg-surface px-1.5 pr-2 text-sm text-text transition-colors hover:bg-bg-elevated',
         )}
       >
-        <span className="grid h-6 w-6 place-items-center rounded-md bg-gradient-to-br from-primary to-accent text-xs font-bold text-bg">
+        <span className="grid h-6 w-6 place-items-center rounded-md bg-gradient-to-br from-primary to-primary-hover text-xs font-bold text-bg">
           {initial}
         </span>
         <ChevronDownIcon

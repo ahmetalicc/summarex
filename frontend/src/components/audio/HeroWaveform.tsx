@@ -58,7 +58,7 @@ export function HeroWaveform({ className, barCount = 64 }: HeroWaveformProps) {
           key={i}
           data-bar
           style={{ transformOrigin: '50% 50%' }}
-          className="block h-24 w-[3px] rounded-full bg-gradient-to-b from-primary via-primary/60 to-accent/40 opacity-70 will-change-transform"
+          className="block h-24 w-[3px] rounded-full bg-gradient-to-b from-primary via-primary/60 to-primary-hover/40 opacity-70 will-change-transform"
         />
       ))}
     </div>
