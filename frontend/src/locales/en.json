@@ -8,6 +8,8 @@
     "signedInAs": "Signed in as",
     "dashboard": "Dashboard",
     "record": "Record",
+    "summarize": "Summarize",
+    "transcribe": "Transcribe",
     "language": "Language",
     "theme": "Theme",
     "toggleTheme": "Toggle theme",
@@ -140,6 +142,14 @@
     "fileEmpty": "The file is empty.",
     "fileTooLarge": "That file is over 100 MB. Try a smaller one."
   },
+  "summarize": {
+    "title": "Summarize audio",
+    "subtitle": "Record live or upload a file. Summarex transcribes it and pulls out the key points — decisions, action items, and more."
+  },
+  "transcribe": {
+    "title": "Transcribe audio",
+    "subtitle": "Record live or upload a file to get an accurate, searchable transcript. Add a summary later, whenever you want."
+  },
   "meeting": {
     "untitled": "Untitled recording",
     "statusQueued": "Queued",
@@ -158,6 +168,9 @@
     "regenerateConfirmTitle": "Regenerate the summary?",
     "regenerateConfirmBody": "We'll re-run the summary on the existing transcript. The current summary will be replaced.",
     "regenerateConfirmAction": "Regenerate",
+    "generateSummary": "Generate summary",
+    "summarizeCtaTitle": "Ready for a summary?",
+    "summarizeCtaBody": "Turn this transcript into an overview, decisions, action items, and key quotes — powered by Claude.",
     "delete": "Delete",
     "deleteConfirmTitle": "Delete this recording?",
     "deleteConfirmBody": "\"{{title}}\" and its transcript, summary, and audio file will be permanently removed. This can't be undone.",

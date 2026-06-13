@@ -9,7 +9,7 @@ import { Skeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
 import { MeetingCard } from '../components/meeting/MeetingCard';
 import { useMeetingsList } from '../hooks/useMeetings';
-import { MicIcon, RefreshIcon, SearchIcon } from '../components/layout/Icons';
+import { FileTextIcon, MicIcon, RefreshIcon, SearchIcon, SparklesIcon } from '../components/layout/Icons';
 
 const PAGE_SIZE = 12;
 
@@ -62,11 +62,18 @@ export default function Dashboard() {
           </h1>
           <p className="mt-1 text-sm text-text-muted">{t('dashboard.subtitle')}</p>
         </div>
-        <Link to="/record">
-          <Button leftIcon={<MicIcon width={16} height={16} />}>
-            {t('dashboard.newRecording')}
-          </Button>
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link to="/summarize">
+            <Button leftIcon={<SparklesIcon width={16} height={16} />}>
+              {t('common.summarize')}
+            </Button>
+          </Link>
+          <Link to="/transcribe">
+            <Button variant="secondary" leftIcon={<FileTextIcon width={16} height={16} />}>
+              {t('common.transcribe')}
+            </Button>
+          </Link>
+        </div>
       </header>
 
       <div className="mb-6 max-w-md">
@@ -114,11 +121,18 @@ export default function Dashboard() {
           }
           action={
             !search && (
-              <Link to="/record">
-                <Button leftIcon={<MicIcon width={16} height={16} />}>
-                  {t('dashboard.emptyCta')}
-                </Button>
-              </Link>
+              <div className="flex flex-wrap justify-center gap-2">
+                <Link to="/summarize">
+                  <Button leftIcon={<SparklesIcon width={16} height={16} />}>
+                    {t('common.summarize')}
+                  </Button>
+                </Link>
+                <Link to="/transcribe">
+                  <Button variant="secondary" leftIcon={<FileTextIcon width={16} height={16} />}>
+                    {t('common.transcribe')}
+                  </Button>
+                </Link>
+              </div>
             )
           }
         />

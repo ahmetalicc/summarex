@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthGuard } from './components/auth/AuthGuard';
 import { Layout } from './components/layout/Layout';
@@ -11,7 +11,8 @@ import i18n from './lib/i18n';
 const Landing = lazy(() => import('./pages/Landing'));
 const Login = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
-const RecordPage = lazy(() => import('./pages/RecordPage'));
+const SummarizePage = lazy(() => import('./pages/SummarizePage'));
+const TranscribePage = lazy(() => import('./pages/TranscribePage'));
 const MeetingDetail = lazy(() => import('./pages/MeetingDetail'));
 const SharedMeeting = lazy(() => import('./pages/SharedMeeting'));
 const Privacy = lazy(() => import('./pages/Privacy'));
@@ -68,13 +69,22 @@ function App() {
               }
             />
             <Route
-              path="/record"
+              path="/summarize"
               element={
                 <AuthGuard>
-                  <PageWrapper><RecordPage /></PageWrapper>
+                  <PageWrapper><SummarizePage /></PageWrapper>
                 </AuthGuard>
               }
             />
+            <Route
+              path="/transcribe"
+              element={
+                <AuthGuard>
+                  <PageWrapper><TranscribePage /></PageWrapper>
+                </AuthGuard>
+              }
+            />
+            <Route path="/record" element={<Navigate to="/summarize" replace />} />
             <Route
               path="/meetings/:id"
               element={

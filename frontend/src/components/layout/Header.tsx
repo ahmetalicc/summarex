@@ -40,8 +40,11 @@ export function Header() {
               <NavLink to="/dashboard" className={navLinkClass}>
                 {t('common.dashboard')}
               </NavLink>
-              <NavLink to="/record" className={navLinkClass}>
-                {t('common.record')}
+              <NavLink to="/summarize" className={navLinkClass}>
+                {t('common.summarize')}
+              </NavLink>
+              <NavLink to="/transcribe" className={navLinkClass}>
+                {t('common.transcribe')}
               </NavLink>
             </nav>
           )}
@@ -91,10 +94,16 @@ export function Header() {
                     {t('common.dashboard')}
                   </NavLink>
                   <NavLink
-                    to="/record"
+                    to="/summarize"
                     className="rounded-lg px-3 py-2 text-sm text-text hover:bg-bg-surface"
                   >
-                    {t('common.record')}
+                    {t('common.summarize')}
+                  </NavLink>
+                  <NavLink
+                    to="/transcribe"
+                    className="rounded-lg px-3 py-2 text-sm text-text hover:bg-bg-surface"
+                  >
+                    {t('common.transcribe')}
                   </NavLink>
                 </nav>
               )}
