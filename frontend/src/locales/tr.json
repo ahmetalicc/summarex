@@ -66,6 +66,14 @@
     "demoActions": "Aksiyon maddeleri",
     "demoAction1Task": "Tüm müşterilere yayılma duyurusu e-postasını gönder.",
     "demoAction1Deadline": "Son tarih: Pazartesi",
+    "mobile": {
+      "eyebrow": "Mobil uygulamalar",
+      "title": "Summarex'i yanında taşı.",
+      "subtitle": "Hareket halindeyken kaydet, yazıya dök ve özetle. iOS ve Android uygulamalarımız yolda — daha uzun kayıtlar ve mobile özel Pro özellikleriyle.",
+      "comingSoon": "Yakında",
+      "appStore": "App Store",
+      "googlePlay": "Google Play"
+    },
     "finalCtaTitle": "Sesi ileri-geri sarmayı bırak. Önemi olanı bul.",
     "finalCtaSubtitle": "Beta sürecinde ücretsiz. Kart bilgisi yok. Kurulum yok.",
     "finalCtaButton": "Ücretsiz başla"
