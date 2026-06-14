@@ -48,6 +48,7 @@ async def create_meeting_from_audio(
     file: UploadFile = File(...),
     title: str | None = Form(None),
     mode: Literal["summary", "transcript"] = Form("summary"),
+    duration_seconds: float | None = Form(None),
 ) -> dict:
     user_id = str(current_user["id"])
     file_bytes = await file.read()
@@ -62,7 +63,7 @@ async def create_meeting_from_audio(
             user_id=user_id,
             title=title or None,
             audio_url=audio_path,
-            duration_seconds=None,
+            duration_seconds=duration_seconds,
             meeting_id=meeting_id,
         )
     except ExternalServiceError:

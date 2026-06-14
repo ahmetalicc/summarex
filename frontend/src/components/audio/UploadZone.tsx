@@ -23,6 +23,28 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function probeDurationSeconds(file: File): Promise<number | undefined> {
+  return new Promise((resolve) => {
+    try {
+      const url = URL.createObjectURL(file);
+      const audio = document.createElement('audio');
+      audio.preload = 'metadata';
+      audio.onloadedmetadata = () => {
+        URL.revokeObjectURL(url);
+        const d = audio.duration;
+        resolve(Number.isFinite(d) && d > 0 ? d : undefined);
+      };
+      audio.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(undefined);
+      };
+      audio.src = url;
+    } catch {
+      resolve(undefined);
+    }
+  });
+}
+
 export function UploadZone({ mode = 'summary' }: { mode?: ProcessingMode }) {
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -94,9 +116,10 @@ export function UploadZone({ mode = 'summary' }: { mode?: ProcessingMode }) {
     uploadMutation.reset();
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!file) return;
-    uploadMutation.mutate({ file, title: title.trim() || undefined, mode });
+    const durationSeconds = await probeDurationSeconds(file);
+    uploadMutation.mutate({ file, title: title.trim() || undefined, mode, durationSeconds });
   };
 
   return (
@@ -179,7 +202,7 @@ export function UploadZone({ mode = 'summary' }: { mode?: ProcessingMode }) {
           )}
 
           <Button
-            onClick={handleUpload}
+            onClick={() => void handleUpload()}
             isLoading={uploadMutation.isPending}
             leftIcon={!uploadMutation.isPending && <UploadIcon width={16} height={16} />}
           >
