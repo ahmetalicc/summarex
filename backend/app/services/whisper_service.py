@@ -21,6 +21,19 @@ log = get_logger(__name__)
 _LANGUAGE_NORMALIZE = {"english": "en", "turkish": "tr", "en": "en", "tr": "tr"}
 _COST_PER_MINUTE_USD = 0.006
 
+_TR_CHARS = set("çğıöşüÇĞİÖŞÜ")
+
+
+def _detect_language_from_text(text: str) -> str:
+    """Lightweight EN/TR detection for models that don't return a language
+    (gpt-4o-mini-transcribe / gpt-4o-transcribe). Turkish prose is dense with
+    ç/ğ/ı/ö/ş/ü, which English never uses; require a small minimum to ignore a
+    stray loanword or proper noun."""
+    if not text:
+        return "en"
+    tr_count = sum(1 for ch in text if ch in _TR_CHARS)
+    return "tr" if tr_count >= 3 else "en"
+
 
 def _uses_verbose_json(model: str) -> bool:
     """Only whisper-1 supports verbose_json with timestamp_granularities."""
@@ -84,7 +97,7 @@ class WhisperService:
             ]
         else:
             audio_seconds = 0.0
-            raw_language = (getattr(response, "language", None) or "").lower()
+            raw_language = _detect_language_from_text(response.text)
             segments = []
 
         normalized_language = _LANGUAGE_NORMALIZE.get(raw_language, "en")
