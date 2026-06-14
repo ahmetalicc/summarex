@@ -66,6 +66,14 @@
     "demoActions": "Action items",
     "demoAction1Task": "Send the rollout announcement email to all customers.",
     "demoAction1Deadline": "Due Monday",
+    "mobile": {
+      "eyebrow": "Mobile apps",
+      "title": "Take Summarex with you.",
+      "subtitle": "Record, transcribe, and summarize on the go. Our iOS and Android apps are on the way — with longer recordings and Pro features built for mobile.",
+      "comingSoon": "Coming soon",
+      "appStore": "App Store",
+      "googlePlay": "Google Play"
+    },
     "finalCtaTitle": "Stop scrubbing audio. Start finding what matters.",
     "finalCtaSubtitle": "Free during beta. No credit card. No setup.",
     "finalCtaButton": "Get started free"

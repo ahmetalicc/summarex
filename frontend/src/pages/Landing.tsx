@@ -7,7 +7,9 @@ import { Card, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { HeroWaveform } from '../components/audio/HeroWaveform';
 import {
+  AppleIcon,
   FileTextIcon,
+  GooglePlayIcon,
   MicIcon,
   PlayIcon,
   ShareIcon,
@@ -232,6 +234,45 @@ export default function Landing() {
             </Card>
           </motion.div>
         </div>
+      </section>
+
+      {/* MOBILE TEASER */}
+      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="flex flex-col items-center gap-6 rounded-3xl border border-border bg-bg-surface/60 px-8 py-12 text-center backdrop-blur"
+        >
+          <Badge variant="info">{t('landing.mobile.eyebrow')}</Badge>
+          <h2 className="font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">
+            {t('landing.mobile.title')}
+          </h2>
+          <p className="max-w-xl text-text-muted">{t('landing.mobile.subtitle')}</p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {(
+              [
+                { Icon: AppleIcon, label: t('landing.mobile.appStore') },
+                { Icon: GooglePlayIcon, label: t('landing.mobile.googlePlay') },
+              ] as const
+            ).map(({ Icon, label }) => (
+              <span
+                key={label}
+                aria-disabled
+                className="inline-flex cursor-default items-center gap-2.5 rounded-xl border border-border bg-bg-elevated/70 px-4 py-2.5 text-left opacity-80"
+              >
+                <Icon width={22} height={22} />
+                <span className="flex flex-col leading-tight">
+                  <span className="text-[10px] uppercase tracking-wider text-text-muted">
+                    {t('landing.mobile.comingSoon')}
+                  </span>
+                  <span className="text-sm font-semibold text-text">{label}</span>
+                </span>
+              </span>
+            ))}
+          </div>
+        </motion.div>
       </section>
 
       {/* FINAL CTA */}
