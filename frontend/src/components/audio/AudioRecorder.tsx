@@ -65,7 +65,12 @@ export function AudioRecorder({ mode = 'summary' }: { mode?: ProcessingMode }) {
 
   const handleSave = () => {
     if (!blob) return;
-    recordMutation.mutate({ blob, title: title.trim() || undefined, mode });
+    recordMutation.mutate({
+      blob,
+      title: title.trim() || undefined,
+      mode,
+      durationSeconds: durationMs > 0 ? durationMs / 1000 : undefined,
+    });
   };
 
   const ringColor = isError

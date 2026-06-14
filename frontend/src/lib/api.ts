@@ -48,6 +48,7 @@ export function deleteMeeting(id: string): Promise<Meeting> {
 export interface UploadAudioOptions {
   title?: string;
   mode?: ProcessingMode;
+  durationSeconds?: number;
 }
 
 function buildAudioForm(file: Blob, filename: string, opts: UploadAudioOptions): FormData {
@@ -55,6 +56,7 @@ function buildAudioForm(file: Blob, filename: string, opts: UploadAudioOptions):
   form.append('file', file, filename);
   if (opts.title) form.append('title', opts.title);
   if (opts.mode) form.append('mode', opts.mode);
+  if (opts.durationSeconds != null) form.append('duration_seconds', String(opts.durationSeconds));
   return form;
 }
 
