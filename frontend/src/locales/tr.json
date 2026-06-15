@@ -31,11 +31,11 @@
         "description": "Tarayıcıdan sesi yakala ya da dosyayı bırak. MP3, WAV, M4A, WebM — hepsi destekli."
       },
       "transcribe": {
-        "title": "Whisper kalitesinde döküm",
-        "description": "Zaman damgalı, çok dilli ve doğru — üzerinde gezinip aratabileceğin transkriptler."
+        "title": "Doğru transkriptler",
+        "description": "Okuyabileceğin, arayabileceğin ve saniyeler içinde kopyalayabileceğin temiz, çok dilli transkriptler."
       },
       "summarize": {
-        "title": "Claude özetleri",
+        "title": "Akıllı özetler",
         "description": "Kararlar, aksiyon maddeleri, ton ve önemli alıntılar — otomatik olarak çıkarılır."
       },
       "share": {
@@ -47,7 +47,7 @@
     "demoSubtitle": "Diğer tarafta seni neyin beklediğini gösteren gerçekçi bir örnek.",
     "demoTranscriptLabel": "Transkript",
     "demoTranscript": {
-      "badge": "Whisper · TR",
+      "badge": "AI · TR",
       "line1Speaker": "Maya",
       "line1Text": "Hızlıca toparlayalım — Q2 planlaması. Bugün üç karar alarak çıkmak istiyorum.",
       "line2Speaker": "Diego",

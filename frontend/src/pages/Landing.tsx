@@ -190,7 +190,7 @@ export default function Landing() {
                   <h3 className="text-sm font-semibold uppercase tracking-wider text-text-muted">
                     {t('landing.demoSummaryLabel')}
                   </h3>
-                  <Badge variant="success">Claude · Done</Badge>
+                  <Badge variant="success">AI · Done</Badge>
                 </div>
                 <div className="space-y-5 text-sm">
                   <div>

@@ -1,9 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Brand } from './Brand';
-import { GitHubIcon } from './Icons';
-
-const GITHUB_URL = 'https://github.com/ahmetalicc/summarex.git';
 
 export function Footer() {
   const { t } = useTranslation();
@@ -22,15 +19,6 @@ export function Footer() {
           <Link to="/terms" className="text-xs transition-colors hover:text-text">
             {t('footer.terms')}
           </Link>
-          <a
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="transition-colors hover:text-text"
-            aria-label={t('footer.github')}
-          >
-            <GitHubIcon width={18} height={18} />
-          </a>
         </div>
       </div>
     </footer>
