@@ -40,18 +40,27 @@ export default function Landing() {
           aria-hidden
           className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_15%,rgba(42,180,143,0.08),transparent_60%)]"
         />
-        <div className="absolute inset-x-0 top-1/2 -z-10 h-72 -translate-y-1/2">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.9, ease: 'easeOut', delay: 0.15 }}
+          className="absolute inset-x-0 top-1/2 -z-10 h-72 -translate-y-1/2"
+        >
           <HeroWaveform />
-        </div>
+        </motion.div>
         <div className="mx-auto flex min-h-[calc(100dvh-4rem-4rem)] max-w-5xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
           >
-            <Badge variant="info" className="mb-6">
-              {t('landing.heroEyebrow')}
-            </Badge>
+            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/70 bg-bg-surface/40 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted backdrop-blur">
+                <span
+                  aria-hidden
+                  className="h-1.5 w-1.5 rounded-full bg-primary motion-safe:animate-pulse"
+                />
+                {t('landing.heroEyebrow')}
+              </span>
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
