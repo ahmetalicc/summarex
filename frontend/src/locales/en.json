@@ -31,11 +31,11 @@
         "description": "Capture audio in the browser or drop a file. MP3, WAV, M4A, WebM — all handled."
       },
       "transcribe": {
-        "title": "Whisper-grade transcripts",
-        "description": "Accurate, timestamped, multilingual transcripts you can scrub through and search."
+        "title": "Accurate transcripts",
+        "description": "Clean, multilingual transcripts you can read, search, and copy in seconds."
       },
       "summarize": {
-        "title": "Claude summaries",
+        "title": "Smart summaries",
         "description": "Decisions, action items, sentiment, and key quotes — pulled out automatically."
       },
       "share": {
@@ -47,7 +47,7 @@
     "demoSubtitle": "A real-looking example so you know what to expect on the other side.",
     "demoTranscriptLabel": "Transcript",
     "demoTranscript": {
-      "badge": "Whisper · EN",
+      "badge": "AI · EN",
       "line1Speaker": "Maya",
       "line1Text": "Quick reset before we dive in — Q2 planning. I want to walk away with three decisions today.",
       "line2Speaker": "Diego",
