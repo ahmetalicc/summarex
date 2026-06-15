@@ -29,8 +29,8 @@ const config: Config = {
         error: '#EF4444',
       },
       fontFamily: {
-        display: ['Sora', 'sans-serif'],
-        body: ['"Plus Jakarta Sans"', 'sans-serif'],
+        display: ['"Space Grotesk"', 'sans-serif'],
+        body: ['"DM Sans"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
     },
