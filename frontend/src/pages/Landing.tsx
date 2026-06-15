@@ -38,7 +38,7 @@ export default function Landing() {
       <section className="relative isolate overflow-hidden">
         <div
           aria-hidden
-          className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_30%,rgba(0,212,170,0.18),transparent_55%),radial-gradient(circle_at_75%_70%,rgba(245,166,35,0.12),transparent_60%)]"
+          className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_15%,rgba(42,180,143,0.08),transparent_60%)]"
         />
         <div className="absolute inset-x-0 top-1/2 -z-10 h-72 -translate-y-1/2">
           <HeroWaveform />
