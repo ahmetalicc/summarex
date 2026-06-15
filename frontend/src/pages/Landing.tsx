@@ -12,7 +12,6 @@ import {
   GooglePlayIcon,
   MicIcon,
   PlayIcon,
-  ShareIcon,
   SparklesIcon,
   UploadIcon,
 } from '../components/layout/Icons';
@@ -20,13 +19,6 @@ import {
 export default function Landing() {
   const { t } = useTranslation();
   const demoRef = useRef<HTMLDivElement>(null);
-
-  const features = [
-    { key: 'record', Icon: MicIcon },
-    { key: 'transcribe', Icon: FileTextIcon },
-    { key: 'summarize', Icon: SparklesIcon },
-    { key: 'share', Icon: ShareIcon },
-  ] as const;
 
   const scrollToDemo = () => {
     demoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -105,16 +97,24 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
+      {/* TWO FLOWS */}
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
         <div className="mx-auto mb-12 max-w-2xl text-center">
+          <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
+            {t('landing.flows.eyebrow')}
+          </p>
           <h2 className="font-display text-3xl font-bold tracking-tight text-text sm:text-4xl">
-            {t('landing.featuresTitle')}
+            {t('landing.flows.title')}
           </h2>
-          <p className="mt-3 text-text-muted">{t('landing.featuresSubtitle')}</p>
+          <p className="mt-3 text-text-muted">{t('landing.flows.subtitle')}</p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map(({ key, Icon }, i) => (
+        <div className="grid gap-5 md:grid-cols-2">
+          {(
+            [
+              { Icon: SparklesIcon, key: 'summarize' },
+              { Icon: FileTextIcon, key: 'transcribe' },
+            ] as const
+          ).map(({ Icon, key }, i) => (
             <motion.div
               key={key}
               initial={{ opacity: 0, y: 16 }}
@@ -122,17 +122,22 @@ export default function Landing() {
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 0.45, delay: i * 0.08, ease: 'easeOut' }}
             >
-              <Card hoverable className="h-full">
-                <CardContent className="flex h-full flex-col gap-3 p-6">
-                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-                    <Icon width={20} height={20} />
+              <Card glass className="h-full">
+                <CardContent className="flex h-full flex-col gap-4 p-7">
+                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary">
+                    <Icon width={22} height={22} />
                   </span>
-                  <h3 className="text-base font-semibold text-text">
-                    {t(`landing.features.${key}.title`)}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-text-muted">
-                    {t(`landing.features.${key}.description`)}
-                  </p>
+                  <div>
+                    <h3 className="font-display text-xl font-semibold text-text">
+                      {t(`landing.flows.${key}.title`)}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-text-muted">
+                      {t(`landing.flows.${key}.description`)}
+                    </p>
+                  </div>
+                  <span className="mt-auto pt-2 font-mono text-[11px] uppercase tracking-[0.16em] text-primary">
+                    {t(`landing.flows.${key}.tag`)}
+                  </span>
                 </CardContent>
               </Card>
             </motion.div>
