@@ -43,6 +43,21 @@
         "description": "Generate a public read-only view your team can open without an account."
       }
     },
+    "flows": {
+      "eyebrow": "Two ways to work",
+      "title": "One app, two workflows.",
+      "subtitle": "Get a full AI summary, or just a clean transcript — whichever the moment calls for.",
+      "summarize": {
+        "title": "Summarize",
+        "description": "Upload or record audio and get a structured summary — overview, decisions, action items, and key quotes. Or summarize a transcript you already have.",
+        "tag": "Audio → Summary"
+      },
+      "transcribe": {
+        "title": "Transcribe",
+        "description": "Just need the words? Get a clean, multilingual transcript you can read, search, and copy — then summarize it later if you want.",
+        "tag": "Audio → Transcript"
+      }
+    },
     "demoTitle": "What the AI actually gives you.",
     "demoSubtitle": "A real-looking example so you know what to expect on the other side.",
     "demoTranscriptLabel": "Transcript",

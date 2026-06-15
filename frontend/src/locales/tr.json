@@ -43,6 +43,21 @@
         "description": "Ekibinin hesapsız açabileceği herkese açık, salt-okunur bir görünüm oluştur."
       }
     },
+    "flows": {
+      "eyebrow": "İki çalışma şekli",
+      "title": "Tek uygulama, iki akış.",
+      "subtitle": "İster tam bir yapay zekâ özeti, ister sadece temiz bir transkript — anına göre seç.",
+      "summarize": {
+        "title": "Özetle",
+        "description": "Ses yükle veya kaydet, yapısal bir özet al — genel bakış, kararlar, aksiyon maddeleri ve önemli alıntılar. Ya da elindeki bir transkripti özetle.",
+        "tag": "Ses → Özet"
+      },
+      "transcribe": {
+        "title": "Yazıya dök",
+        "description": "Sadece metin mi lazım? Okuyabileceğin, arayabileceğin ve kopyalayabileceğin temiz, çok dilli bir transkript al — istersen sonra özetle.",
+        "tag": "Ses → Transkript"
+      }
+    },
     "demoTitle": "Yapay zekâ aslında sana ne veriyor.",
     "demoSubtitle": "Diğer tarafta seni neyin beklediğini gösteren gerçekçi bir örnek.",
     "demoTranscriptLabel": "Transkript",
