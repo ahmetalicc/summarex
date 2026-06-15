@@ -168,25 +168,15 @@ export default function Landing() {
                   </h3>
                   <Badge variant="info">{t('landing.demoTranscript.badge')}</Badge>
                 </div>
-                <div className="space-y-3 text-sm leading-relaxed">
-                  {(
-                    [
-                      { time: '00:12', who: t('landing.demoTranscript.line1Speaker'), text: t('landing.demoTranscript.line1Text') },
-                      { time: '01:34', who: t('landing.demoTranscript.line2Speaker'), text: t('landing.demoTranscript.line2Text') },
-                      { time: '03:08', who: t('landing.demoTranscript.line3Speaker'), text: t('landing.demoTranscript.line3Text') },
-                      { time: '04:52', who: t('landing.demoTranscript.line4Speaker'), text: t('landing.demoTranscript.line4Text') },
-                    ] as const
-                  ).map((line) => (
-                    <div key={line.time} className="flex gap-3">
-                      <span className="mt-0.5 inline-flex h-6 shrink-0 items-center rounded-md border border-border/80 bg-bg-elevated px-1.5 font-mono text-[10px] text-text-muted">
-                        {line.time}
-                      </span>
-                      <p className="text-text">
-                        <span className="font-semibold text-primary">{line.who}:</span>{' '}
-                        <span className="text-text-muted">{line.text}</span>
-                      </p>
-                    </div>
-                  ))}
+                <div className="space-y-3 text-sm leading-relaxed text-text-muted">
+                  <p>
+                    {t('landing.demoTranscript.line1Text')}{' '}
+                    {t('landing.demoTranscript.line2Text')}
+                  </p>
+                  <p>
+                    {t('landing.demoTranscript.line3Text')}{' '}
+                    {t('landing.demoTranscript.line4Text')}
+                  </p>
                 </div>
               </CardContent>
             </Card>
