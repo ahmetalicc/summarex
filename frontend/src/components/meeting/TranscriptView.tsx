@@ -93,7 +93,7 @@ export function TranscriptView({ transcript, className }: TranscriptViewProps) {
         </button>
       </header>
 
-      <div className="flex-1 overflow-y-auto px-5 py-4">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4">
         {hasSegments ? (
           <ol className="space-y-2">
             {segments.map((seg, idx) => {

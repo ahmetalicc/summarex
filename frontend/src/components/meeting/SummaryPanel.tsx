@@ -47,7 +47,7 @@ export function SummaryPanel({ summary, className }: SummaryPanelProps) {
         </h2>
       </header>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto overscroll-contain">
         <CollapsibleSection title={t('meeting.summary.sections.overview')}>
           {overviewParagraphs.length > 0 ? (
             <div className="space-y-3 text-sm leading-relaxed text-text">
