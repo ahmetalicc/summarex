@@ -1,7 +1,7 @@
 """Audio validation. Format check + size check only.
 
-Duration is derived later from Whisper's verbose_json response, so we don't probe
-files locally and we don't depend on FFmpeg in this layer.
+Duration is derived later from the transcription service (ElevenLabs Scribe word
+timestamps), so we don't probe files locally and we don't depend on FFmpeg in this layer.
 """
 from app.utils.exceptions import AudioValidationError
 

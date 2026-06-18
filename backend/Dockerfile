@@ -10,8 +10,7 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /app
 
 # Install dependencies first so the layer caches across code changes.
-# Transcription uses the OpenAI Whisper API (not the local model), so no
-# ffmpeg or other system audio libraries are required — keep the image lean.
+# Transcription uses the ElevenLabs Scribe v2 HTTP API, so no audio libraries are needed.
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
