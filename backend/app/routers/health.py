@@ -21,6 +21,6 @@ def health():
     return {
         "status": "ok" if supabase_ok else "degraded",
         "supabase": "up" if supabase_ok else "down",
-        "openai_configured": bool(settings.OPENAI_API_KEY),
+        "elevenlabs_configured": bool(settings.ELEVENLABS_API_KEY),
         "anthropic_configured": bool(settings.ANTHROPIC_API_KEY),
     }

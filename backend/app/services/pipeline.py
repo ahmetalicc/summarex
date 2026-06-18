@@ -13,7 +13,7 @@ from io import BytesIO
 
 from app.services.claude_service import ClaudeService
 from app.services.supabase_service import SupabaseService
-from app.services.whisper_service import WhisperService
+from app.services.transcription_service import TranscriptionService
 from app.utils.exceptions import SummarexError
 from app.utils.logging import get_logger
 
@@ -21,32 +21,32 @@ log = get_logger(__name__)
 
 
 async def run_meeting_pipeline(meeting_id: str, audio_path: str, extension: str) -> None:
-    """Download audio, transcribe with Whisper, summarize with Claude, persist results."""
+    """Download audio, transcribe with ElevenLabs Scribe, summarize with Claude, persist results."""
     supabase = SupabaseService()
     try:
         supabase.update_meeting_status(meeting_id, "transcribing")
         audio_bytes = await asyncio.to_thread(supabase.download_audio, audio_path)
 
         buf = BytesIO(audio_bytes)
-        buf.name = f"audio.{extension}"  # OpenAI SDK uses .name for MIME sniffing
-        whisper = WhisperService()
-        whisper_result = await whisper.transcribe(buf)
+        buf.name = f"audio.{extension}"  # transcription service uses .name to derive MIME type
+        transcriber = TranscriptionService()
+        result = await transcriber.transcribe(buf)
 
         supabase.create_transcript(
             meeting_id=meeting_id,
-            full_text=whisper_result["full_text"],
-            language=whisper_result["language"],
-            segments=whisper_result["segments"],
+            full_text=result["full_text"],
+            language=result["language"],
+            segments=result["segments"],
         )
 
-        if whisper_result.get("duration_seconds"):
+        if result.get("duration_seconds"):
             supabase._ensure_client().table("meetings").update(
-                {"duration_seconds": int(whisper_result["duration_seconds"])}
+                {"duration_seconds": int(result["duration_seconds"])}
             ).eq("id", meeting_id).execute()
 
         supabase.update_meeting_status(meeting_id, "summarizing")
         claude = ClaudeService()
-        summary_payload = await claude.summarize(whisper_result["full_text"])
+        summary_payload = await claude.summarize(result["full_text"])
         supabase.create_summary(meeting_id=meeting_id, payload=summary_payload)
 
         supabase.update_meeting_status(meeting_id, "done")
@@ -66,27 +66,27 @@ async def run_meeting_pipeline(meeting_id: str, audio_path: str, extension: str)
 
 
 async def run_transcription(meeting_id: str, audio_path: str, extension: str) -> None:
-    """Transcribe-only flow: download audio, transcribe with Whisper, persist the transcript. No summary."""
+    """Transcribe-only flow: download audio, transcribe with ElevenLabs Scribe, persist the transcript. No summary."""
     supabase = SupabaseService()
     try:
         supabase.update_meeting_status(meeting_id, "transcribing")
         audio_bytes = await asyncio.to_thread(supabase.download_audio, audio_path)
 
         buf = BytesIO(audio_bytes)
-        buf.name = f"audio.{extension}"  # OpenAI SDK uses .name for MIME sniffing
-        whisper = WhisperService()
-        whisper_result = await whisper.transcribe(buf)
+        buf.name = f"audio.{extension}"  # transcription service uses .name to derive MIME type
+        transcriber = TranscriptionService()
+        result = await transcriber.transcribe(buf)
 
         supabase.create_transcript(
             meeting_id=meeting_id,
-            full_text=whisper_result["full_text"],
-            language=whisper_result["language"],
-            segments=whisper_result["segments"],
+            full_text=result["full_text"],
+            language=result["language"],
+            segments=result["segments"],
         )
 
-        if whisper_result.get("duration_seconds"):
+        if result.get("duration_seconds"):
             supabase._ensure_client().table("meetings").update(
-                {"duration_seconds": int(whisper_result["duration_seconds"])}
+                {"duration_seconds": int(result["duration_seconds"])}
             ).eq("id", meeting_id).execute()
 
         supabase.update_meeting_status(meeting_id, "transcribed")
@@ -104,7 +104,7 @@ async def run_transcription(meeting_id: str, audio_path: str, extension: str) ->
 
 
 async def run_resummarize(meeting_id: str) -> None:
-    """Re-summarize from existing transcript. Skips Whisper entirely."""
+    """Re-summarize from existing transcript. Skips transcription entirely."""
     supabase = SupabaseService()
     try:
         supabase.update_meeting_status(meeting_id, "summarizing")
