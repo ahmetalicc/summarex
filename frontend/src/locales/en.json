@@ -274,7 +274,15 @@
     "rights": "All rights reserved.",
     "privacy": "Privacy",
     "terms": "Terms",
-    "github": "GitHub"
+    "github": "GitHub",
+    "contact": "Contact"
+  },
+  "contactPage": {
+    "pageTitle": "Contact",
+    "intro": "Have a question, feedback, or need help? Reach out and we'll get back to you as soon as we can.",
+    "emailLabel": "Email",
+    "socialLabel": "Follow us",
+    "instagram": "Instagram"
   },
   "privacy": {
     "pageTitle": "Privacy Policy",

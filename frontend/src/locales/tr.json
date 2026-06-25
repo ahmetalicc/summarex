@@ -274,7 +274,15 @@
     "rights": "Tüm hakları saklıdır.",
     "privacy": "Gizlilik",
     "terms": "Şartlar",
-    "github": "GitHub"
+    "github": "GitHub",
+    "contact": "İletişim"
+  },
+  "contactPage": {
+    "pageTitle": "İletişim",
+    "intro": "Sorunuz, geri bildiriminiz mi var ya da yardıma mı ihtiyacınız var? Bize ulaşın, en kısa sürede dönüş yapalım.",
+    "emailLabel": "E-posta",
+    "socialLabel": "Bizi takip edin",
+    "instagram": "Instagram"
   },
   "privacy": {
     "pageTitle": "Gizlilik Politikası",

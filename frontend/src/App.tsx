@@ -17,6 +17,7 @@ const MeetingDetail = lazy(() => import('./pages/MeetingDetail'));
 const SharedMeeting = lazy(() => import('./pages/SharedMeeting'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
+const Contact = lazy(() => import('./pages/Contact'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 const PAGE_TRANSITION = {
@@ -96,6 +97,7 @@ function App() {
             <Route path="/shared/:token" element={<PageWrapper><SharedMeeting /></PageWrapper>} />
             <Route path="/privacy" element={<PageWrapper><Privacy /></PageWrapper>} />
             <Route path="/terms" element={<PageWrapper><Terms /></PageWrapper>} />
+            <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
             <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
           </Route>
         </Routes>

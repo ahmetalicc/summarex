@@ -19,6 +19,9 @@ export function Footer() {
           <Link to="/terms" className="text-xs transition-colors hover:text-text">
             {t('footer.terms')}
           </Link>
+          <Link to="/contact" className="text-xs transition-colors hover:text-text">
+            {t('footer.contact')}
+          </Link>
         </div>
       </div>
     </footer>
