@@ -20,7 +20,7 @@
   "landing": {
     "heroEyebrow": "Yapay zekâ destekli ses zekâsı",
     "heroTitle": "Saatler süren ses, dakikalar içinde özet.",
-    "heroSubtitle": "Canlı kaydet ya da dosya yükle. Summarex metne döker, kilit noktaları öne çıkarır ve uzun sesi — toplantılar, dersler, röportajlar, podcastler — taranabilir bir özete dönüştürür.",
+    "heroSubtitle": "Canlı kaydet ya da dosya yükle. Summarex metne döker, kilit noktaları öne çıkarır ve toplantı, ders, röportaj, podcast gibi uzun kayıtları taranabilir bir özete dönüştürür.",
     "ctaPrimary": "Summarex'i dene",
     "ctaSecondary": "Nasıl çalıştığını gör",
     "featuresTitle": "Ham sesten net adımlara.",
@@ -28,7 +28,7 @@
     "features": {
       "record": {
         "title": "Kaydet ya da yükle",
-        "description": "Tarayıcıdan sesi yakala ya da dosyayı bırak. MP3, WAV, M4A, WebM — hepsi destekli."
+        "description": "Tarayıcıdan sesi yakala ya da dosyayı bırak. MP3, WAV, M4A, WebM. Hepsi destekli."
       },
       "transcribe": {
         "title": "Doğru transkriptler",
@@ -36,7 +36,7 @@
       },
       "summarize": {
         "title": "Akıllı özetler",
-        "description": "Kararlar, aksiyon maddeleri, ton ve önemli alıntılar — otomatik olarak çıkarılır."
+        "description": "Kararlar, aksiyon maddeleri, ton ve önemli alıntılar otomatik olarak çıkarılır."
       },
       "share": {
         "title": "Tek bağlantıyla paylaş",
@@ -46,15 +46,15 @@
     "flows": {
       "eyebrow": "İki çalışma şekli",
       "title": "Tek uygulama, iki akış.",
-      "subtitle": "İster tam bir yapay zekâ özeti, ister sadece temiz bir transkript — anına göre seç.",
+      "subtitle": "İster tam bir yapay zekâ özeti ister sadece temiz bir transkript. Anına göre seç.",
       "summarize": {
         "title": "Özetle",
-        "description": "Ses yükle veya kaydet, yapısal bir özet al — genel bakış, kararlar, aksiyon maddeleri ve önemli alıntılar. Ya da elindeki bir transkripti özetle.",
+        "description": "Ses yükle veya kaydet, genel bakış, kararlar, aksiyon maddeleri ve önemli alıntılar içeren yapısal bir özet al. Ya da elindeki bir transkripti özetle.",
         "tag": "Ses → Özet"
       },
       "transcribe": {
         "title": "Yazıya dök",
-        "description": "Sadece metin mi lazım? Okuyabileceğin, arayabileceğin ve kopyalayabileceğin temiz, çok dilli bir transkript al — istersen sonra özetle.",
+        "description": "Sadece metin mi lazım? Okuyabileceğin, arayabileceğin ve kopyalayabileceğin temiz, çok dilli bir transkript al, istersen sonra özetlersin.",
         "tag": "Ses → Transkript"
       }
     },
@@ -64,11 +64,11 @@
     "demoTranscript": {
       "badge": "AI · TR",
       "line1Speaker": "Maya",
-      "line1Text": "Hızlıca toparlayalım — Q2 planlaması. Bugün üç karar alarak çıkmak istiyorum.",
+      "line1Text": "Hızlıca toparlayalım. Q2 planlaması var, bugün üç karar alarak çıkmak istiyorum.",
       "line2Speaker": "Diego",
       "line2Text": "Fiyatlandırma denemesi %14 dönüşüm artışıyla kapandı. Bence önümüzdeki hafta %100'e açalım.",
       "line3Speaker": "Aisha",
-      "line3Text": "Katılıyorum — Maya, duyuru e-postasını sen üstlenebilir misin? Ben de dashboard güncellemelerini hallederim.",
+      "line3Text": "Katılıyorum. Maya, duyuru e-postasını sen üstlenebilir misin? Ben de dashboard güncellemelerini hallederim.",
       "line4Speaker": "Maya",
       "line4Text": "Anlaştık. Salı'ya yayın için kilitleyelim, iki hafta sonra churn metriklerine geri dönelim."
     },
@@ -84,7 +84,7 @@
     "mobile": {
       "eyebrow": "Mobil uygulamalar",
       "title": "Summarex'i yanında taşı.",
-      "subtitle": "Hareket halindeyken kaydet, yazıya dök ve özetle. iOS ve Android uygulamalarımız yolda — daha uzun kayıtlar ve mobile özel Pro özellikleriyle.",
+      "subtitle": "Hareket halindeyken kaydet, yazıya dök ve özetle. iOS ve Android uygulamalarımız yolda. Daha uzun kayıtlar ve mobile özel Pro özellikleriyle geliyor.",
       "comingSoon": "Yakında",
       "appStore": "App Store",
       "googlePlay": "Google Play"
@@ -122,7 +122,7 @@
   },
   "dashboard": {
     "title": "Kayıtların",
-    "subtitle": "Kaydettiğin ya da yüklediğin her kayıt — aranabilir ve tekrar açılmaya hazır.",
+    "subtitle": "Kaydettiğin ya da yüklediğin her kayıt aranabilir ve tekrar açılmaya hazır.",
     "newRecording": "Yeni kayıt",
     "searchPlaceholder": "Başlığa göre ara…",
     "emptyTitle": "Henüz kayıt yok",
@@ -167,9 +167,9 @@
   },
   "summarize": {
     "title": "Sesi özetle",
-    "subtitle": "Canlı kaydet veya dosya yükle. Summarex sesi metne döker ve önemli noktaları çıkarır — kararlar, aksiyon maddeleri ve daha fazlası.",
+    "subtitle": "Canlı kaydet veya dosya yükle. Summarex sesi metne döker ve kararlar, aksiyon maddeleri ve daha fazlası gibi önemli noktaları çıkarır.",
     "pickerTitle": "Veya mevcut bir transkripti özetle",
-    "pickerSubtitle": "Transkriptlerinden birini seç ve özete dönüştür — sesi yeniden yüklemene gerek yok.",
+    "pickerSubtitle": "Transkriptlerinden birini seç ve özete dönüştür. Sesi yeniden yüklemene gerek yok.",
     "pickerEmpty": "Özet bekleyen transkript yok. Önce bir sesi yazıya dök, sonra buraya dön.",
     "pickerAction": "Özetle"
   },
@@ -197,7 +197,7 @@
     "regenerateConfirmAction": "Yenile",
     "generateSummary": "Özet çıkar",
     "summarizeCtaTitle": "Özet ister misin?",
-    "summarizeCtaBody": "Bu transkripti genel bakış, kararlar, aksiyon maddeleri ve önemli alıntılara dönüştür — Claude ile.",
+    "summarizeCtaBody": "Bu transkripti Claude ile genel bakış, kararlar, aksiyon maddeleri ve önemli alıntılara dönüştür.",
     "delete": "Sil",
     "deleteConfirmTitle": "Bu kayıt silinsin mi?",
     "deleteConfirmBody": "\"{{title}}\" ve ona ait transkript, özet ve ses dosyası kalıcı olarak silinecek. Geri alınamaz.",
@@ -211,11 +211,11 @@
     "transcriptSegmentCount_one": "{{count}} bölüm",
     "transcriptSegmentCount_other": "{{count}} bölüm",
     "transcriptEmpty": "Henüz bir transkript yok.",
-    "transcriptPlainNotice": "Düz transkript — belirli bir ana atlamak için sesi açın.",
+    "transcriptPlainNotice": "Düz transkript. Belirli bir ana atlamak için sesi açın.",
     "summaryTitle": "Özet",
     "processing": {
       "title": "Kayıt işleniyor",
-      "subtitle": "Dayan — bu genelde 1–3 dakika sürer.",
+      "subtitle": "Dayan, bu genelde 1–3 dakika sürer.",
       "steps": {
         "uploaded": "Yüklendi",
         "transcribing": "Ses metne dönüştürülüyor",
@@ -287,7 +287,7 @@
   "privacy": {
     "pageTitle": "Gizlilik Politikası",
     "lastUpdated": "Son güncelleme: 13 Haziran 2026",
-    "betaBanner": "Beta — taslak içerik, hukuki tavsiye değildir",
+    "betaBanner": "Beta. Taslak içerik, hukuki tavsiye değildir",
     "intro": {
       "heading": "Giriş",
       "body": "Summarex şu an beta aşamasındadır. Bu politika, hizmetimizi kullanırken verilerinizi nasıl işlediğimizi açıklamaktadır. Basit ve dürüst tutuyoruz: verileriniz sizindir."
@@ -298,15 +298,15 @@
     },
     "howWeUseIt": {
       "heading": "Verilerinizi Nasıl Kullanıyoruz",
-      "body": "Verileriniz yalnızca Summarex hizmetini sunmak — sesinizi metne dökmek ve özetler oluşturmak — amacıyla kullanılır. Verilerinizi satmıyor ya da reklam amaçlı kullanmıyoruz."
+      "body": "Verileriniz yalnızca Summarex hizmetini sunmak, yani sesinizi metne dökmek ve özetler oluşturmak amacıyla kullanılır. Verilerinizi satmıyor ya da reklam amaçlı kullanmıyoruz."
     },
     "thirdParties": {
       "heading": "Üçüncü Taraf Sağlayıcılar",
-      "body": "Summarex aşağıdaki sağlayıcılara dayanmaktadır. Ses içeriğiniz işlenmek üzere bu hizmetlere gönderilir: Supabase (kimlik doğrulama ve dosya depolama), OpenAI Whisper (ses transkripsiyonu), Anthropic Claude (yapay zekâ özetleri)."
+      "body": "Summarex aşağıdaki sağlayıcılara dayanmaktadır. Ses içeriğiniz işlenmek üzere bu hizmetlere gönderilir: Supabase (kimlik doğrulama ve dosya depolama), ElevenLabs Scribe (ses transkripsiyonu), Anthropic Claude (yapay zekâ özetleri)."
     },
     "retention": {
       "heading": "Veri Saklama",
-      "body": "Orijinal sesinizi saklamıyoruz. İşleme tamamlanır tamamlanmaz ses dosyası depolamamızdan kalıcı olarak silinir — yalnızca transkript ve özet kalır. Bunlar da siz silene ya da hesabınızı kapatana kadar tutulur; bir kaydı silmek ilgili transkript ve özeti kalıcı olarak kaldırır."
+      "body": "Orijinal sesinizi saklamıyoruz. İşleme tamamlanır tamamlanmaz ses dosyası depolamamızdan kalıcı olarak silinir ve yalnızca transkript ve özet kalır. Bunlar da siz silene ya da hesabınızı kapatana kadar tutulur; bir kaydı silmek ilgili transkript ve özeti kalıcı olarak kaldırır."
     },
     "rights": {
       "heading": "Haklarınız",
@@ -320,14 +320,14 @@
   "terms": {
     "pageTitle": "Kullanım Şartları",
     "lastUpdated": "Son güncelleme: 7 Haziran 2026",
-    "betaBanner": "Beta — taslak içerik, hukuki tavsiye değildir",
+    "betaBanner": "Beta. Taslak içerik, hukuki tavsiye değildir",
     "intro": {
       "heading": "Giriş",
       "body": "Summarex, ücretsiz sunulan bir beta hizmetidir. Summarex'i kullanarak bu şartları kabul etmiş olursunuz. Hizmet; kullanılabilirlik, doğruluk veya belirli bir amaca uygunluk garantisi olmaksızın olduğu gibi sunulmaktadır."
     },
     "account": {
       "heading": "Hesap",
-      "body": "Kişi başına bir hesap açılabilir. Giriş bilgilerinizi güvende tutun — hesabınız altında gerçekleşen tüm etkinliklerden siz sorumlusunuz."
+      "body": "Kişi başına bir hesap açılabilir. Giriş bilgilerinizi güvende tutun, çünkü hesabınız altında gerçekleşen tüm etkinliklerden siz sorumlusunuz."
     },
     "acceptableUse": {
       "heading": "Kabul Edilebilir Kullanım",

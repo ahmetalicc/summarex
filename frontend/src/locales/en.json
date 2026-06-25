@@ -20,7 +20,7 @@
   "landing": {
     "heroEyebrow": "AI-powered audio intelligence",
     "heroTitle": "Hours of audio, summarized in minutes.",
-    "heroSubtitle": "Record live or upload a file. Summarex transcribes it, surfaces the key points, and turns long audio — meetings, lectures, interviews, podcasts — into something you can skim and share.",
+    "heroSubtitle": "Record live or upload a file. Summarex transcribes it, surfaces the key points, and turns long recordings like meetings, lectures, interviews, and podcasts into something you can skim and share.",
     "ctaPrimary": "Try Summarex",
     "ctaSecondary": "See how it works",
     "featuresTitle": "From raw audio to clear next steps.",
@@ -28,7 +28,7 @@
     "features": {
       "record": {
         "title": "Record or upload",
-        "description": "Capture audio in the browser or drop a file. MP3, WAV, M4A, WebM — all handled."
+        "description": "Capture audio in the browser or drop a file. MP3, WAV, M4A, WebM. All handled."
       },
       "transcribe": {
         "title": "Accurate transcripts",
@@ -36,7 +36,7 @@
       },
       "summarize": {
         "title": "Smart summaries",
-        "description": "Decisions, action items, sentiment, and key quotes — pulled out automatically."
+        "description": "Decisions, action items, sentiment, and key quotes are pulled out automatically."
       },
       "share": {
         "title": "Share with one link",
@@ -46,15 +46,15 @@
     "flows": {
       "eyebrow": "Two ways to work",
       "title": "One app, two workflows.",
-      "subtitle": "Get a full AI summary, or just a clean transcript — whichever the moment calls for.",
+      "subtitle": "Get a full AI summary or just a clean transcript, whichever the moment calls for.",
       "summarize": {
         "title": "Summarize",
-        "description": "Upload or record audio and get a structured summary — overview, decisions, action items, and key quotes. Or summarize a transcript you already have.",
+        "description": "Upload or record audio and get a structured summary with an overview, decisions, action items, and key quotes. Or summarize a transcript you already have.",
         "tag": "Audio → Summary"
       },
       "transcribe": {
         "title": "Transcribe",
-        "description": "Just need the words? Get a clean, multilingual transcript you can read, search, and copy — then summarize it later if you want.",
+        "description": "Just need the words? Get a clean, multilingual transcript you can read, search, and copy, then summarize it later if you want.",
         "tag": "Audio → Transcript"
       }
     },
@@ -64,11 +64,11 @@
     "demoTranscript": {
       "badge": "AI · EN",
       "line1Speaker": "Maya",
-      "line1Text": "Quick reset before we dive in — Q2 planning. I want to walk away with three decisions today.",
+      "line1Text": "Quick reset before we dive in. This is Q2 planning, and I want to walk away with three decisions today.",
       "line2Speaker": "Diego",
       "line2Text": "The pricing experiment landed at +14% conversion. I'd vote we roll it to 100% next week.",
       "line3Speaker": "Aisha",
-      "line3Text": "Agreed — and Maya, can you own the announcement email? I'll handle the dashboard updates.",
+      "line3Text": "Agreed. And Maya, can you own the announcement email? I'll handle the dashboard updates.",
       "line4Speaker": "Maya",
       "line4Text": "Done. Let's lock the rollout for Tuesday and revisit churn metrics in two weeks."
     },
@@ -84,7 +84,7 @@
     "mobile": {
       "eyebrow": "Mobile apps",
       "title": "Take Summarex with you.",
-      "subtitle": "Record, transcribe, and summarize on the go. Our iOS and Android apps are on the way — with longer recordings and Pro features built for mobile.",
+      "subtitle": "Record, transcribe, and summarize on the go. Our iOS and Android apps are on the way, with longer recordings and Pro features built for mobile.",
       "comingSoon": "Coming soon",
       "appStore": "App Store",
       "googlePlay": "Google Play"
@@ -122,11 +122,11 @@
   },
   "dashboard": {
     "title": "Your recordings",
-    "subtitle": "Every recording you've captured or uploaded — searchable and ready to revisit.",
+    "subtitle": "Every recording you've captured or uploaded, searchable and ready to revisit.",
     "newRecording": "New recording",
     "searchPlaceholder": "Search by title…",
     "emptyTitle": "No recordings yet",
-    "emptyDescription": "Record audio or upload a file — it'll appear here once processing is done.",
+    "emptyDescription": "Record audio or upload a file, and it'll appear here once processing is done.",
     "emptyCta": "Make your first recording",
     "emptySearchTitle": "No matches",
     "emptySearchDescription": "Nothing matches that search. Try a different title or clear the box to see everything.",
@@ -167,9 +167,9 @@
   },
   "summarize": {
     "title": "Summarize audio",
-    "subtitle": "Record live or upload a file. Summarex transcribes it and pulls out the key points — decisions, action items, and more.",
+    "subtitle": "Record live or upload a file. Summarex transcribes it and pulls out the key points like decisions, action items, and more.",
     "pickerTitle": "Or summarize an existing transcript",
-    "pickerSubtitle": "Pick one of your transcripts and turn it into a summary — no need to re-upload audio.",
+    "pickerSubtitle": "Pick one of your transcripts and turn it into a summary. No need to re-upload audio.",
     "pickerEmpty": "No transcripts waiting for a summary. Transcribe some audio first, then come back here.",
     "pickerAction": "Summarize"
   },
@@ -197,7 +197,7 @@
     "regenerateConfirmAction": "Regenerate",
     "generateSummary": "Generate summary",
     "summarizeCtaTitle": "Ready for a summary?",
-    "summarizeCtaBody": "Turn this transcript into an overview, decisions, action items, and key quotes — powered by Claude.",
+    "summarizeCtaBody": "Turn this transcript into an overview, decisions, action items, and key quotes, all powered by Claude.",
     "delete": "Delete",
     "deleteConfirmTitle": "Delete this recording?",
     "deleteConfirmBody": "\"{{title}}\" and its transcript, summary, and audio file will be permanently removed. This can't be undone.",
@@ -211,11 +211,11 @@
     "transcriptSegmentCount_one": "{{count}} segment",
     "transcriptSegmentCount_other": "{{count}} segments",
     "transcriptEmpty": "No transcript available yet.",
-    "transcriptPlainNotice": "Plain transcript — open the audio to skip to specific moments.",
+    "transcriptPlainNotice": "Plain transcript. Open the audio to skip to specific moments.",
     "summaryTitle": "Summary",
     "processing": {
       "title": "Processing your recording",
-      "subtitle": "Hang tight — this usually takes 1–3 minutes.",
+      "subtitle": "Hang tight, this usually takes 1–3 minutes.",
       "steps": {
         "uploaded": "Uploaded",
         "transcribing": "Transcribing audio",
@@ -287,7 +287,7 @@
   "privacy": {
     "pageTitle": "Privacy Policy",
     "lastUpdated": "Last updated: 2026-06-13",
-    "betaBanner": "Beta — placeholder content, not legal advice",
+    "betaBanner": "Beta. Placeholder content, not legal advice",
     "intro": {
       "heading": "Introduction",
       "body": "Summarex is currently in beta. This policy describes how we handle your data while you use our service. We keep it simple and honest: your data is yours."
@@ -298,15 +298,15 @@
     },
     "howWeUseIt": {
       "heading": "How We Use Your Data",
-      "body": "Your data is used solely to provide the Summarex service — transcribing your audio and generating summaries. We do not sell your data or use it for advertising."
+      "body": "Your data is used solely to provide the Summarex service, transcribing your audio and generating summaries. We do not sell your data or use it for advertising."
     },
     "thirdParties": {
       "heading": "Third-Party Providers",
-      "body": "Summarex relies on the following providers to function. Your audio content is sent to these services for processing: Supabase (authentication and file storage), OpenAI Whisper (audio transcription), Anthropic Claude (AI summaries)."
+      "body": "Summarex relies on the following providers to function. Your audio content is sent to these services for processing: Supabase (authentication and file storage), ElevenLabs Scribe (audio transcription), Anthropic Claude (AI summaries)."
     },
     "retention": {
       "heading": "Data Retention",
-      "body": "We do not retain your original audio. As soon as processing finishes, the audio file is permanently deleted from our storage — only the transcript and summary remain. Those are kept until you delete them or close your account, and deleting a recording permanently removes its transcript and summary."
+      "body": "We do not retain your original audio. As soon as processing finishes, the audio file is permanently deleted from our storage, and only the transcript and summary remain. Those are kept until you delete them or close your account, and deleting a recording permanently removes its transcript and summary."
     },
     "rights": {
       "heading": "Your Rights",
@@ -320,14 +320,14 @@
   "terms": {
     "pageTitle": "Terms of Service",
     "lastUpdated": "Last updated: 2026-06-07",
-    "betaBanner": "Beta — placeholder content, not legal advice",
+    "betaBanner": "Beta. Placeholder content, not legal advice",
     "intro": {
       "heading": "Introduction",
       "body": "Summarex is a beta service provided free of charge. By using Summarex, you agree to these terms. The service is provided as-is with no guarantees of availability, accuracy, or fitness for a particular purpose."
     },
     "account": {
       "heading": "Account",
-      "body": "One account per person. Keep your credentials secure — you are responsible for all activity that occurs under your account."
+      "body": "One account per person. Keep your credentials secure, since you are responsible for all activity that occurs under your account."
     },
     "acceptableUse": {
       "heading": "Acceptable Use",
