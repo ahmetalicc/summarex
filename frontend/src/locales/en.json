@@ -311,10 +311,6 @@
     "rights": {
       "heading": "Your Rights",
       "body": "You can delete any recording at any time from your dashboard. To delete your entire account and all associated data, contact us at the email below."
-    },
-    "contact": {
-      "heading": "Contact",
-      "body": "Questions about this policy? Reach us at"
     }
   },
   "terms": {
@@ -352,10 +348,6 @@
     "governingLaw": {
       "heading": "Governing Law",
       "body": "These terms are governed by the laws of Turkey. Any disputes will be resolved in the courts of Turkey."
-    },
-    "contact": {
-      "heading": "Contact",
-      "body": "Questions about these terms? Reach us at"
     }
   }
 }

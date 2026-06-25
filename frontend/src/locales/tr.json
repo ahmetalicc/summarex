@@ -311,10 +311,6 @@
     "rights": {
       "heading": "Haklarınız",
       "body": "Panelden istediğiniz zaman herhangi bir kaydı silebilirsiniz. Tüm hesabınızı ve verilerinizi silmek için aşağıdaki e-posta adresinden bize ulaşın."
-    },
-    "contact": {
-      "heading": "İletişim",
-      "body": "Bu politika hakkında sorularınız mı var? Bize şu adresten ulaşın:"
     }
   },
   "terms": {
@@ -352,10 +348,6 @@
     "governingLaw": {
       "heading": "Geçerli Hukuk",
       "body": "Bu şartlar Türk hukukuna tabidir. Anlaşmazlıklar Türkiye mahkemelerinde çözüme kavuşturulur."
-    },
-    "contact": {
-      "heading": "İletişim",
-      "body": "Bu şartlar hakkında sorularınız mı var? Bize şu adresten ulaşın:"
     }
   }
 }

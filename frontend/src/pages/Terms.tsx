@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const CONTACT_EMAIL = 'ahmetskry54@gmail.com';
-
 const SECTIONS = [
   'intro',
   'account',
@@ -37,20 +35,6 @@ export default function Terms() {
             <p className="mt-2 leading-relaxed text-text-muted">{t(`terms.${s}.body`)}</p>
           </div>
         ))}
-        <div>
-          <h2 className="font-display text-xl font-semibold text-text">
-            {t('terms.contact.heading')}
-          </h2>
-          <p className="mt-2 leading-relaxed text-text-muted">
-            {t('terms.contact.body')}{' '}
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="text-primary hover:underline"
-            >
-              {CONTACT_EMAIL}
-            </a>
-          </p>
-        </div>
       </div>
     </section>
   );
