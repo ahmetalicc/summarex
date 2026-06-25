@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MailIcon, InstagramIcon } from '../components/layout/Icons';
 
 const CONTACT_EMAIL = 'support@summarex.app';
 const INSTAGRAM_URL = 'https://www.instagram.com/summarex.app';
@@ -21,9 +22,12 @@ export default function Contact() {
             {t('contactPage.emailLabel')}
           </h2>
           <p className="mt-2 leading-relaxed text-text-muted">
-            <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary hover:underline">
-              {CONTACT_EMAIL}
-            </a>
+            <span className="inline-flex items-center gap-2">
+              <MailIcon className="text-primary shrink-0" />
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary hover:underline">
+                {CONTACT_EMAIL}
+              </a>
+            </span>
           </p>
         </div>
         <div>
@@ -31,14 +35,17 @@ export default function Contact() {
             {t('contactPage.socialLabel')}
           </h2>
           <p className="mt-2 leading-relaxed text-text-muted">
-            <a
-              href={INSTAGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              {t('contactPage.instagram')}
-            </a>
+            <span className="inline-flex items-center gap-2">
+              <InstagramIcon className="text-primary shrink-0" />
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                {t('contactPage.instagram')}
+              </a>
+            </span>
           </p>
         </div>
       </div>
