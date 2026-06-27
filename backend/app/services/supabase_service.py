@@ -74,6 +74,23 @@ class SupabaseService:
 
     # ── Meetings DB ───────────────────────────────────────────────────────────
 
+    def count_meetings_this_month(self, user_id: str) -> int:
+        """Count meetings created by this user since the start of the current UTC month."""
+        now = datetime.now(timezone.utc)
+        start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        try:
+            result = (
+                self._ensure_client()
+                .table("meetings")
+                .select("id", count="exact")
+                .eq("user_id", user_id)
+                .gte("created_at", start.isoformat())
+                .execute()
+            )
+        except Exception as exc:
+            raise ExternalServiceError(f"Failed to count meetings: {exc}") from exc
+        return result.count or 0
+
     def create_meeting(
         self,
         user_id: str,

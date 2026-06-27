@@ -6,7 +6,7 @@ timestamps), so we don't probe files locally and we don't depend on FFmpeg in th
 from app.utils.exceptions import AudioValidationError
 
 ALLOWED_EXTENSIONS = {"mp3", "wav", "m4a", "webm"}
-MAX_SIZE_BYTES = 100 * 1024 * 1024  # 100 MB
+MAX_SIZE_BYTES = 25 * 1024 * 1024  # 25 MB
 CONTENT_TYPES = {
     "mp3": "audio/mpeg",
     "wav": "audio/wav",
@@ -30,7 +30,7 @@ class AudioService:
             raise AudioValidationError("File is empty")
         if size_bytes > MAX_SIZE_BYTES:
             raise AudioValidationError(
-                f"File too large: {size_bytes / 1_000_000:.1f} MB (max 100 MB)"
+                f"File too large: {size_bytes / 1_000_000:.1f} MB (max 25 MB)"
             )
         return ext
 

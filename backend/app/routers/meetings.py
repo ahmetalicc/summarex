@@ -27,10 +27,11 @@ from app.limiter import limiter
 from app.models.meeting import Meeting, MeetingStatusOut, MeetingUpdate
 from app.models.summary import Summary
 from app.models.transcript import Transcript
+from app.config import settings
 from app.services.audio_service import AudioService
 from app.services.pipeline import run_meeting_pipeline, run_resummarize, run_transcription
 from app.services.supabase_service import SupabaseService
-from app.utils.exceptions import ExternalServiceError, MeetingNotFoundError
+from app.utils.exceptions import ExternalServiceError, MeetingNotFoundError, UsageLimitError
 from app.utils.logging import get_logger
 
 log = get_logger(__name__)
@@ -56,6 +57,12 @@ async def create_meeting_from_audio(
 
     meeting_id = str(uuid.uuid4())
     svc = SupabaseService()
+
+    used = svc.count_meetings_this_month(user_id)
+    if used >= settings.MONTHLY_UPLOAD_CAP:
+        raise UsageLimitError(
+            f"Monthly limit of {settings.MONTHLY_UPLOAD_CAP} uploads reached. It resets at the start of next month."
+        )
 
     audio_path = svc.upload_audio(user_id, meeting_id, file_bytes, ext)
     try:

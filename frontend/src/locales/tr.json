@@ -163,7 +163,7 @@
     "browseFiles": "Dosyalara göz at",
     "invalidFile": "Desteklenmeyen biçim. MP3, WAV, M4A veya WebM kullan.",
     "fileEmpty": "Dosya boş.",
-    "fileTooLarge": "Dosya 100 MB'ı aşıyor. Daha küçük bir dosya dene."
+    "fileTooLarge": "Dosya 25 MB'ı aşıyor. Daha küçük bir dosya dene."
   },
   "summarize": {
     "title": "Sesi özetle",

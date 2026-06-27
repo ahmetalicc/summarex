@@ -15,6 +15,8 @@ services:
         value: production
       - key: LOG_LEVEL
         value: INFO
+      - key: MONTHLY_UPLOAD_CAP
+        value: "20"
       # The following must be set in the Render dashboard (sync: false hides them):
       - key: SUPABASE_URL
         sync: false

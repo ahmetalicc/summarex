@@ -163,7 +163,7 @@
     "browseFiles": "Browse files",
     "invalidFile": "Unsupported format. Use MP3, WAV, M4A, or WebM.",
     "fileEmpty": "The file is empty.",
-    "fileTooLarge": "That file is over 100 MB. Try a smaller one."
+    "fileTooLarge": "That file is over 25 MB. Try a smaller one."
   },
   "summarize": {
     "title": "Summarize audio",
