@@ -118,7 +118,16 @@
     "errorEmailInUse": "Bu e-posta ile bir hesap zaten var. Bunun yerine giriş yapmayı dene.",
     "errorWeakPassword": "Şifren çok kısa. En az 6 karakter kullan.",
     "errorEmailNotConfirmed": "Lütfen önce e-postanı onayla. Etkinleştirme bağlantısı için gelen kutunu kontrol et.",
-    "errorGeneric": "Bir şeyler ters gitti. Lütfen birazdan tekrar dene."
+    "errorGeneric": "Bir şeyler ters gitti. Lütfen birazdan tekrar dene.",
+    "resetSubtitle": "Hesabın için yeni bir şifre belirle.",
+    "newPassword": "Yeni şifre",
+    "confirmPassword": "Yeni şifreyi onayla",
+    "updatePasswordButton": "Şifreyi güncelle",
+    "updatingPassword": "Güncelleniyor…",
+    "errorPasswordMismatch": "Şifreler eşleşmiyor.",
+    "passwordUpdatedTitle": "Şifre güncellendi",
+    "passwordUpdatedBody": "Şifren değiştirildi ve giriş yaptın.",
+    "continueToDashboard": "Panele devam et"
   },
   "dashboard": {
     "title": "Kayıtların",

@@ -118,7 +118,16 @@
     "errorEmailInUse": "An account with this email already exists. Try signing in instead.",
     "errorWeakPassword": "Your password is too short. Use at least 6 characters.",
     "errorEmailNotConfirmed": "Please confirm your email first. Check your inbox for the activation link.",
-    "errorGeneric": "Something went wrong. Please try again in a moment."
+    "errorGeneric": "Something went wrong. Please try again in a moment.",
+    "resetSubtitle": "Choose a new password for your account.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "updatePasswordButton": "Update password",
+    "updatingPassword": "Updating…",
+    "errorPasswordMismatch": "Passwords do not match.",
+    "passwordUpdatedTitle": "Password updated",
+    "passwordUpdatedBody": "Your password has been changed and you are now signed in.",
+    "continueToDashboard": "Continue to dashboard"
   },
   "dashboard": {
     "title": "Your recordings",

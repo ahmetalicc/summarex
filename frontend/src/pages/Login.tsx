@@ -14,8 +14,8 @@ interface LocationState {
   from?: { pathname?: string };
 }
 
-type Mode = 'signin' | 'signup' | 'forgot';
-type SuccessPanel = 'checkEmail' | 'resetSent';
+type Mode = 'signin' | 'signup' | 'forgot' | 'reset';
+type SuccessPanel = 'checkEmail' | 'resetSent' | 'passwordUpdated';
 
 export default function Login() {
   const { session, isLoading } = useAuth();
@@ -23,18 +23,34 @@ export default function Login() {
   const location = useLocation();
   const { t } = useTranslation();
 
-  useEffect(() => {
-    if (!session) return;
-    const from = (location.state as LocationState | null)?.from?.pathname;
-    navigate(from ?? '/dashboard', { replace: true });
-  }, [session, navigate, location.state]);
-
+  const [isRecovery, setIsRecovery] = useState(false);
   const [mode, setMode] = useState<Mode>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<SuccessPanel | null>(null);
+
+  useEffect(() => {
+    if (isRecovery) return;
+    if (!session) return;
+    const from = (location.state as LocationState | null)?.from?.pathname;
+    navigate(from ?? '/dashboard', { replace: true });
+  }, [session, navigate, location.state, isRecovery]);
+
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsRecovery(true);
+        setMode('reset');
+        setSuccess(null);
+        setError(null);
+      }
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
 
   function mapError(message: string): string {
     if (message.includes('Invalid login credentials')) return t('auth.errorInvalidCredentials');
@@ -72,6 +88,18 @@ export default function Login() {
           setSuccess('checkEmail');
         }
         // If a session is returned, the session effect redirects automatically.
+      } else if (mode === 'reset') {
+        if (newPassword !== confirmPassword) {
+          setError(t('auth.errorPasswordMismatch'));
+          return;
+        }
+        const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+        if (updateError) {
+          setError(mapError(updateError.message));
+        } else {
+          setIsRecovery(false);
+          setSuccess('passwordUpdated');
+        }
       } else {
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${env.APP_URL}/login`,
@@ -92,17 +120,21 @@ export default function Login() {
       ? t('auth.signInButton')
       : mode === 'signup'
         ? t('auth.signUpButton')
-        : t('auth.sendResetLink');
+        : mode === 'reset'
+          ? t('auth.updatePasswordButton')
+          : t('auth.sendResetLink');
   const submitLoadingLabel =
     mode === 'signin'
       ? t('auth.signingIn')
       : mode === 'signup'
         ? t('auth.signingUp')
-        : t('auth.sendingReset');
+        : mode === 'reset'
+          ? t('auth.updatingPassword')
+          : t('auth.sendingReset');
 
   return (
     <section className="mx-auto flex min-h-[calc(100dvh-4rem-4rem)] max-w-md flex-col items-center justify-center gap-6 px-4 py-16 sm:px-6">
-      {isLoading || session ? (
+      {(isLoading || session) && !isRecovery ? (
         <Spinner size="lg" className="text-primary" />
       ) : (
         <Card className="w-full">
@@ -112,7 +144,9 @@ export default function Login() {
               <h1 className="font-display text-2xl font-bold text-text">
                 {t('auth.welcomeTitle')}
               </h1>
-              <p className="text-sm text-text-muted">{t('auth.welcomeSubtitle')}</p>
+              <p className="text-sm text-text-muted">
+                {mode === 'reset' ? t('auth.resetSubtitle') : t('auth.welcomeSubtitle')}
+              </p>
             </div>
 
             {success ? (
@@ -120,35 +154,51 @@ export default function Login() {
                 <h2 className="font-display text-lg font-semibold text-text">
                   {success === 'checkEmail'
                     ? t('auth.checkEmailTitle')
-                    : t('auth.resetSentTitle')}
+                    : success === 'resetSent'
+                      ? t('auth.resetSentTitle')
+                      : t('auth.passwordUpdatedTitle')}
                 </h2>
                 <p className="text-sm text-text-muted">
                   {success === 'checkEmail'
                     ? t('auth.checkEmailBody')
-                    : t('auth.resetSentBody')}
+                    : success === 'resetSent'
+                      ? t('auth.resetSentBody')
+                      : t('auth.passwordUpdatedBody')}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => switchMode('signin')}
-                  className="text-sm font-medium text-primary hover:text-primary-hover"
-                >
-                  {t('auth.backToSignIn')}
-                </button>
+                {success === 'passwordUpdated' ? (
+                  <button
+                    type="button"
+                    onClick={() => navigate('/dashboard')}
+                    className="text-sm font-medium text-primary hover:text-primary-hover"
+                  >
+                    {t('auth.continueToDashboard')}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => switchMode('signin')}
+                    className="text-sm font-medium text-primary hover:text-primary-hover"
+                  >
+                    {t('auth.backToSignIn')}
+                  </button>
+                )}
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-                <Input
-                  label={t('auth.email')}
-                  type="email"
-                  autoComplete="email"
-                  placeholder={t('auth.emailPlaceholder')}
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (error) setError(null);
-                  }}
-                  required
-                />
+                {mode !== 'reset' && (
+                  <Input
+                    label={t('auth.email')}
+                    type="email"
+                    autoComplete="email"
+                    placeholder={t('auth.emailPlaceholder')}
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    required
+                  />
+                )}
 
                 {showPassword && (
                   <Input
@@ -164,6 +214,35 @@ export default function Login() {
                     }}
                     required
                   />
+                )}
+
+                {mode === 'reset' && (
+                  <>
+                    <Input
+                      label={t('auth.newPassword')}
+                      type="password"
+                      passwordToggle
+                      autoComplete="new-password"
+                      value={newPassword}
+                      onChange={(e) => {
+                        setNewPassword(e.target.value);
+                        if (error) setError(null);
+                      }}
+                      required
+                    />
+                    <Input
+                      label={t('auth.confirmPassword')}
+                      type="password"
+                      passwordToggle
+                      autoComplete="new-password"
+                      value={confirmPassword}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                        if (error) setError(null);
+                      }}
+                      required
+                    />
+                  </>
                 )}
 
                 {error && (
