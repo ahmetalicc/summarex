@@ -127,7 +127,8 @@
     "errorPasswordMismatch": "Şifreler eşleşmiyor.",
     "passwordUpdatedTitle": "Şifre güncellendi",
     "passwordUpdatedBody": "Şifren değiştirildi ve giriş yaptın.",
-    "continueToDashboard": "Panele devam et"
+    "continueToDashboard": "Panele devam et",
+    "resetLinkInvalid": "Bu bağlantı geçersiz veya süresi dolmuş. Lütfen yeni bir sıfırlama bağlantısı isteyin."
   },
   "dashboard": {
     "title": "Kayıtların",

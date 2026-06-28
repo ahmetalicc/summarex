@@ -127,7 +127,8 @@
     "errorPasswordMismatch": "Passwords do not match.",
     "passwordUpdatedTitle": "Password updated",
     "passwordUpdatedBody": "Your password has been changed and you are now signed in.",
-    "continueToDashboard": "Continue to dashboard"
+    "continueToDashboard": "Continue to dashboard",
+    "resetLinkInvalid": "This link is invalid or has expired. Please request a new reset link."
   },
   "dashboard": {
     "title": "Your recordings",
