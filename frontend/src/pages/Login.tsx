@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabaseClient';
 import { env } from '../lib/env';
 import { useAuth } from '../hooks/useAuth';
+import { useLanguageStore } from '../store/languageStore';
 import { Card, CardContent } from '../components/ui/Card';
 import { Brand } from '../components/layout/Brand';
 import { Spinner } from '../components/ui/Spinner';
@@ -22,6 +23,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const language = useLanguageStore((s) => s.language);
 
   const [isRecovery, setIsRecovery] = useState(false);
   const [mode, setMode] = useState<Mode>('signin');
@@ -79,7 +81,7 @@ export default function Login() {
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${env.APP_URL}/login` },
+          options: { emailRedirectTo: `${env.APP_URL}/login`, data: { lang: language } },
         });
         if (signUpError) {
           setError(mapError(signUpError.message));
