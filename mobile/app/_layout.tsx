@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { Slot, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-url-polyfill/auto';
 import { supabase } from '@/lib/supabase';
@@ -51,7 +51,12 @@ export default function RootLayout() {
 
   return (
     <>
-      <Slot />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="confirm" />
+        <Stack.Screen name="reset-password" />
+      </Stack>
       <StatusBar style="light" />
     </>
   );

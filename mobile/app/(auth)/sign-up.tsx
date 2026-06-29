@@ -24,7 +24,18 @@ export default function SignUpScreen() {
   async function handleSignUp() {
     if (!email || !password) return;
     setLoading(true);
-    const locale = getLocales()[0]?.languageCode ?? 'en';
+
+    let locale = 'en';
+    try {
+      locale = getLocales()[0]?.languageCode ?? 'en';
+    } catch {
+      try {
+        locale = Intl.DateTimeFormat().resolvedOptions().locale.split('-')[0];
+      } catch {
+        locale = 'en';
+      }
+    }
+
     const { error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
