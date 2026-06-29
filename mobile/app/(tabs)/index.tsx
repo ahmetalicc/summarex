@@ -78,7 +78,7 @@ export default function MeetingsScreen() {
   return (
     <View style={s.container}>
       <View style={s.header}>
-        <Text style={s.headerTitle}>Meetings</Text>
+        <Text style={s.headerTitle}>Recordings</Text>
       </View>
 
       <FlatList
@@ -95,7 +95,7 @@ export default function MeetingsScreen() {
         ListEmptyComponent={
           <View style={s.empty}>
             <Text style={s.emptyIcon}>🎙</Text>
-            <Text style={s.emptyTitle}>No meetings yet</Text>
+            <Text style={s.emptyTitle}>No recordings yet</Text>
             <Text style={s.emptySubtitle}>Upload an audio file to get started.</Text>
           </View>
         }
