@@ -1,11 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function ConfirmScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
+
+  const s = useMemo(() => StyleSheet.create({
+    container: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg },
+    text: { color: colors.textMuted, marginTop: 16, fontSize: 15 },
+  }), [colors]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -19,13 +25,8 @@ export default function ConfirmScreen() {
 
   return (
     <View style={s.container}>
-      <ActivityIndicator size="large" color={Colors.dark.primary} />
+      <ActivityIndicator size="large" color={colors.primary} />
       <Text style={s.text}>Confirming your account…</Text>
     </View>
   );
 }
-
-const s = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.dark.bg },
-  text: { color: Colors.dark.textMuted, marginTop: 16, fontSize: 15 },
-});
