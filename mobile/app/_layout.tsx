@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-url-polyfill/auto';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/colors';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import type { Session } from '@supabase/supabase-js';
 
 export default function RootLayout() {
@@ -50,7 +51,7 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <ThemeProvider>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="(auth)" />
@@ -59,7 +60,7 @@ export default function RootLayout() {
         <Stack.Screen name="upload" options={{ presentation: 'modal', headerShown: false }} />
         <Stack.Screen name="meeting/[id]" options={{ headerShown: false }} />
       </Stack>
-      <StatusBar style="light" />
-    </>
+      <StatusBar style="auto" />
+    </ThemeProvider>
   );
 }

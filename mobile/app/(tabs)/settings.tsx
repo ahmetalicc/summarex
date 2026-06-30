@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView,
 } from 'react-native';
@@ -6,32 +6,125 @@ import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/lib/supabase';
 import { api } from '@/lib/api';
-import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
+import type { ColorScheme } from '@/constants/colors';
 import type { Entitlement } from '@/lib/api';
 
 function formatReset(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-function Chevron() {
-  return <Ionicons name="chevron-forward" size={16} color={Colors.dark.textMuted} />;
-}
-
-function RowItem({ label, rightText, onPress }: { label: string; rightText?: string; onPress: () => void }) {
+function RowItem({ label, rightText, onPress, colors }: {
+  label: string; rightText?: string; onPress: () => void; colors: ColorScheme;
+}) {
   return (
-    <TouchableOpacity style={s.rowItem} onPress={onPress}>
-      <Text style={s.rowLabel}>{label}</Text>
-      <View style={s.rowRight}>
-        {rightText ? <Text style={s.rowRightText}>{rightText}</Text> : null}
-        <Chevron />
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        flexDirection: 'row', alignItems: 'center',
+        backgroundColor: colors.bgSurface,
+        borderWidth: 1, borderColor: colors.border,
+        borderRadius: 12, paddingHorizontal: 16, paddingVertical: 15,
+        marginBottom: 8,
+      }}
+    >
+      <Text style={{ flex: 1, fontSize: 15, color: colors.text }}>{label}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+        {rightText ? <Text style={{ fontSize: 14, color: colors.textMuted }}>{rightText}</Text> : null}
+        <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
       </View>
     </TouchableOpacity>
   );
 }
 
 export default function SettingsScreen() {
+  const { colors, theme, toggleTheme } = useTheme();
   const [email, setEmail] = useState<string | null>(null);
   const [entitlement, setEntitlement] = useState<Entitlement | null>(null);
+
+  const s = useMemo(() => StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.bg },
+    content: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 40 },
+
+    accountCard: {
+      flexDirection: 'row', gap: 14, alignItems: 'center',
+      backgroundColor: colors.bgSurface,
+      borderWidth: 1, borderColor: colors.border,
+      borderRadius: 16, padding: 16,
+    },
+    avatar: {
+      width: 52, height: 52, borderRadius: 26,
+      backgroundColor: colors.primary,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    avatarText: { color: '#FFFFFF', fontSize: 22, fontWeight: '700' },
+    accountInfo: { flex: 1 },
+    email: { color: colors.text, fontSize: 15, fontWeight: '600' },
+    planBadge: {
+      alignSelf: 'flex-start',
+      paddingHorizontal: 10, paddingVertical: 3, borderRadius: 99,
+      marginTop: 6,
+    },
+    planBadgeFree: { backgroundColor: colors.textMuted + '22' },
+    planBadgePro: { backgroundColor: colors.primary + '22' },
+    planBadgeText: { fontSize: 11, fontWeight: '700' },
+    planBadgeTextFree: { color: colors.textMuted },
+    planBadgeTextPro: { color: colors.primary },
+
+    sectionHeader: {
+      fontSize: 11, fontWeight: '700', color: colors.textMuted,
+      letterSpacing: 1, textTransform: 'uppercase',
+      marginBottom: 8, marginTop: 28, paddingHorizontal: 4,
+    },
+
+    usageCard: {
+      backgroundColor: colors.bgSurface,
+      borderWidth: 1, borderColor: colors.border,
+      borderRadius: 12, padding: 16,
+    },
+    usageHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    usageTitle: { fontSize: 14, fontWeight: '700', color: colors.text },
+    usageReset: { fontSize: 12, color: colors.textMuted },
+    barTrack: {
+      marginTop: 12, height: 6, borderRadius: 3,
+      backgroundColor: colors.border, overflow: 'hidden',
+    },
+    barFill: { height: 6, borderRadius: 3 },
+    usageBottomRow: {
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      marginTop: 8,
+    },
+    usageBottomText: { fontSize: 12, color: colors.textMuted },
+
+    upgradeCard: {
+      backgroundColor: colors.bgSurface,
+      borderWidth: 1, borderColor: colors.primary + '44',
+      borderRadius: 16, padding: 20,
+    },
+    upgradeHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    upgradeTitle: { fontSize: 16, fontWeight: '700', color: colors.text },
+    upgradePill: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: 10, paddingVertical: 3, borderRadius: 99,
+    },
+    upgradePillText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
+    upgradeSubtitle: { fontSize: 13, color: colors.textMuted, marginTop: 4 },
+    upgradePrice: { color: colors.primary, fontSize: 22, fontWeight: '700', marginTop: 12 },
+    upgradeButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 10, paddingVertical: 14,
+      alignItems: 'center', marginTop: 16,
+    },
+    upgradeButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
+
+    signOutButton: {
+      backgroundColor: 'transparent',
+      borderWidth: 1.5, borderColor: colors.error,
+      borderRadius: 10, paddingVertical: 14,
+      alignItems: 'center', marginTop: 32,
+    },
+    signOutText: { color: colors.error, fontSize: 15, fontWeight: '700' },
+  }), [colors]);
 
   useEffect(() => {
     supabase.auth.getUser()
@@ -65,7 +158,7 @@ export default function SettingsScreen() {
   const pct = entitlement
     ? Math.min(100, (entitlement.minutes_used / entitlement.minutes_limit) * 100)
     : 0;
-  const barColor = pct > 90 ? Colors.dark.error : pct >= 70 ? Colors.dark.accent : Colors.dark.primary;
+  const barColor = pct > 90 ? colors.error : pct >= 70 ? colors.accent : colors.primary;
   const initial = email ? email.charAt(0).toUpperCase() : '?';
 
   return (
@@ -136,18 +229,20 @@ export default function SettingsScreen() {
         label="Language"
         rightText="English"
         onPress={() => comingSoon('Coming Soon', 'Multi-language support is coming soon.')}
+        colors={colors}
       />
       <RowItem
         label="Appearance"
-        rightText="Dark"
-        onPress={() => comingSoon('Coming Soon', 'Light mode is coming in the next update.')}
+        rightText={theme === 'dark' ? 'Dark' : 'Light'}
+        onPress={toggleTheme}
+        colors={colors}
       />
 
       {/* Legal */}
       <Text style={s.sectionHeader}>LEGAL</Text>
-      <RowItem label="Privacy Policy" onPress={() => openLink('https://summarex.app/privacy')} />
-      <RowItem label="Terms of Service" onPress={() => openLink('https://summarex.app/terms')} />
-      <RowItem label="Contact Us" onPress={() => openLink('https://summarex.app/contact')} />
+      <RowItem label="Privacy Policy" onPress={() => openLink('https://summarex.app/privacy')} colors={colors} />
+      <RowItem label="Terms of Service" onPress={() => openLink('https://summarex.app/terms')} colors={colors} />
+      <RowItem label="Contact Us" onPress={() => openLink('https://summarex.app/contact')} colors={colors} />
 
       {/* Sign Out */}
       <TouchableOpacity style={s.signOutButton} onPress={handleSignOut}>
@@ -156,98 +251,3 @@ export default function SettingsScreen() {
     </ScrollView>
   );
 }
-
-const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.dark.bg },
-  content: { paddingHorizontal: 20, paddingTop: 60, paddingBottom: 40 },
-
-  accountCard: {
-    flexDirection: 'row', gap: 14, alignItems: 'center',
-    backgroundColor: Colors.dark.bgSurface,
-    borderWidth: 1, borderColor: Colors.dark.border,
-    borderRadius: 16, padding: 16,
-  },
-  avatar: {
-    width: 52, height: 52, borderRadius: 26,
-    backgroundColor: Colors.dark.primary,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  avatarText: { color: '#FFFFFF', fontSize: 22, fontWeight: '700' },
-  accountInfo: { flex: 1 },
-  email: { color: Colors.dark.text, fontSize: 15, fontWeight: '600' },
-  planBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10, paddingVertical: 3, borderRadius: 99,
-    marginTop: 6,
-  },
-  planBadgeFree: { backgroundColor: Colors.dark.textMuted + '22' },
-  planBadgePro: { backgroundColor: Colors.dark.primary + '22' },
-  planBadgeText: { fontSize: 11, fontWeight: '700' },
-  planBadgeTextFree: { color: Colors.dark.textMuted },
-  planBadgeTextPro: { color: Colors.dark.primary },
-
-  sectionHeader: {
-    fontSize: 11, fontWeight: '700', color: Colors.dark.textMuted,
-    letterSpacing: 1, textTransform: 'uppercase',
-    marginBottom: 8, marginTop: 28, paddingHorizontal: 4,
-  },
-
-  usageCard: {
-    backgroundColor: Colors.dark.bgSurface,
-    borderWidth: 1, borderColor: Colors.dark.border,
-    borderRadius: 12, padding: 16,
-  },
-  usageHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  usageTitle: { fontSize: 14, fontWeight: '700', color: Colors.dark.text },
-  usageReset: { fontSize: 12, color: Colors.dark.textMuted },
-  barTrack: {
-    marginTop: 12, height: 6, borderRadius: 3,
-    backgroundColor: Colors.dark.border, overflow: 'hidden',
-  },
-  barFill: { height: 6, borderRadius: 3 },
-  usageBottomRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    marginTop: 8,
-  },
-  usageBottomText: { fontSize: 12, color: Colors.dark.textMuted },
-
-  upgradeCard: {
-    backgroundColor: Colors.dark.bgSurface,
-    borderWidth: 1, borderColor: Colors.dark.primary + '44',
-    borderRadius: 16, padding: 20,
-  },
-  upgradeHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  upgradeTitle: { fontSize: 16, fontWeight: '700', color: Colors.dark.text },
-  upgradePill: {
-    backgroundColor: Colors.dark.primary,
-    paddingHorizontal: 10, paddingVertical: 3, borderRadius: 99,
-  },
-  upgradePillText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
-  upgradeSubtitle: { fontSize: 13, color: Colors.dark.textMuted, marginTop: 4 },
-  upgradePrice: { color: Colors.dark.primary, fontSize: 22, fontWeight: '700', marginTop: 12 },
-  upgradeButton: {
-    backgroundColor: Colors.dark.primary,
-    borderRadius: 10, paddingVertical: 14,
-    alignItems: 'center', marginTop: 16,
-  },
-  upgradeButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
-
-  rowItem: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: Colors.dark.bgSurface,
-    borderWidth: 1, borderColor: Colors.dark.border,
-    borderRadius: 12, paddingHorizontal: 16, paddingVertical: 15,
-    marginBottom: 8,
-  },
-  rowLabel: { flex: 1, fontSize: 15, color: Colors.dark.text },
-  rowRight: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  rowRightText: { fontSize: 14, color: Colors.dark.textMuted },
-
-  signOutButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5, borderColor: Colors.dark.error,
-    borderRadius: 10, paddingVertical: 14,
-    alignItems: 'center', marginTop: 32,
-  },
-  signOutText: { color: Colors.dark.error, fontSize: 15, fontWeight: '700' },
-});

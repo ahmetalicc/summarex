@@ -1,5 +1,6 @@
+import { useMemo } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface BrandProps {
   size?: 'sm' | 'md' | 'lg';
@@ -12,7 +13,17 @@ const SIZE = {
 };
 
 export function Brand({ size = 'md' }: BrandProps) {
+  const { colors } = useTheme();
   const d = SIZE[size];
+
+  const s = useMemo(() => StyleSheet.create({
+    row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    img: {},
+    text: { fontWeight: '700', letterSpacing: -0.5 },
+    textDark: { color: colors.text },
+    textGreen: { color: colors.primary },
+  }), [colors]);
+
   return (
     <View style={s.row}>
       <Image
@@ -27,11 +38,3 @@ export function Brand({ size = 'md' }: BrandProps) {
     </View>
   );
 }
-
-const s = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  img: {},
-  text: { fontWeight: '700', letterSpacing: -0.5 },
-  textDark: { color: Colors.dark.text },
-  textGreen: { color: Colors.dark.primary },
-});

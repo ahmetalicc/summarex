@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ActivityIndicator,
   Alert, SafeAreaView,
@@ -6,16 +6,55 @@ import {
 import { useRouter } from 'expo-router';
 import * as DocumentPicker from 'expo-document-picker';
 import { uploadMeeting } from '@/lib/api';
-import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const ACCEPTED_TYPES = ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/x-m4a', 'audio/aac'];
 const MAX_BYTES = 25 * 1024 * 1024;
 
 export default function UploadScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [file, setFile] = useState<{ uri: string; name: string; mimeType: string; size: number } | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  const s = useMemo(() => StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.bg },
+    header: {
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      paddingHorizontal: 20, paddingVertical: 16,
+      borderBottomWidth: 1, borderBottomColor: colors.border,
+    },
+    cancel: { color: colors.primary, fontSize: 16, width: 60 },
+    title: { fontSize: 17, fontWeight: '600', color: colors.text },
+    body: { flex: 1, padding: 24 },
+    picker: {
+      borderWidth: 2, borderColor: colors.border, borderStyle: 'dashed',
+      borderRadius: 16, padding: 40, alignItems: 'center', marginBottom: 20,
+      backgroundColor: colors.bgSurface,
+    },
+    pickerIcon: { fontSize: 40, marginBottom: 12 },
+    pickerLabel: { fontSize: 16, fontWeight: '600', color: colors.text, marginBottom: 6 },
+    pickerHint: { fontSize: 12, color: colors.textMuted },
+    fileInfo: {
+      backgroundColor: colors.bgSurface, borderRadius: 10, padding: 14,
+      borderWidth: 1, borderColor: colors.border, marginBottom: 20,
+    },
+    fileName: { fontSize: 14, color: colors.text, fontWeight: '500', marginBottom: 4 },
+    fileSize: { fontSize: 12, color: colors.textMuted },
+    progressContainer: {
+      height: 6, backgroundColor: colors.bgElevated, borderRadius: 3,
+      overflow: 'hidden', marginBottom: 8,
+    },
+    progressBar: { height: 6, backgroundColor: colors.primary, borderRadius: 3 },
+    progressText: { fontSize: 12, color: colors.textMuted, textAlign: 'right', marginBottom: 20 },
+    uploadButton: {
+      backgroundColor: colors.primary, borderRadius: 12,
+      paddingVertical: 16, alignItems: 'center',
+    },
+    uploadButtonDisabled: { opacity: 0.4 },
+    uploadButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  }), [colors]);
 
   async function pickFile() {
     const result = await DocumentPicker.getDocumentAsync({
@@ -108,41 +147,3 @@ export default function UploadScreen() {
     </SafeAreaView>
   );
 }
-
-const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.dark.bg },
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 20, paddingVertical: 16,
-    borderBottomWidth: 1, borderBottomColor: Colors.dark.border,
-  },
-  cancel: { color: Colors.dark.primary, fontSize: 16, width: 60 },
-  title: { fontSize: 17, fontWeight: '600', color: Colors.dark.text },
-  body: { flex: 1, padding: 24 },
-  picker: {
-    borderWidth: 2, borderColor: Colors.dark.border, borderStyle: 'dashed',
-    borderRadius: 16, padding: 40, alignItems: 'center', marginBottom: 20,
-    backgroundColor: Colors.dark.bgSurface,
-  },
-  pickerIcon: { fontSize: 40, marginBottom: 12 },
-  pickerLabel: { fontSize: 16, fontWeight: '600', color: Colors.dark.text, marginBottom: 6 },
-  pickerHint: { fontSize: 12, color: Colors.dark.textMuted },
-  fileInfo: {
-    backgroundColor: Colors.dark.bgSurface, borderRadius: 10, padding: 14,
-    borderWidth: 1, borderColor: Colors.dark.border, marginBottom: 20,
-  },
-  fileName: { fontSize: 14, color: Colors.dark.text, fontWeight: '500', marginBottom: 4 },
-  fileSize: { fontSize: 12, color: Colors.dark.textMuted },
-  progressContainer: {
-    height: 6, backgroundColor: Colors.dark.bgElevated, borderRadius: 3,
-    overflow: 'hidden', marginBottom: 8,
-  },
-  progressBar: { height: 6, backgroundColor: Colors.dark.primary, borderRadius: 3 },
-  progressText: { fontSize: 12, color: Colors.dark.textMuted, textAlign: 'right', marginBottom: 20 },
-  uploadButton: {
-    backgroundColor: Colors.dark.primary, borderRadius: 12,
-    paddingVertical: 16, alignItems: 'center',
-  },
-  uploadButtonDisabled: { opacity: 0.4 },
-  uploadButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-});
