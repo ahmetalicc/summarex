@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  ActivityIndicator, Alert, TextInput, Pressable,
+  ActivityIndicator, Alert, TextInput, Pressable, Share,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { api } from '@/lib/api';
@@ -25,6 +25,7 @@ export default function MeetingDetailScreen() {
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState('');
   const [regenerating, setRegenerating] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   async function load() {
     setLoadError(null);
@@ -72,6 +73,19 @@ export default function MeetingDetailScreen() {
       Alert.alert('Error', (e as Error).message);
     }
     setEditingTitle(false);
+  }
+
+  async function handleShare() {
+    setSharing(true);
+    try {
+      const { token } = await api.meetings.share.create(id);
+      const url = `https://summarex.app/shared/${token}`;
+      await Share.share({ message: url, url });
+    } catch (e: unknown) {
+      Alert.alert('Error', (e as Error).message);
+    } finally {
+      setSharing(false);
+    }
   }
 
   async function handleRegenerate() {
@@ -138,6 +152,13 @@ export default function MeetingDetailScreen() {
           <Text style={s.backText}>‹ Back</Text>
         </TouchableOpacity>
         <View style={s.headerRight}>
+          {sharing ? (
+            <ActivityIndicator size="small" color={Colors.dark.textMuted} style={{ marginRight: 8 }} />
+          ) : (
+            <TouchableOpacity onPress={handleShare} style={s.shareBtn}>
+              <Text style={s.shareText}>Share</Text>
+            </TouchableOpacity>
+          )}
           {isDone && (
             <TouchableOpacity
               onPress={handleRegenerate}
@@ -352,6 +373,8 @@ const s = StyleSheet.create({
   backBtn: { padding: 4 },
   backText: { color: Colors.dark.primary, fontSize: 17 },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  shareBtn: { padding: 4 },
+  shareText: { color: Colors.dark.primary, fontSize: 14 },
   regenerateBtn: { padding: 4 },
   regenerateText: { color: Colors.dark.textMuted, fontSize: 13 },
   deleteBtn: { padding: 4 },
