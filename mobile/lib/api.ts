@@ -153,12 +153,18 @@ export interface Transcript {
   created_at: string;
 }
 
+export interface ActionItem {
+  task: string;
+  assignee: string | null;
+  deadline: string | null;
+}
+
 export interface Summary {
   id: string;
   meeting_id: string;
   overview: string;
   decisions: string[];
-  action_items: string[];
+  action_items: ActionItem[];
   topics: string[];
   sentiment: string | null;
   key_quotes: string[];

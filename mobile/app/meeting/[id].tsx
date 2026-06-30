@@ -6,7 +6,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { api } from '@/lib/api';
 import { Colors } from '@/constants/colors';
-import type { Meeting, Transcript, Summary, MeetingStatus } from '@/lib/api';
+import type { Meeting, Transcript, Summary, MeetingStatus, ActionItem } from '@/lib/api';
 
 const PROCESSING = new Set<MeetingStatus>(['queued', 'transcribing', 'summarizing']);
 
@@ -276,7 +276,9 @@ function SummaryTab({
       )}
       {summary.action_items.length > 0 && (
         <Section title="Action Items">
-          {summary.action_items.map((a, i) => <BulletItem key={i} text={a} />)}
+          {summary.action_items.map((a, i) => (
+            <ActionBullet key={i} item={a} />
+          ))}
         </Section>
       )}
       {summary.topics.length > 0 && (
@@ -314,6 +316,19 @@ function BulletItem({ text }: { text: string }) {
     <View style={s.bulletRow}>
       <Text style={s.bullet}>•</Text>
       <Text style={s.bulletText}>{text}</Text>
+    </View>
+  );
+}
+
+function ActionBullet({ item }: { item: ActionItem }) {
+  const meta = [item.assignee, item.deadline].filter(Boolean).join(' · ');
+  return (
+    <View style={s.bulletRow}>
+      <Text style={s.bullet}>•</Text>
+      <View style={{ flex: 1 }}>
+        <Text style={s.bulletText}>{item.task}</Text>
+        {meta ? <Text style={s.actionMeta}>{meta}</Text> : null}
+      </View>
     </View>
   );
 }
@@ -381,7 +396,8 @@ const s = StyleSheet.create({
   bodyText: { fontSize: 15, color: Colors.dark.text, lineHeight: 22 },
   bulletRow: { flexDirection: 'row', marginBottom: 6 },
   bullet: { color: Colors.dark.primary, marginRight: 8, fontSize: 15 },
-  bulletText: { flex: 1, fontSize: 15, color: Colors.dark.text, lineHeight: 22 },
+  bulletText: { fontSize: 15, color: Colors.dark.text, lineHeight: 22 },
+  actionMeta: { fontSize: 12, color: Colors.dark.textMuted, marginTop: 2 },
   quote: {
     fontSize: 14, color: Colors.dark.textMuted, fontStyle: 'italic',
     borderLeftWidth: 3, borderLeftColor: Colors.dark.primary,
