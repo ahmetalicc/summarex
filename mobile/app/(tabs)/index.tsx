@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
-  ActivityIndicator, RefreshControl, Alert,
+  ActivityIndicator, RefreshControl, Alert, TextInput,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { api } from '@/lib/api';
 import { Colors } from '@/constants/colors';
+import { Brand } from '@/components/Brand';
 import type { Meeting, MeetingStatus } from '@/lib/api';
 
 const STATUS_LABEL: Record<MeetingStatus, string> = {
@@ -42,11 +43,12 @@ export default function MeetingsScreen() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [search, setSearch] = useState('');
 
-  async function load(isRefresh = false) {
+  async function load(isRefresh = false, q = search) {
     if (isRefresh) setRefreshing(true);
     try {
-      const data = await api.meetings.list({ limit: 50 });
+      const data = await api.meetings.list({ limit: 50, search: q || undefined });
       setMeetings(data);
     } catch (e: unknown) {
       if (!isRefresh) Alert.alert('Error', (e as Error).message);
@@ -67,6 +69,11 @@ export default function MeetingsScreen() {
     return () => clearInterval(timer);
   }, [meetings]);
 
+  useEffect(() => {
+    const t = setTimeout(() => load(false, search), 300);
+    return () => clearTimeout(t);
+  }, [search]);
+
   if (loading) {
     return (
       <View style={s.center}>
@@ -78,7 +85,16 @@ export default function MeetingsScreen() {
   return (
     <View style={s.container}>
       <View style={s.header}>
-        <Text style={s.headerTitle}>Recordings</Text>
+        <Brand size="sm" />
+        <TextInput
+          style={s.searchInput}
+          placeholder="Search recordings…"
+          placeholderTextColor={Colors.dark.textMuted}
+          value={search}
+          onChangeText={setSearch}
+          clearButtonMode="while-editing"
+          autoCapitalize="none"
+        />
       </View>
 
       <FlatList
@@ -102,7 +118,7 @@ export default function MeetingsScreen() {
         renderItem={({ item }) => (
           <TouchableOpacity style={s.card} onPress={() => router.push(`/meeting/${item.id}` as never)}>
             <View style={s.cardTop}>
-              <Text style={s.cardTitle} numberOfLines={1}>{item.title}</Text>
+              <Text style={s.cardTitle} numberOfLines={1}>{item.title || 'Untitled recording'}</Text>
               <View style={[s.badge, { backgroundColor: STATUS_COLOR[item.status] + '22' }]}>
                 <Text style={[s.badgeText, { color: STATUS_COLOR[item.status] }]}>
                   {STATUS_LABEL[item.status]}
@@ -127,11 +143,19 @@ const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.dark.bg },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.dark.bg },
   header: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
     paddingTop: 56, paddingBottom: 16, paddingHorizontal: 20,
     backgroundColor: Colors.dark.bgSurface,
     borderBottomWidth: 1, borderBottomColor: Colors.dark.border,
   },
-  headerTitle: { fontSize: 24, fontWeight: '700', color: Colors.dark.text },
+  searchInput: {
+    flex: 1,
+    backgroundColor: Colors.dark.bg,
+    borderWidth: 1, borderColor: Colors.dark.border,
+    borderRadius: 8,
+    paddingHorizontal: 12, paddingVertical: 8,
+    color: Colors.dark.text, fontSize: 14,
+  },
   list: { padding: 16, gap: 12 },
   emptyContainer: { flex: 1 },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 120 },

@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/colors';
+import { Brand } from '@/components/Brand';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -40,6 +41,9 @@ export default function ForgotPasswordScreen() {
   return (
     <KeyboardAvoidingView style={s.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={s.inner}>
+        <View style={s.brand}>
+          <Brand size="lg" />
+        </View>
         <Text style={s.title}>Reset password</Text>
         <Text style={s.subtitle}>Enter your email and we'll send a reset link.</Text>
 
@@ -72,6 +76,7 @@ export default function ForgotPasswordScreen() {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.dark.bg },
   inner: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
+  brand: { alignItems: 'center', marginBottom: 16 },
   title: { fontSize: 28, fontWeight: '700', color: Colors.dark.primary, textAlign: 'center', marginBottom: 8 },
   subtitle: { fontSize: 15, color: Colors.dark.textMuted, textAlign: 'center', marginBottom: 40 },
   input: {

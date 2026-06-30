@@ -13,6 +13,7 @@ import {
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/colors';
+import { Brand } from '@/components/Brand';
 
 export default function SignInScreen() {
   const router = useRouter();
@@ -31,7 +32,10 @@ export default function SignInScreen() {
   return (
     <KeyboardAvoidingView style={s.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={s.inner}>
-        <Text style={s.title}>Summarex</Text>
+        <View style={s.brand}>
+          <Brand size="lg" />
+          <Text style={s.brandTagline}>Record it. Transcribe it. Understand it.</Text>
+        </View>
         <Text style={s.subtitle}>Sign in to your account</Text>
 
         <TextInput
@@ -75,7 +79,8 @@ export default function SignInScreen() {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.dark.bg },
   inner: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
-  title: { fontSize: 32, fontWeight: '700', color: Colors.dark.primary, textAlign: 'center', marginBottom: 8 },
+  brand: { alignItems: 'center', marginBottom: 16 },
+  brandTagline: { fontSize: 13, color: Colors.dark.textMuted, marginTop: 8 },
   subtitle: { fontSize: 16, color: Colors.dark.textMuted, textAlign: 'center', marginBottom: 40 },
   input: {
     backgroundColor: Colors.dark.bgSurface,

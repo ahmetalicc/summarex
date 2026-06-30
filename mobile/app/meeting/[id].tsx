@@ -195,7 +195,7 @@ export default function MeetingDetailScreen() {
             style={{ flex: 1 }}
             hitSlop={{ top: 8, bottom: 8, left: 0, right: 0 }}
           >
-            <Text style={s.titleText} numberOfLines={2}>{meeting.title}</Text>
+            <Text style={s.titleText} numberOfLines={2}>{meeting.title || 'Untitled recording'}</Text>
             <Text style={s.titleHint}>Tap to edit</Text>
           </Pressable>
         )}
