@@ -1,14 +1,7 @@
 import { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  ActivityIndicator,
-  Alert,
+  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  KeyboardAvoidingView, Platform, ActivityIndicator, Alert, ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
@@ -31,68 +24,87 @@ export default function ForgotPasswordScreen() {
     } else {
       Alert.alert(
         'Email sent',
-        'Check your inbox for the password reset link.',
+        'If an account exists for that address, you\'ll receive a reset link.',
         [{ text: 'OK', onPress: () => router.replace('/(auth)/sign-in') }]
       );
     }
   }
 
   return (
-    <KeyboardAvoidingView style={s.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={s.inner}>
-        <Text style={s.title}>Reset password</Text>
-        <Text style={s.subtitle}>Enter your email and we'll send a reset link.</Text>
+    <KeyboardAvoidingView style={s.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
+        <View style={s.brand}>
+          <View style={s.logoMark}>
+            <Text style={s.logoLetter}>S</Text>
+          </View>
+          <Text style={s.brandName}>Summarex</Text>
+        </View>
 
-        <TextInput
-          style={s.input}
-          placeholder="Email"
-          placeholderTextColor={Colors.dark.textMuted}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
+        <View style={s.card}>
+          <Text style={s.cardTitle}>Reset password</Text>
+          <Text style={s.cardSubtitle}>Enter your email and we'll send a reset link.</Text>
 
-        <TouchableOpacity style={s.button} onPress={handleReset} disabled={loading}>
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={s.buttonText}>Send Reset Link</Text>
-          )}
+          <View style={s.field}>
+            <Text style={s.label}>Email</Text>
+            <TextInput
+              style={s.input}
+              placeholder="you@example.com"
+              placeholderTextColor={Colors.dark.textMuted}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+              onSubmitEditing={handleReset}
+              returnKeyType="go"
+            />
+          </View>
+
+          <TouchableOpacity style={s.button} onPress={handleReset} disabled={loading} activeOpacity={0.85}>
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.buttonText}>Send Reset Link</Text>}
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity onPress={() => router.back()} style={s.footer}>
+          <Text style={[s.footerText, s.footerLink]}>← Back to sign in</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={s.link}>Back to sign in</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.dark.bg },
-  inner: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
-  title: { fontSize: 28, fontWeight: '700', color: Colors.dark.primary, textAlign: 'center', marginBottom: 8 },
-  subtitle: { fontSize: 15, color: Colors.dark.textMuted, textAlign: 'center', marginBottom: 40 },
-  input: {
+  root: { flex: 1, backgroundColor: Colors.dark.bg },
+  scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 48 },
+  brand: { alignItems: 'center', marginBottom: 36 },
+  logoMark: {
+    width: 56, height: 56, borderRadius: 16,
+    backgroundColor: Colors.dark.primary,
+    alignItems: 'center', justifyContent: 'center', marginBottom: 12,
+  },
+  logoLetter: { fontSize: 28, fontWeight: '800', color: '#fff' },
+  brandName: { fontSize: 26, fontWeight: '700', color: Colors.dark.text, letterSpacing: -0.5 },
+  card: {
     backgroundColor: Colors.dark.bgSurface,
-    borderWidth: 1,
-    borderColor: Colors.dark.border,
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    color: Colors.dark.text,
-    fontSize: 16,
-    marginBottom: 16,
+    borderRadius: 16, padding: 24,
+    borderWidth: 1, borderColor: Colors.dark.border,
+  },
+  cardTitle: { fontSize: 20, fontWeight: '700', color: Colors.dark.text, marginBottom: 4 },
+  cardSubtitle: { fontSize: 14, color: Colors.dark.textMuted, marginBottom: 24 },
+  field: { marginBottom: 16 },
+  label: { fontSize: 13, fontWeight: '500', color: Colors.dark.text, marginBottom: 6 },
+  input: {
+    backgroundColor: Colors.dark.bg,
+    borderWidth: 1, borderColor: Colors.dark.border,
+    borderRadius: 10, paddingHorizontal: 14, paddingVertical: 13,
+    color: Colors.dark.text, fontSize: 15,
   },
   button: {
     backgroundColor: Colors.dark.primary,
-    borderRadius: 10,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 24,
+    borderRadius: 10, paddingVertical: 15,
+    alignItems: 'center', marginTop: 8,
   },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  link: { color: Colors.dark.primary, textAlign: 'center', marginTop: 16, fontSize: 14 },
+  buttonText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  footer: { alignItems: 'center', marginTop: 24 },
+  footerText: { fontSize: 14, color: Colors.dark.textMuted },
+  footerLink: { color: Colors.dark.primary, fontWeight: '600' },
 });
