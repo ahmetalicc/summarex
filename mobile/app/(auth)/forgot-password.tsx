@@ -6,6 +6,7 @@ import {
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/colors';
+import { Brand } from '@/components/Brand';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function ForgotPasswordScreen() {
     } else {
       Alert.alert(
         'Email sent',
-        'If an account exists for that address, you\'ll receive a reset link.',
+        "If an account exists for that address, you'll receive a reset link.",
         [{ text: 'OK', onPress: () => router.replace('/(auth)/sign-in') }]
       );
     }
@@ -34,10 +35,7 @@ export default function ForgotPasswordScreen() {
     <KeyboardAvoidingView style={s.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
         <View style={s.brand}>
-          <View style={s.logoMark}>
-            <Text style={s.logoLetter}>S</Text>
-          </View>
-          <Text style={s.brandName}>Summarex</Text>
+          <Brand size="lg" />
         </View>
 
         <View style={s.card}>
@@ -76,13 +74,6 @@ const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.dark.bg },
   scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 48 },
   brand: { alignItems: 'center', marginBottom: 36 },
-  logoMark: {
-    width: 56, height: 56, borderRadius: 16,
-    backgroundColor: Colors.dark.primary,
-    alignItems: 'center', justifyContent: 'center', marginBottom: 12,
-  },
-  logoLetter: { fontSize: 28, fontWeight: '800', color: '#fff' },
-  brandName: { fontSize: 26, fontWeight: '700', color: Colors.dark.text, letterSpacing: -0.5 },
   card: {
     backgroundColor: Colors.dark.bgSurface,
     borderRadius: 16, padding: 24,

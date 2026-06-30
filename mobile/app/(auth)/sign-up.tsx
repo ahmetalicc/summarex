@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { getLocales } from 'expo-localization';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/colors';
+import { Brand } from '@/components/Brand';
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -47,10 +48,7 @@ export default function SignUpScreen() {
     <KeyboardAvoidingView style={s.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
         <View style={s.brand}>
-          <View style={s.logoMark}>
-            <Text style={s.logoLetter}>S</Text>
-          </View>
-          <Text style={s.brandName}>Summarex</Text>
+          <Brand size="lg" />
           <Text style={s.brandTagline}>Record it. Transcribe it. Understand it.</Text>
         </View>
 
@@ -105,14 +103,7 @@ const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.dark.bg },
   scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 48 },
   brand: { alignItems: 'center', marginBottom: 36 },
-  logoMark: {
-    width: 56, height: 56, borderRadius: 16,
-    backgroundColor: Colors.dark.primary,
-    alignItems: 'center', justifyContent: 'center', marginBottom: 12,
-  },
-  logoLetter: { fontSize: 28, fontWeight: '800', color: '#fff' },
-  brandName: { fontSize: 26, fontWeight: '700', color: Colors.dark.text, letterSpacing: -0.5 },
-  brandTagline: { fontSize: 13, color: Colors.dark.textMuted, marginTop: 4, textAlign: 'center' },
+  brandTagline: { fontSize: 13, color: Colors.dark.textMuted, marginTop: 8, textAlign: 'center' },
   card: {
     backgroundColor: Colors.dark.bgSurface,
     borderRadius: 16, padding: 24,
