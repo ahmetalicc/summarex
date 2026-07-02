@@ -33,7 +33,13 @@
     "plugins": [
       "expo-router",
       "expo-localization",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow Summarex to access your microphone to record meetings."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
