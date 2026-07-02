@@ -139,7 +139,7 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fields),
       }),
-    delete: (id: string) => apiFetch<Meeting>(`/meetings/${id}`, { method: 'DELETE' }),
+    delete: (id: string): Promise<void> => apiFetch(`/meetings/${id}`, { method: 'DELETE' }),
     regenerateSummary: (id: string) =>
       apiFetch<{ status: string }>(`/meetings/${id}/regenerate-summary`, { method: 'POST' }),
     share: {

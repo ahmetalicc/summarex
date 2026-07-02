@@ -4,6 +4,7 @@ import {
   ActivityIndicator, Alert, TextInput, Pressable, Share,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { api } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
 import type { ColorScheme } from '@/constants/colors';
@@ -37,8 +38,12 @@ function createStyles(colors: ColorScheme) {
     shareText: { color: colors.primary, fontSize: 14 },
     regenerateBtn: { padding: 4 },
     regenerateText: { color: colors.textMuted, fontSize: 13 },
-    deleteBtn: { padding: 4 },
-    deleteText: { color: colors.error, fontSize: 15 },
+    deleteBtn: {
+      flexDirection: 'row', alignItems: 'center', gap: 6,
+      backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.error + '44',
+      borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6,
+    },
+    deleteText: { color: colors.error, fontSize: 13, fontWeight: '600' },
     titleRow: { padding: 20, paddingBottom: 12 },
     titleText: { fontSize: 20, fontWeight: '700', color: colors.text },
     titleHint: { fontSize: 11, color: colors.textMuted, marginTop: 4 },
@@ -108,6 +113,7 @@ export default function MeetingDetailScreen() {
   const [titleDraft, setTitleDraft] = useState('');
   const [regenerating, setRegenerating] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   async function load() {
     setLoadError(null);
@@ -183,21 +189,28 @@ export default function MeetingDetailScreen() {
     }
   }
 
-  async function handleDelete() {
-    Alert.alert('Delete recording', 'This cannot be undone.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete', style: 'destructive',
-        onPress: async () => {
-          try {
-            await api.meetings.delete(id);
-            router.back();
-          } catch (e: unknown) {
-            Alert.alert('Error', (e as Error).message);
-          }
+  function handleDelete() {
+    Alert.alert(
+      'Delete recording',
+      'This will permanently delete the recording, transcript, and summary. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            setDeleting(true);
+            try {
+              await api.meetings.delete(id);
+              router.back();
+            } catch (e: unknown) {
+              setDeleting(false);
+              Alert.alert('Error', (e as Error).message);
+            }
+          },
         },
-      },
-    ]);
+      ]
+    );
   }
 
   if (loading) {
@@ -253,7 +266,11 @@ export default function MeetingDetailScreen() {
               }
             </TouchableOpacity>
           )}
-          <TouchableOpacity onPress={handleDelete} style={s.deleteBtn}>
+          <TouchableOpacity onPress={handleDelete} disabled={deleting} style={s.deleteBtn}>
+            {deleting
+              ? <ActivityIndicator size="small" color={colors.error} />
+              : <Ionicons name="trash-outline" size={18} color={colors.error} />
+            }
             <Text style={s.deleteText}>Delete</Text>
           </TouchableOpacity>
         </View>
