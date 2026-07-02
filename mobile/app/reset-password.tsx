@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -12,12 +12,39 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const s = useMemo(() => StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.bg },
+    inner: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
+    title: { fontSize: 28, fontWeight: '700', color: colors.primary, textAlign: 'center', marginBottom: 8 },
+    subtitle: { fontSize: 15, color: colors.textMuted, textAlign: 'center', marginBottom: 40 },
+    input: {
+      backgroundColor: colors.bgSurface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 10,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      color: colors.text,
+      fontSize: 16,
+      marginBottom: 16,
+    },
+    button: {
+      backgroundColor: colors.primary,
+      borderRadius: 10,
+      paddingVertical: 16,
+      alignItems: 'center',
+      marginTop: 8,
+    },
+    buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  }), [colors]);
 
   async function handleUpdate() {
     if (!password) return;
@@ -42,7 +69,7 @@ export default function ResetPasswordScreen() {
         <TextInput
           style={s.input}
           placeholder="New password"
-          placeholderTextColor={Colors.dark.textMuted}
+          placeholderTextColor={colors.textMuted}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -59,29 +86,3 @@ export default function ResetPasswordScreen() {
     </KeyboardAvoidingView>
   );
 }
-
-const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.dark.bg },
-  inner: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
-  title: { fontSize: 28, fontWeight: '700', color: Colors.dark.primary, textAlign: 'center', marginBottom: 8 },
-  subtitle: { fontSize: 15, color: Colors.dark.textMuted, textAlign: 'center', marginBottom: 40 },
-  input: {
-    backgroundColor: Colors.dark.bgSurface,
-    borderWidth: 1,
-    borderColor: Colors.dark.border,
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    color: Colors.dark.text,
-    fontSize: 16,
-    marginBottom: 16,
-  },
-  button: {
-    backgroundColor: Colors.dark.primary,
-    borderRadius: 10,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-});

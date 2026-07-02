@@ -1,20 +1,102 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
   ActivityIndicator, Alert, TextInput, Pressable, Share,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { api } from '@/lib/api';
-import { Colors } from '@/constants/colors';
+import { useTheme } from '@/contexts/ThemeContext';
+import type { ColorScheme } from '@/constants/colors';
 import type { Meeting, Transcript, Summary, MeetingStatus, ActionItem } from '@/lib/api';
 
 const PROCESSING = new Set<MeetingStatus>(['queued', 'transcribing', 'summarizing']);
 
 type Tab = 'summary' | 'transcript';
 
+function createStyles(colors: ColorScheme) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.bg },
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg, padding: 24 },
+    errorText: { color: colors.error, fontSize: 15, textAlign: 'center', marginBottom: 16 },
+    retryBtn: {
+      backgroundColor: colors.bgSurface, borderRadius: 8, paddingVertical: 10,
+      paddingHorizontal: 20, borderWidth: 1, borderColor: colors.border,
+    },
+    retryText: { color: colors.text, fontSize: 14 },
+    backLinkText: { color: colors.primary, fontSize: 14 },
+    header: {
+      flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+      paddingTop: 52, paddingBottom: 8, paddingHorizontal: 16,
+      backgroundColor: colors.bgSurface,
+      borderBottomWidth: 1, borderBottomColor: colors.border,
+    },
+    backBtn: { padding: 4 },
+    backText: { color: colors.primary, fontSize: 17 },
+    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    shareBtn: { padding: 4 },
+    shareText: { color: colors.primary, fontSize: 14 },
+    regenerateBtn: { padding: 4 },
+    regenerateText: { color: colors.textMuted, fontSize: 13 },
+    deleteBtn: { padding: 4 },
+    deleteText: { color: colors.error, fontSize: 15 },
+    titleRow: { padding: 20, paddingBottom: 12 },
+    titleText: { fontSize: 20, fontWeight: '700', color: colors.text },
+    titleHint: { fontSize: 11, color: colors.textMuted, marginTop: 4 },
+    titleInput: {
+      fontSize: 20, fontWeight: '700', color: colors.text,
+      borderBottomWidth: 1, borderBottomColor: colors.primary, paddingBottom: 4,
+    },
+    processingBanner: {
+      flexDirection: 'row', alignItems: 'center',
+      marginHorizontal: 20, marginBottom: 8,
+      backgroundColor: colors.accent + '22',
+      borderRadius: 8, padding: 12,
+    },
+    processingText: { color: colors.accent, fontSize: 14 },
+    tabs: {
+      flexDirection: 'row', marginHorizontal: 20,
+      borderBottomWidth: 1, borderBottomColor: colors.border,
+    },
+    tab: { flex: 1, paddingVertical: 12, alignItems: 'center' },
+    tabActive: { borderBottomWidth: 2, borderBottomColor: colors.primary },
+    tabText: { fontSize: 14, color: colors.textMuted, fontWeight: '500' },
+    tabTextActive: { color: colors.primary },
+    scroll: { flex: 1 },
+    scrollContent: { padding: 20, paddingBottom: 40 },
+    noContent: { color: colors.textMuted, fontSize: 14, textAlign: 'center', marginTop: 40 },
+    generateCta: { alignItems: 'center', paddingTop: 60, paddingHorizontal: 24 },
+    generateTitle: { fontSize: 18, fontWeight: '700', color: colors.text, textAlign: 'center', marginBottom: 10 },
+    generateBody: { fontSize: 14, color: colors.textMuted, textAlign: 'center', lineHeight: 20, marginBottom: 28 },
+    generateButton: {
+      backgroundColor: colors.primary, borderRadius: 10,
+      paddingVertical: 14, paddingHorizontal: 32,
+    },
+    generateButtonText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+    sectionTitle: {
+      fontSize: 12, fontWeight: '700', color: colors.textMuted,
+      textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10,
+    },
+    bodyText: { fontSize: 15, color: colors.text, lineHeight: 22 },
+    bulletRow: { flexDirection: 'row', marginBottom: 6 },
+    bullet: { color: colors.primary, marginRight: 8, fontSize: 15 },
+    bulletText: { fontSize: 15, color: colors.text, lineHeight: 22 },
+    actionMeta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
+    quote: {
+      fontSize: 14, color: colors.textMuted, fontStyle: 'italic',
+      borderLeftWidth: 3, borderLeftColor: colors.primary,
+      paddingLeft: 12, marginBottom: 8,
+    },
+    transcriptText: { fontSize: 15, color: colors.text, lineHeight: 24 },
+  });
+}
+
+type Styles = ReturnType<typeof createStyles>;
+
 export default function MeetingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { colors } = useTheme();
+  const s = useMemo(() => createStyles(colors), [colors]);
 
   const [meeting, setMeeting] = useState<Meeting | null>(null);
   const [transcript, setTranscript] = useState<Transcript | null>(null);
@@ -121,7 +203,7 @@ export default function MeetingDetailScreen() {
   if (loading) {
     return (
       <View style={s.center}>
-        <ActivityIndicator color={Colors.dark.primary} />
+        <ActivityIndicator color={colors.primary} />
       </View>
     );
   }
@@ -153,7 +235,7 @@ export default function MeetingDetailScreen() {
         </TouchableOpacity>
         <View style={s.headerRight}>
           {sharing ? (
-            <ActivityIndicator size="small" color={Colors.dark.textMuted} style={{ marginRight: 8 }} />
+            <ActivityIndicator size="small" color={colors.textMuted} style={{ marginRight: 8 }} />
           ) : (
             <TouchableOpacity onPress={handleShare} style={s.shareBtn}>
               <Text style={s.shareText}>Share</Text>
@@ -166,7 +248,7 @@ export default function MeetingDetailScreen() {
               style={s.regenerateBtn}
             >
               {regenerating
-                ? <ActivityIndicator size="small" color={Colors.dark.textMuted} />
+                ? <ActivityIndicator size="small" color={colors.textMuted} />
                 : <Text style={s.regenerateText}>Regenerate</Text>
               }
             </TouchableOpacity>
@@ -204,7 +286,7 @@ export default function MeetingDetailScreen() {
       {/* Processing banner */}
       {isProcessing && (
         <View style={s.processingBanner}>
-          <ActivityIndicator color={Colors.dark.accent} size="small" style={{ marginRight: 10 }} />
+          <ActivityIndicator color={colors.accent} size="small" style={{ marginRight: 10 }} />
           <Text style={s.processingText}>
             {meeting.status === 'queued' ? 'Queued for processing…' :
              meeting.status === 'transcribing' ? 'Transcribing audio…' : 'Generating summary…'}
@@ -214,8 +296,8 @@ export default function MeetingDetailScreen() {
 
       {/* Error banner */}
       {meeting.status === 'error' && (
-        <View style={[s.processingBanner, { backgroundColor: Colors.dark.error + '22' }]}>
-          <Text style={[s.processingText, { color: Colors.dark.error }]}>
+        <View style={[s.processingBanner, { backgroundColor: colors.error + '22' }]}>
+          <Text style={[s.processingText, { color: colors.error }]}>
             {meeting.error_message ?? 'Processing failed.'}
           </Text>
         </View>
@@ -246,9 +328,10 @@ export default function MeetingDetailScreen() {
                 status={meeting.status}
                 onGenerate={handleRegenerate}
                 generating={regenerating}
+                s={s}
               />
             )}
-            {tab === 'transcript' && <TranscriptTab transcript={transcript} />}
+            {tab === 'transcript' && <TranscriptTab transcript={transcript} s={s} />}
           </ScrollView>
         </>
       )}
@@ -261,11 +344,13 @@ function SummaryTab({
   status,
   onGenerate,
   generating,
+  s,
 }: {
   summary: Summary | null;
   status: MeetingStatus;
   onGenerate: () => void;
   generating: boolean;
+  s: Styles;
 }) {
   if (!summary && status === 'transcribed') {
     return (
@@ -287,28 +372,28 @@ function SummaryTab({
 
   return (
     <View style={{ gap: 20 }}>
-      <Section title="Overview">
+      <Section title="Overview" s={s}>
         <Text style={s.bodyText}>{summary.overview}</Text>
       </Section>
       {summary.decisions.length > 0 && (
-        <Section title="Decisions">
-          {summary.decisions.map((d, i) => <BulletItem key={i} text={d} />)}
+        <Section title="Decisions" s={s}>
+          {summary.decisions.map((d, i) => <BulletItem key={i} text={d} s={s} />)}
         </Section>
       )}
       {summary.action_items.length > 0 && (
-        <Section title="Action Items">
+        <Section title="Action Items" s={s}>
           {summary.action_items.map((a, i) => (
-            <ActionBullet key={i} item={a} />
+            <ActionBullet key={i} item={a} s={s} />
           ))}
         </Section>
       )}
       {summary.topics.length > 0 && (
-        <Section title="Topics">
+        <Section title="Topics" s={s}>
           <Text style={s.bodyText}>{summary.topics.join(', ')}</Text>
         </Section>
       )}
       {summary.key_quotes.length > 0 && (
-        <Section title="Key Quotes">
+        <Section title="Key Quotes" s={s}>
           {summary.key_quotes.map((q, i) => (
             <Text key={i} style={s.quote}>"{q}"</Text>
           ))}
@@ -318,12 +403,12 @@ function SummaryTab({
   );
 }
 
-function TranscriptTab({ transcript }: { transcript: Transcript | null }) {
+function TranscriptTab({ transcript, s }: { transcript: Transcript | null; s: Styles }) {
   if (!transcript) return <Text style={s.noContent}>Transcript not available yet.</Text>;
   return <Text style={s.transcriptText}>{transcript.full_text}</Text>;
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children, s }: { title: string; children: React.ReactNode; s: Styles }) {
   return (
     <View>
       <Text style={s.sectionTitle}>{title}</Text>
@@ -332,7 +417,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function BulletItem({ text }: { text: string }) {
+function BulletItem({ text, s }: { text: string; s: Styles }) {
   return (
     <View style={s.bulletRow}>
       <Text style={s.bullet}>•</Text>
@@ -341,7 +426,7 @@ function BulletItem({ text }: { text: string }) {
   );
 }
 
-function ActionBullet({ item }: { item: ActionItem }) {
+function ActionBullet({ item, s }: { item: ActionItem; s: Styles }) {
   const meta = [item.assignee, item.deadline].filter(Boolean).join(' · ');
   return (
     <View style={s.bulletRow}>
@@ -353,78 +438,3 @@ function ActionBullet({ item }: { item: ActionItem }) {
     </View>
   );
 }
-
-const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.dark.bg },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.dark.bg, padding: 24 },
-  errorText: { color: Colors.dark.error, fontSize: 15, textAlign: 'center', marginBottom: 16 },
-  retryBtn: {
-    backgroundColor: Colors.dark.bgSurface, borderRadius: 8, paddingVertical: 10,
-    paddingHorizontal: 20, borderWidth: 1, borderColor: Colors.dark.border,
-  },
-  retryText: { color: Colors.dark.text, fontSize: 14 },
-  backLinkText: { color: Colors.dark.primary, fontSize: 14 },
-  header: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingTop: 52, paddingBottom: 8, paddingHorizontal: 16,
-    backgroundColor: Colors.dark.bgSurface,
-    borderBottomWidth: 1, borderBottomColor: Colors.dark.border,
-  },
-  backBtn: { padding: 4 },
-  backText: { color: Colors.dark.primary, fontSize: 17 },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  shareBtn: { padding: 4 },
-  shareText: { color: Colors.dark.primary, fontSize: 14 },
-  regenerateBtn: { padding: 4 },
-  regenerateText: { color: Colors.dark.textMuted, fontSize: 13 },
-  deleteBtn: { padding: 4 },
-  deleteText: { color: Colors.dark.error, fontSize: 15 },
-  titleRow: { padding: 20, paddingBottom: 12 },
-  titleText: { fontSize: 20, fontWeight: '700', color: Colors.dark.text },
-  titleHint: { fontSize: 11, color: Colors.dark.textMuted, marginTop: 4 },
-  titleInput: {
-    fontSize: 20, fontWeight: '700', color: Colors.dark.text,
-    borderBottomWidth: 1, borderBottomColor: Colors.dark.primary, paddingBottom: 4,
-  },
-  processingBanner: {
-    flexDirection: 'row', alignItems: 'center',
-    marginHorizontal: 20, marginBottom: 8,
-    backgroundColor: Colors.dark.accent + '22',
-    borderRadius: 8, padding: 12,
-  },
-  processingText: { color: Colors.dark.accent, fontSize: 14 },
-  tabs: {
-    flexDirection: 'row', marginHorizontal: 20,
-    borderBottomWidth: 1, borderBottomColor: Colors.dark.border,
-  },
-  tab: { flex: 1, paddingVertical: 12, alignItems: 'center' },
-  tabActive: { borderBottomWidth: 2, borderBottomColor: Colors.dark.primary },
-  tabText: { fontSize: 14, color: Colors.dark.textMuted, fontWeight: '500' },
-  tabTextActive: { color: Colors.dark.primary },
-  scroll: { flex: 1 },
-  scrollContent: { padding: 20, paddingBottom: 40 },
-  noContent: { color: Colors.dark.textMuted, fontSize: 14, textAlign: 'center', marginTop: 40 },
-  generateCta: { alignItems: 'center', paddingTop: 60, paddingHorizontal: 24 },
-  generateTitle: { fontSize: 18, fontWeight: '700', color: Colors.dark.text, textAlign: 'center', marginBottom: 10 },
-  generateBody: { fontSize: 14, color: Colors.dark.textMuted, textAlign: 'center', lineHeight: 20, marginBottom: 28 },
-  generateButton: {
-    backgroundColor: Colors.dark.primary, borderRadius: 10,
-    paddingVertical: 14, paddingHorizontal: 32,
-  },
-  generateButtonText: { color: '#fff', fontSize: 15, fontWeight: '600' },
-  sectionTitle: {
-    fontSize: 12, fontWeight: '700', color: Colors.dark.textMuted,
-    textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10,
-  },
-  bodyText: { fontSize: 15, color: Colors.dark.text, lineHeight: 22 },
-  bulletRow: { flexDirection: 'row', marginBottom: 6 },
-  bullet: { color: Colors.dark.primary, marginRight: 8, fontSize: 15 },
-  bulletText: { fontSize: 15, color: Colors.dark.text, lineHeight: 22 },
-  actionMeta: { fontSize: 12, color: Colors.dark.textMuted, marginTop: 2 },
-  quote: {
-    fontSize: 14, color: Colors.dark.textMuted, fontStyle: 'italic',
-    borderLeftWidth: 3, borderLeftColor: Colors.dark.primary,
-    paddingLeft: 12, marginBottom: 8,
-  },
-  transcriptText: { fontSize: 15, color: Colors.dark.text, lineHeight: 24 },
-});
