@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ActivityIndicator,
-  Alert, TextInput, Animated, Linking, Platform,
+  Alert, TextInput, Animated, Linking,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as DocumentPicker from 'expo-document-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useAudioRecorder, RecordingPresets, AudioModule } from 'expo-audio';
+import { useTranslation } from 'react-i18next';
 import { uploadMeeting, recordMeeting } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Fonts } from '@/constants/fonts';
 import type { ColorScheme } from '@/constants/colors';
 
 const ACCEPTED_TYPES = ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/x-m4a', 'audio/aac'];
@@ -25,18 +27,18 @@ function formatDuration(totalSeconds: number): string {
 }
 
 function WaveformBars({ active, color }: { active: boolean; color: string }) {
-  const bars = useRef(Array.from({ length: 5 }, () => new Animated.Value(8))).current;
+  const bars = useRef(Array.from({ length: 7 }, () => new Animated.Value(10))).current;
   const animsRef = useRef<Animated.CompositeAnimation[]>([]);
 
   useEffect(() => {
     if (active) {
       animsRef.current = bars.map((bar) => {
-        const maxHeight = 20 + Math.random() * 30;
+        const maxHeight = 25 + Math.random() * 35;
         const duration = 200 + Math.random() * 200;
         const anim = Animated.loop(
           Animated.sequence([
             Animated.timing(bar, { toValue: maxHeight, duration, useNativeDriver: false }),
-            Animated.timing(bar, { toValue: 8, duration, useNativeDriver: false }),
+            Animated.timing(bar, { toValue: 10, duration, useNativeDriver: false }),
           ])
         );
         anim.start();
@@ -45,7 +47,7 @@ function WaveformBars({ active, color }: { active: boolean; color: string }) {
     } else {
       animsRef.current.forEach((a) => a.stop());
       animsRef.current = [];
-      bars.forEach((bar) => bar.setValue(8));
+      bars.forEach((bar) => bar.setValue(10));
     }
     return () => {
       animsRef.current.forEach((a) => a.stop());
@@ -65,13 +67,45 @@ function WaveformBars({ active, color }: { active: boolean; color: string }) {
 }
 
 const waveformStyles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'flex-end', height: 50 },
-  bar: { width: 4, borderRadius: 2, margin: 2 },
+  row: { flexDirection: 'row', alignItems: 'center', height: 60 },
+  bar: { width: 5, borderRadius: 2.5, marginHorizontal: 1.5 },
+});
+
+function PulseRing({ color }: { color: string }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const opacity = useRef(new Animated.Value(0.6)).current;
+
+  useEffect(() => {
+    const anim = Animated.loop(
+      Animated.parallel([
+        Animated.timing(scale, { toValue: 1.4, duration: 1200, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0, duration: 1200, useNativeDriver: true }),
+      ])
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [scale, opacity]);
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[pulseStyles.ring, { borderColor: color, transform: [{ scale }], opacity }]}
+    />
+  );
+}
+
+const pulseStyles = StyleSheet.create({
+  ring: {
+    position: 'absolute',
+    width: 96, height: 96, borderRadius: 48,
+    borderWidth: 3,
+  },
 });
 
 export default function UploadScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   const [mode, setMode] = useState<Mode>('summary');
   const [tab, setTab] = useState<Tab>('record');
@@ -84,6 +118,7 @@ export default function UploadScreen() {
   // Record tab state
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const [recState, setRecState] = useState<RecState>('idle');
+  const [recordedUri, setRecordedUri] = useState<string | null>(null);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [durationSecs, setDurationSecs] = useState(0);
   const [title, setTitle] = useState('');
@@ -123,6 +158,8 @@ export default function UploadScreen() {
     } else {
       stopTimer();
       await audioRecorder.stop();
+      const uri = audioRecorder.uri;
+      setRecordedUri(uri ?? null);
       setRecState('stopped');
     }
   }
@@ -143,14 +180,18 @@ export default function UploadScreen() {
     setRecState('idle');
     setDurationSecs(0);
     setTitle('');
+    setRecordedUri(null);
   }
 
   async function handleSaveRecording() {
-    if (!audioRecorder.uri) return;
+    if (!recordedUri) {
+      Alert.alert(t('newRecording.uploadFailed'), t('newRecording.noAudioCaptured'));
+      return;
+    }
     setRecordSaving(true);
     try {
       await recordMeeting({
-        uri: audioRecorder.uri,
+        uri: recordedUri,
         mimeType: 'audio/m4a',
         title: title.trim() || undefined,
         mode,
@@ -160,9 +201,9 @@ export default function UploadScreen() {
     } catch (e: unknown) {
       const err = e as Error & { status?: number };
       if (err.status === 429) {
-        Alert.alert('Monthly limit reached', err.message);
+        Alert.alert(t('newRecording.limitReached'), err.message);
       } else {
-        Alert.alert('Upload failed', err.message);
+        Alert.alert(t('newRecording.uploadFailed'), err.message);
       }
     } finally {
       setRecordSaving(false);
@@ -177,7 +218,7 @@ export default function UploadScreen() {
     if (result.canceled) return;
     const asset = result.assets[0];
     if (asset.size && asset.size > MAX_BYTES) {
-      Alert.alert('File too large', 'Maximum file size is 25 MB.');
+      Alert.alert(t('newRecording.fileTooLargeTitle'), t('newRecording.fileTooLarge'));
       return;
     }
     setFile({
@@ -199,9 +240,9 @@ export default function UploadScreen() {
     } catch (e: unknown) {
       const err = e as Error & { status?: number };
       if (err.status === 429) {
-        Alert.alert('Monthly limit reached', err.message);
+        Alert.alert(t('newRecording.limitReached'), err.message);
       } else {
-        Alert.alert('Upload failed', err.message);
+        Alert.alert(t('newRecording.uploadFailed'), err.message);
       }
     } finally {
       setFileUploading(false);
@@ -219,49 +260,64 @@ export default function UploadScreen() {
       return (
         <View style={s.permissionContainer}>
           <Ionicons name="mic-off-outline" size={48} color={colors.error} />
-          <Text style={s.permissionTitle}>Microphone permission required</Text>
-          <Text style={s.permissionSubtitle}>
-            Please enable microphone access in your device settings.
-          </Text>
+          <Text style={s.permissionTitle}>{t('newRecording.permissionTitle')}</Text>
+          <Text style={s.permissionSubtitle}>{t('newRecording.permissionSubtitle')}</Text>
           <TouchableOpacity style={s.settingsButton} onPress={() => Linking.openSettings()}>
-            <Text style={s.settingsButtonText}>Open Settings</Text>
+            <Text style={s.settingsButtonText}>{t('newRecording.openSettings')}</Text>
           </TouchableOpacity>
         </View>
       );
     }
 
-    return (
-      <View style={s.recordContainer}>
-        <WaveformBars active={recState === 'recording'} color={colors.primary} />
+    const stateLabel =
+      recState === 'recording' ? t('newRecording.recording')
+      : recState === 'paused' ? t('newRecording.paused')
+      : t('newRecording.recordHint');
+    const stateLabelColor =
+      recState === 'recording' ? colors.error
+      : recState === 'paused' ? colors.accent
+      : colors.textMuted;
 
-        <Text style={[s.duration, recState === 'recording' ? s.durationActive : s.durationIdle]}>
+    return (
+      <View style={s.recordCard}>
+        <Text style={[s.duration, recState === 'idle' ? s.durationIdle : s.durationActive]}>
           {formatDuration(durationSecs)}
         </Text>
 
+        <View style={s.waveformBox}>
+          <WaveformBars active={recState === 'recording'} color={colors.primary} />
+        </View>
+
         {recState !== 'stopped' ? (
           <>
-            <TouchableOpacity
-              style={[
-                s.micButton,
-                recState === 'idle' && s.micButtonIdle,
-                recState === 'recording' && s.micButtonRecording,
-                recState === 'paused' && s.micButtonPaused,
-              ]}
-              onPress={handleMicPress}
-              activeOpacity={0.85}
-            >
-              <Ionicons
-                name={recState === 'idle' ? 'mic' : 'stop'}
-                size={32}
-                color={
-                  recState === 'idle'
-                    ? colors.primary
-                    : recState === 'recording'
-                      ? colors.error
-                      : colors.accent
-                }
-              />
-            </TouchableOpacity>
+            <View style={s.micArea}>
+              {recState === 'recording' && <PulseRing color={colors.error} />}
+              <TouchableOpacity
+                style={[
+                  s.micButton,
+                  recState === 'idle' && s.micButtonIdle,
+                  recState === 'recording' && s.micButtonRecording,
+                  recState === 'paused' && s.micButtonPaused,
+                ]}
+                onPress={handleMicPress}
+                activeOpacity={0.85}
+                accessibilityLabel={recState === 'idle' ? t('newRecording.startRecording') : t('newRecording.stop')}
+              >
+                <Ionicons
+                  name={recState === 'idle' ? 'mic' : 'stop'}
+                  size={36}
+                  color={
+                    recState === 'idle'
+                      ? colors.primary
+                      : recState === 'recording'
+                        ? colors.error
+                        : colors.accent
+                  }
+                />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={[s.stateLabel, { color: stateLabelColor }]}>{stateLabel}</Text>
 
             {(recState === 'recording' || recState === 'paused') && (
               <TouchableOpacity
@@ -273,15 +329,18 @@ export default function UploadScreen() {
                   size={14}
                   color={colors.text}
                 />
-                <Text style={s.pausePillText}>{recState === 'recording' ? 'Pause' : 'Resume'}</Text>
+                <Text style={s.pausePillText}>
+                  {recState === 'recording' ? t('newRecording.pause') : t('newRecording.resume')}
+                </Text>
               </TouchableOpacity>
             )}
           </>
         ) : (
           <View style={s.stoppedSection}>
+            <Text style={s.titleInputLabel}>{t('newRecording.titlePlaceholder')}</Text>
             <TextInput
               style={s.titleInput}
-              placeholder="Recording title (optional)"
+              placeholder={t('newRecording.titlePlaceholder')}
               placeholderTextColor={colors.textMuted}
               value={title}
               onChangeText={setTitle}
@@ -289,7 +348,7 @@ export default function UploadScreen() {
             />
             <View style={s.stoppedButtonsRow}>
               <TouchableOpacity style={s.discardButton} onPress={handleDiscard} disabled={recordSaving}>
-                <Text style={s.discardButtonText}>Discard</Text>
+                <Text style={s.discardButtonText}>{t('newRecording.discard')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[s.saveButton, recordSaving && s.uploadButtonDisabled]}
@@ -299,7 +358,7 @@ export default function UploadScreen() {
                 {recordSaving ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={s.saveButtonText}>Save Recording</Text>
+                  <Text style={s.saveButtonText}>{t('newRecording.saveRecording')}</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -313,22 +372,29 @@ export default function UploadScreen() {
     return (
       <View style={s.uploadBody}>
         <TouchableOpacity style={s.picker} onPress={pickFile} disabled={fileUploading}>
-          <Text style={s.pickerIcon}>🎵</Text>
-          <Text style={s.pickerLabel}>{file ? 'Change file' : 'Choose audio file'}</Text>
-          <Text style={s.pickerHint}>MP3, M4A, WAV, OGG · max 25 MB</Text>
+          <Ionicons name="musical-notes-outline" size={48} color={colors.primary} style={s.pickerIcon} />
+          <Text style={s.pickerLabel}>
+            {file ? t('newRecording.changeFile') : t('newRecording.chooseFile')}
+          </Text>
+          <Text style={s.pickerHint}>{t('newRecording.fileFormats')}</Text>
         </TouchableOpacity>
 
         {file && (
           <View style={s.fileInfo}>
-            <Text style={s.fileName} numberOfLines={1}>{file.name}</Text>
-            <Text style={s.fileSize}>{formatBytes(file.size)}</Text>
+            <Ionicons name="checkmark-circle" size={22} color={colors.success} />
+            <View style={s.fileInfoBody}>
+              <Text style={s.fileName} numberOfLines={1}>{file.name}</Text>
+              <Text style={s.fileSize}>{formatBytes(file.size)}</Text>
+            </View>
           </View>
         )}
 
         {progress !== null && (
-          <View style={s.progressContainer}>
-            <View style={[s.progressBar, { width: `${progress}%` }]} />
-            <Text style={s.progressText}>{progress}%</Text>
+          <View style={s.progressSection}>
+            <View style={s.progressTrack}>
+              <View style={[s.progressBar, { width: `${progress}%` }]} />
+            </View>
+            <Text style={s.progressText}>{t('newRecording.uploading')} {progress}%</Text>
           </View>
         )}
 
@@ -340,7 +406,7 @@ export default function UploadScreen() {
           {fileUploading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={s.uploadButtonText}>Upload</Text>
+            <Text style={s.uploadButtonText}>{t('newRecording.upload')}</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -350,8 +416,8 @@ export default function UploadScreen() {
   return (
     <View style={s.container}>
       <View style={s.header}>
-        <Text style={s.headerTitle}>New Recording</Text>
-        <TouchableOpacity onPress={() => router.back()}>
+        <Text style={s.headerTitle}>{t('newRecording.title')}</Text>
+        <TouchableOpacity onPress={() => router.back()} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
           <Ionicons name="close" size={24} color={colors.textMuted} />
         </TouchableOpacity>
       </View>
@@ -361,16 +427,26 @@ export default function UploadScreen() {
           style={[s.modePill, mode === 'summary' && s.modePillActive]}
           onPress={() => setMode('summary')}
         >
+          <Ionicons
+            name="sparkles-outline"
+            size={14}
+            color={mode === 'summary' ? '#fff' : colors.textMuted}
+          />
           <Text style={[s.modePillText, mode === 'summary' && s.modePillTextActive]}>
-            Transcribe + Summarize
+            {t('newRecording.modeTranscribeAndSummarize')}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[s.modePill, mode === 'transcript' && s.modePillActive]}
           onPress={() => setMode('transcript')}
         >
+          <Ionicons
+            name="document-text-outline"
+            size={14}
+            color={mode === 'transcript' ? '#fff' : colors.textMuted}
+          />
           <Text style={[s.modePillText, mode === 'transcript' && s.modePillTextActive]}>
-            Transcribe only
+            {t('newRecording.modeTranscribeOnly')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -378,7 +454,7 @@ export default function UploadScreen() {
       <View style={s.tabRow}>
         <TouchableOpacity style={[s.tab, tab === 'record' && s.tabActive]} onPress={() => setTab('record')}>
           <Ionicons name="mic" size={16} color={tab === 'record' ? colors.primary : colors.textMuted} />
-          <Text style={[s.tabText, tab === 'record' && s.tabTextActive]}>Record</Text>
+          <Text style={[s.tabText, tab === 'record' && s.tabTextActive]}>{t('newRecording.tabRecord')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[s.tab, tab === 'upload' && s.tabActive]} onPress={() => setTab('upload')}>
           <Ionicons
@@ -386,7 +462,7 @@ export default function UploadScreen() {
             size={16}
             color={tab === 'upload' ? colors.primary : colors.textMuted}
           />
-          <Text style={[s.tabText, tab === 'upload' && s.tabTextActive]}>Upload</Text>
+          <Text style={[s.tabText, tab === 'upload' && s.tabTextActive]}>{t('newRecording.tabUpload')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -404,16 +480,19 @@ function createStyles(colors: ColorScheme) {
       backgroundColor: colors.bgSurface,
       borderBottomWidth: 1, borderBottomColor: colors.border,
     },
-    headerTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
+    headerTitle: { fontSize: 18, fontFamily: Fonts.display, color: colors.text },
 
     modeSelector: {
       flexDirection: 'row', backgroundColor: colors.bgSurface,
       borderRadius: 10, padding: 4, marginHorizontal: 20, marginTop: 16,
       borderWidth: 1, borderColor: colors.border,
     },
-    modePill: { flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
+    modePill: {
+      flex: 1, paddingVertical: 10, borderRadius: 8,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+    },
     modePillActive: { backgroundColor: colors.primary },
-    modePillText: { fontSize: 13, fontWeight: '600', color: colors.textMuted },
+    modePillText: { fontSize: 13, fontFamily: Fonts.bodyMedium, color: colors.textMuted },
     modePillTextActive: { color: '#fff' },
 
     tabRow: {
@@ -426,88 +505,115 @@ function createStyles(colors: ColorScheme) {
       borderBottomWidth: 2, borderBottomColor: 'transparent',
     },
     tabActive: { borderBottomColor: colors.primary },
-    tabText: { fontSize: 14, fontWeight: '600', color: colors.textMuted },
+    tabText: { fontSize: 14, fontFamily: Fonts.bodyMedium, color: colors.textMuted },
     tabTextActive: { color: colors.primary },
 
     // Upload tab
     uploadBody: { flex: 1, padding: 24 },
     picker: {
       borderWidth: 2, borderColor: colors.border, borderStyle: 'dashed',
-      borderRadius: 16, padding: 40, alignItems: 'center', marginBottom: 20,
+      borderRadius: 16, padding: 40, minHeight: 160,
+      alignItems: 'center', justifyContent: 'center', marginBottom: 20,
       backgroundColor: colors.bgSurface,
     },
-    pickerIcon: { fontSize: 40, marginBottom: 12 },
-    pickerLabel: { fontSize: 16, fontWeight: '600', color: colors.text, marginBottom: 6 },
-    pickerHint: { fontSize: 12, color: colors.textMuted },
+    pickerIcon: { marginBottom: 12 },
+    pickerLabel: { fontSize: 16, fontFamily: Fonts.displaySemiBold, color: colors.text, marginBottom: 6 },
+    pickerHint: { fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted },
     fileInfo: {
-      backgroundColor: colors.bgSurface, borderRadius: 10, padding: 14,
+      flexDirection: 'row', alignItems: 'center', gap: 12,
+      backgroundColor: colors.bgSurface, borderRadius: 12, padding: 14,
       borderWidth: 1, borderColor: colors.border, marginBottom: 20,
     },
-    fileName: { fontSize: 14, color: colors.text, fontWeight: '500', marginBottom: 4 },
-    fileSize: { fontSize: 12, color: colors.textMuted },
-    progressContainer: {
-      height: 6, backgroundColor: colors.bgElevated, borderRadius: 3,
-      overflow: 'hidden', marginBottom: 8,
+    fileInfoBody: { flex: 1 },
+    fileName: { fontSize: 14, color: colors.text, fontFamily: Fonts.bodyMedium, marginBottom: 2 },
+    fileSize: { fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted },
+    progressSection: { marginBottom: 20 },
+    progressTrack: {
+      height: 8, backgroundColor: colors.bgElevated, borderRadius: 4,
+      overflow: 'hidden',
     },
-    progressBar: { height: 6, backgroundColor: colors.primary, borderRadius: 3 },
-    progressText: { fontSize: 12, color: colors.textMuted, textAlign: 'right', marginBottom: 20 },
+    progressBar: { height: 8, backgroundColor: colors.primary, borderRadius: 4 },
+    progressText: { fontSize: 12, fontFamily: Fonts.bodyMedium, color: colors.textMuted, textAlign: 'right', marginTop: 8 },
     uploadButton: {
       backgroundColor: colors.primary, borderRadius: 12,
       paddingVertical: 16, alignItems: 'center',
     },
     uploadButtonDisabled: { opacity: 0.4 },
-    uploadButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+    uploadButtonText: { color: '#fff', fontSize: 16, fontFamily: Fonts.displaySemiBold },
 
     // Record tab
-    recordContainer: { flex: 1, alignItems: 'center', paddingTop: 40, paddingHorizontal: 24 },
+    recordCard: {
+      flex: 1, alignItems: 'center',
+      backgroundColor: colors.bgSurface,
+      borderRadius: 24, borderWidth: 1, borderColor: colors.border,
+      marginHorizontal: 16, marginTop: 20, marginBottom: 24,
+      paddingVertical: 32, paddingHorizontal: 24,
+    },
     duration: {
-      fontSize: 36, marginTop: 16, fontVariant: ['tabular-nums'],
-      fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+      fontSize: 48, letterSpacing: -1, fontFamily: Fonts.display,
+      fontVariant: ['tabular-nums'], marginTop: 8,
     },
     durationActive: { color: colors.text },
     durationIdle: { color: colors.textMuted },
+    waveformBox: {
+      height: 80, alignSelf: 'stretch',
+      alignItems: 'center', justifyContent: 'center',
+      backgroundColor: colors.primary + '0A', borderRadius: 16,
+      marginTop: 20,
+    },
+    micArea: {
+      width: 96, height: 96, marginTop: 32,
+      alignItems: 'center', justifyContent: 'center',
+    },
     micButton: {
-      width: 80, height: 80, borderRadius: 40, borderWidth: 3,
-      alignItems: 'center', justifyContent: 'center', marginTop: 32,
+      width: 96, height: 96, borderRadius: 48, borderWidth: 3,
+      alignItems: 'center', justifyContent: 'center',
     },
     micButtonIdle: { borderColor: colors.primary, backgroundColor: colors.primary + '1A' },
     micButtonRecording: { borderColor: colors.error, backgroundColor: colors.error + '33' },
     micButtonPaused: { borderColor: colors.accent, backgroundColor: colors.accent + '33' },
+    stateLabel: { fontSize: 14, fontFamily: Fonts.body, marginTop: 16, textAlign: 'center' },
     pausePill: {
       flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 16,
       paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20,
-      backgroundColor: colors.bgSurface, borderWidth: 1, borderColor: colors.border,
+      backgroundColor: colors.bgElevated, borderWidth: 1, borderColor: colors.border,
     },
-    pausePillText: { fontSize: 13, fontWeight: '600', color: colors.text },
-    stoppedSection: { width: '100%', marginTop: 32 },
+    pausePillText: { fontSize: 13, fontFamily: Fonts.bodyMedium, color: colors.text },
+    stoppedSection: { width: '100%', marginTop: 24 },
+    titleInputLabel: {
+      fontSize: 13, fontFamily: Fonts.bodyMedium, color: colors.text, marginBottom: 8,
+    },
     titleInput: {
-      backgroundColor: colors.bgSurface, borderWidth: 1, borderColor: colors.border,
+      backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border,
       borderRadius: 10, paddingHorizontal: 14, paddingVertical: 13,
-      color: colors.text, fontSize: 15, marginBottom: 16,
+      color: colors.text, fontSize: 15, fontFamily: Fonts.body, marginBottom: 16,
     },
     stoppedButtonsRow: { flexDirection: 'row', gap: 12 },
     discardButton: {
       flex: 1, borderWidth: 1, borderColor: colors.border, borderRadius: 10,
       paddingVertical: 14, alignItems: 'center',
     },
-    discardButtonText: { color: colors.textMuted, fontSize: 15, fontWeight: '600' },
+    discardButtonText: { color: colors.textMuted, fontSize: 15, fontFamily: Fonts.bodyMedium },
     saveButton: {
       flex: 1, backgroundColor: colors.primary, borderRadius: 10,
       paddingVertical: 14, alignItems: 'center',
     },
-    saveButtonText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+    saveButtonText: { color: '#fff', fontSize: 15, fontFamily: Fonts.displaySemiBold },
 
     // Permission denied
     permissionContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
-    permissionTitle: { fontSize: 16, fontWeight: '700', color: colors.text, marginTop: 16, textAlign: 'center' },
+    permissionTitle: {
+      fontSize: 16, fontFamily: Fonts.displaySemiBold, color: colors.text,
+      marginTop: 16, textAlign: 'center',
+    },
     permissionSubtitle: {
-      fontSize: 13, color: colors.textMuted, marginTop: 8,
+      fontSize: 13, fontFamily: Fonts.body, color: colors.textMuted, marginTop: 8,
       textAlign: 'center', lineHeight: 18,
     },
     settingsButton: {
       marginTop: 20, backgroundColor: colors.primary,
       borderRadius: 10, paddingHorizontal: 24, paddingVertical: 12,
     },
-    settingsButtonText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+    settingsButtonText: { color: '#fff', fontSize: 14, fontFamily: Fonts.bodyMedium },
   });
 }

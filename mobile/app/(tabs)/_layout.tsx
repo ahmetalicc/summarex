@@ -1,6 +1,8 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Fonts } from '@/constants/fonts';
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -10,6 +12,7 @@ function tabIcon(name: IoniconsName, focused: boolean, color: string) {
 
 export default function TabLayout() {
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <Tabs
@@ -23,20 +26,20 @@ export default function TabLayout() {
           height: 58,
           paddingBottom: 8,
         },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 11, fontFamily: Fonts.bodyMedium },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Recordings',
+          title: t('recordings.title'),
           tabBarIcon: ({ focused, color }) => tabIcon('mic', focused, color as string),
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Profile',
+          title: t('profile.title'),
           tabBarIcon: ({ focused, color }) => tabIcon('person', focused, color as string),
         }}
       />

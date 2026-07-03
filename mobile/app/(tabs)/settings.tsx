@@ -4,14 +4,16 @@ import {
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import { api } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Fonts } from '@/constants/fonts';
 import type { ColorScheme } from '@/constants/colors';
 import type { Entitlement } from '@/lib/api';
 
-function formatReset(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+function formatReset(iso: string, locale: string): string {
+  return new Date(iso).toLocaleDateString(locale, { month: 'short', day: 'numeric' });
 }
 
 function RowItem({ label, rightText, onPress, colors }: {
@@ -28,9 +30,11 @@ function RowItem({ label, rightText, onPress, colors }: {
         marginBottom: 8,
       }}
     >
-      <Text style={{ flex: 1, fontSize: 15, color: colors.text }}>{label}</Text>
+      <Text style={{ flex: 1, fontSize: 15, fontFamily: Fonts.bodyMedium, color: colors.text }}>{label}</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-        {rightText ? <Text style={{ fontSize: 14, color: colors.textMuted }}>{rightText}</Text> : null}
+        {rightText ? (
+          <Text style={{ fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted }}>{rightText}</Text>
+        ) : null}
         <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
       </View>
     </TouchableOpacity>
@@ -38,7 +42,8 @@ function RowItem({ label, rightText, onPress, colors }: {
 }
 
 export default function SettingsScreen() {
-  const { colors, theme, toggleTheme } = useTheme();
+  const { colors, theme, toggleTheme, language, setLanguage } = useTheme();
+  const { t } = useTranslation();
   const [email, setEmail] = useState<string | null>(null);
   const [entitlement, setEntitlement] = useState<Entitlement | null>(null);
 
@@ -57,9 +62,9 @@ export default function SettingsScreen() {
       backgroundColor: colors.primary,
       alignItems: 'center', justifyContent: 'center',
     },
-    avatarText: { color: '#FFFFFF', fontSize: 22, fontWeight: '700' },
+    avatarText: { color: '#FFFFFF', fontSize: 22, fontFamily: Fonts.display },
     accountInfo: { flex: 1 },
-    email: { color: colors.text, fontSize: 15, fontWeight: '600' },
+    email: { color: colors.text, fontSize: 15, fontFamily: Fonts.displaySemiBold },
     planBadge: {
       alignSelf: 'flex-start',
       paddingHorizontal: 10, paddingVertical: 3, borderRadius: 99,
@@ -67,12 +72,12 @@ export default function SettingsScreen() {
     },
     planBadgeFree: { backgroundColor: colors.textMuted + '22' },
     planBadgePro: { backgroundColor: colors.primary + '22' },
-    planBadgeText: { fontSize: 11, fontWeight: '700' },
+    planBadgeText: { fontSize: 11, fontFamily: Fonts.bodyMedium, fontWeight: '700' },
     planBadgeTextFree: { color: colors.textMuted },
     planBadgeTextPro: { color: colors.primary },
 
     sectionHeader: {
-      fontSize: 11, fontWeight: '700', color: colors.textMuted,
+      fontSize: 11, fontFamily: Fonts.displaySemiBold, color: colors.textMuted,
       letterSpacing: 1, textTransform: 'uppercase',
       marginBottom: 8, marginTop: 28, paddingHorizontal: 4,
     },
@@ -83,8 +88,8 @@ export default function SettingsScreen() {
       borderRadius: 12, padding: 16,
     },
     usageHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-    usageTitle: { fontSize: 14, fontWeight: '700', color: colors.text },
-    usageReset: { fontSize: 12, color: colors.textMuted },
+    usageTitle: { fontSize: 14, fontFamily: Fonts.displaySemiBold, color: colors.text },
+    usageReset: { fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted },
     barTrack: {
       marginTop: 12, height: 6, borderRadius: 3,
       backgroundColor: colors.border, overflow: 'hidden',
@@ -94,7 +99,7 @@ export default function SettingsScreen() {
       flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
       marginTop: 8,
     },
-    usageBottomText: { fontSize: 12, color: colors.textMuted },
+    usageBottomText: { fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted },
 
     upgradeCard: {
       backgroundColor: colors.bgSurface,
@@ -102,20 +107,20 @@ export default function SettingsScreen() {
       borderRadius: 16, padding: 20,
     },
     upgradeHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-    upgradeTitle: { fontSize: 16, fontWeight: '700', color: colors.text },
+    upgradeTitle: { fontSize: 17, fontFamily: Fonts.display, color: colors.text },
     upgradePill: {
       backgroundColor: colors.primary,
       paddingHorizontal: 10, paddingVertical: 3, borderRadius: 99,
     },
-    upgradePillText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
-    upgradeSubtitle: { fontSize: 13, color: colors.textMuted, marginTop: 4 },
-    upgradePrice: { color: colors.primary, fontSize: 22, fontWeight: '700', marginTop: 12 },
+    upgradePillText: { color: '#FFFFFF', fontSize: 11, fontFamily: Fonts.bodyMedium, fontWeight: '700' },
+    upgradeSubtitle: { fontSize: 13, fontFamily: Fonts.body, color: colors.textMuted, marginTop: 4 },
+    upgradePrice: { color: colors.primary, fontSize: 24, fontFamily: Fonts.display, marginTop: 12 },
     upgradeButton: {
       backgroundColor: colors.primary,
       borderRadius: 10, paddingVertical: 14,
       alignItems: 'center', marginTop: 16,
     },
-    upgradeButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
+    upgradeButtonText: { color: '#FFFFFF', fontSize: 15, fontFamily: Fonts.displaySemiBold },
 
     signOutButton: {
       backgroundColor: 'transparent',
@@ -123,7 +128,7 @@ export default function SettingsScreen() {
       borderRadius: 10, paddingVertical: 14,
       alignItems: 'center', marginTop: 32,
     },
-    signOutText: { color: colors.error, fontSize: 15, fontWeight: '700' },
+    signOutText: { color: colors.error, fontSize: 15, fontFamily: Fonts.bodyMedium },
   }), [colors]);
 
   useEffect(() => {
@@ -137,17 +142,13 @@ export default function SettingsScreen() {
   }, []);
 
   function handleSignOut() {
-    Alert.alert('Sign Out', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('profile.signOutConfirmTitle'), t('profile.signOutConfirmBody'), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Sign Out', style: 'destructive',
+        text: t('profile.signOut'), style: 'destructive',
         onPress: async () => { await supabase.auth.signOut(); },
       },
     ]);
-  }
-
-  function comingSoon(title: string, message: string) {
-    Alert.alert(title, message);
   }
 
   function openLink(url: string) {
@@ -172,19 +173,21 @@ export default function SettingsScreen() {
           <Text style={s.email}>{email ?? ''}</Text>
           <View style={[s.planBadge, isPro ? s.planBadgePro : s.planBadgeFree]}>
             <Text style={[s.planBadgeText, isPro ? s.planBadgeTextPro : s.planBadgeTextFree]}>
-              {isPro ? 'Pro Plan' : 'Free Plan'}
+              {isPro ? t('profile.proPlan') : t('profile.freePlan')}
             </Text>
           </View>
         </View>
       </View>
 
       {/* Usage */}
-      <Text style={s.sectionHeader}>USAGE</Text>
+      <Text style={s.sectionHeader}>{t('profile.sectionUsage')}</Text>
       <View style={s.usageCard}>
         <View style={s.usageHeaderRow}>
-          <Text style={s.usageTitle}>Monthly Usage</Text>
+          <Text style={s.usageTitle}>{t('profile.monthlyUsage')}</Text>
           {entitlement && (
-            <Text style={s.usageReset}>Resets {formatReset(entitlement.resets_at)}</Text>
+            <Text style={s.usageReset}>
+              {t('profile.resetsOn', { date: formatReset(entitlement.resets_at, language) })}
+            </Text>
           )}
         </View>
         <View style={s.barTrack}>
@@ -192,10 +195,10 @@ export default function SettingsScreen() {
         </View>
         <View style={s.usageBottomRow}>
           <Text style={s.usageBottomText}>
-            {entitlement ? Math.round(entitlement.minutes_used) : 0} min used
+            {t('profile.minUsed', { used: entitlement ? Math.round(entitlement.minutes_used) : 0 })}
           </Text>
           <Text style={s.usageBottomText}>
-            of {entitlement ? entitlement.minutes_limit : 0} min
+            {t('profile.of', { limit: entitlement ? entitlement.minutes_limit : 0 })}
           </Text>
         </View>
       </View>
@@ -203,50 +206,50 @@ export default function SettingsScreen() {
       {/* Upgrade */}
       {entitlement && !isPro && (
         <>
-          <Text style={s.sectionHeader}>PRO</Text>
+          <Text style={s.sectionHeader}>{t('profile.sectionPro')}</Text>
           <View style={s.upgradeCard}>
             <View style={s.upgradeHeaderRow}>
-              <Text style={s.upgradeTitle}>Upgrade to Pro</Text>
+              <Text style={s.upgradeTitle}>{t('profile.upgradeTitle')}</Text>
               <View style={s.upgradePill}>
-                <Text style={s.upgradePillText}>20 hrs/mo</Text>
+                <Text style={s.upgradePillText}>{t('profile.upgradePill')}</Text>
               </View>
             </View>
-            <Text style={s.upgradeSubtitle}>Priority processing · Unlimited sharing</Text>
-            <Text style={s.upgradePrice}>$9.99 / month</Text>
+            <Text style={s.upgradeSubtitle}>{t('profile.upgradeSubtitle')}</Text>
+            <Text style={s.upgradePrice}>{t('profile.upgradePrice')}</Text>
             <TouchableOpacity
               style={s.upgradeButton}
-              onPress={() => comingSoon('Coming Soon', 'In-app purchases are coming in the next update.')}
+              onPress={() => Alert.alert(t('profile.upgradeComingSoon'), t('profile.upgradeComingSoonBody'))}
             >
-              <Text style={s.upgradeButtonText}>Upgrade Now</Text>
+              <Text style={s.upgradeButtonText}>{t('profile.upgradeButton')}</Text>
             </TouchableOpacity>
           </View>
         </>
       )}
 
       {/* App */}
-      <Text style={s.sectionHeader}>APP</Text>
+      <Text style={s.sectionHeader}>{t('profile.sectionApp')}</Text>
       <RowItem
-        label="Language"
-        rightText="English"
-        onPress={() => comingSoon('Coming Soon', 'Multi-language support is coming soon.')}
+        label={t('profile.language')}
+        rightText={t('profile.languageValue')}
+        onPress={() => setLanguage(language === 'en' ? 'tr' : 'en')}
         colors={colors}
       />
       <RowItem
-        label="Appearance"
-        rightText={theme === 'dark' ? 'Dark' : 'Light'}
+        label={t('profile.appearance')}
+        rightText={theme === 'dark' ? t('profile.appearanceDark') : t('profile.appearanceLight')}
         onPress={toggleTheme}
         colors={colors}
       />
 
       {/* Legal */}
-      <Text style={s.sectionHeader}>LEGAL</Text>
-      <RowItem label="Privacy Policy" onPress={() => openLink('https://summarex.app/privacy')} colors={colors} />
-      <RowItem label="Terms of Service" onPress={() => openLink('https://summarex.app/terms')} colors={colors} />
-      <RowItem label="Contact Us" onPress={() => openLink('https://summarex.app/contact')} colors={colors} />
+      <Text style={s.sectionHeader}>{t('profile.sectionLegal')}</Text>
+      <RowItem label={t('profile.privacyPolicy')} onPress={() => openLink('https://summarex.app/privacy')} colors={colors} />
+      <RowItem label={t('profile.terms')} onPress={() => openLink('https://summarex.app/terms')} colors={colors} />
+      <RowItem label={t('profile.contact')} onPress={() => openLink('https://summarex.app/contact')} colors={colors} />
 
       {/* Sign Out */}
       <TouchableOpacity style={s.signOutButton} onPress={handleSignOut}>
-        <Text style={s.signOutText}>Sign Out</Text>
+        <Text style={s.signOutText}>{t('profile.signOut')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );

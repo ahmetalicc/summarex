@@ -5,13 +5,16 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { getLocales } from 'expo-localization';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Fonts } from '@/constants/fonts';
 import { Brand } from '@/components/Brand';
 
 export default function SignUpScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,31 +23,31 @@ export default function SignUpScreen() {
     root: { flex: 1, backgroundColor: colors.bg },
     scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 48 },
     brand: { alignItems: 'center', marginBottom: 36 },
-    brandTagline: { fontSize: 13, color: colors.textMuted, marginTop: 8, textAlign: 'center' },
+    brandTagline: { fontSize: 14, fontFamily: Fonts.bodyMedium, color: colors.textMuted, marginTop: 8, textAlign: 'center' },
     card: {
       backgroundColor: colors.bgSurface,
       borderRadius: 16, padding: 24,
-      borderWidth: 1, borderColor: colors.border,
+      borderWidth: 1.5, borderColor: colors.border,
     },
-    cardTitle: { fontSize: 20, fontWeight: '700', color: colors.text, marginBottom: 4 },
-    cardSubtitle: { fontSize: 14, color: colors.textMuted, marginBottom: 24 },
+    cardTitle: { fontSize: 20, fontFamily: Fonts.display, color: colors.text, marginBottom: 4 },
+    cardSubtitle: { fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted, marginBottom: 24 },
     field: { marginBottom: 16 },
-    label: { fontSize: 13, fontWeight: '500', color: colors.text, marginBottom: 6 },
+    label: { fontSize: 13, fontFamily: Fonts.bodyMedium, color: colors.text, marginBottom: 6 },
     input: {
       backgroundColor: colors.bg,
       borderWidth: 1, borderColor: colors.border,
       borderRadius: 10, paddingHorizontal: 14, paddingVertical: 13,
-      color: colors.text, fontSize: 15,
+      color: colors.text, fontSize: 15, fontFamily: Fonts.body,
     },
     button: {
       backgroundColor: colors.primary,
       borderRadius: 10, paddingVertical: 15,
       alignItems: 'center', marginTop: 8,
     },
-    buttonText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+    buttonText: { color: '#fff', fontSize: 15, fontFamily: Fonts.displaySemiBold },
     footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 24 },
-    footerText: { fontSize: 14, color: colors.textMuted },
-    footerLink: { color: colors.primary, fontWeight: '600' },
+    footerText: { fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted },
+    footerLink: { color: colors.primary, fontFamily: Fonts.bodyMedium },
   }), [colors]);
 
   async function handleSignUp() {
@@ -66,12 +69,12 @@ export default function SignUpScreen() {
     });
     setLoading(false);
     if (error) {
-      Alert.alert('Sign up failed', error.message);
+      Alert.alert(t('auth.signUpFailed'), error.message);
     } else {
       Alert.alert(
-        'Check your email',
-        'We sent you a confirmation link. Tap it to activate your account.',
-        [{ text: 'OK', onPress: () => router.replace('/(auth)/sign-in') }]
+        t('auth.checkEmailTitle'),
+        t('auth.checkEmailBody'),
+        [{ text: t('common.ok'), onPress: () => router.replace('/(auth)/sign-in') }]
       );
     }
   }
@@ -81,18 +84,18 @@ export default function SignUpScreen() {
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
         <View style={s.brand}>
           <Brand size="lg" />
-          <Text style={s.brandTagline}>Record it. Transcribe it. Understand it.</Text>
+          <Text style={s.brandTagline}>{t('common.tagline')}</Text>
         </View>
 
         <View style={s.card}>
-          <Text style={s.cardTitle}>Create account</Text>
-          <Text style={s.cardSubtitle}>Free during beta. No credit card required.</Text>
+          <Text style={s.cardTitle}>{t('auth.createTitle')}</Text>
+          <Text style={s.cardSubtitle}>{t('auth.createSubtitle')}</Text>
 
           <View style={s.field}>
-            <Text style={s.label}>Email</Text>
+            <Text style={s.label}>{t('auth.email')}</Text>
             <TextInput
               style={s.input}
-              placeholder="you@example.com"
+              placeholder={t('auth.emailPlaceholder')}
               placeholderTextColor={colors.textMuted}
               autoCapitalize="none"
               keyboardType="email-address"
@@ -103,10 +106,10 @@ export default function SignUpScreen() {
           </View>
 
           <View style={s.field}>
-            <Text style={s.label}>Password</Text>
+            <Text style={s.label}>{t('auth.password')}</Text>
             <TextInput
               style={s.input}
-              placeholder="min 6 characters"
+              placeholder={t('auth.minPassword')}
               placeholderTextColor={colors.textMuted}
               secureTextEntry
               autoComplete="new-password"
@@ -118,13 +121,13 @@ export default function SignUpScreen() {
           </View>
 
           <TouchableOpacity style={s.button} onPress={handleSignUp} disabled={loading} activeOpacity={0.85}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.buttonText}>Create Account</Text>}
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.buttonText}>{t('auth.signUpButton')}</Text>}
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity onPress={() => router.back()} style={s.footer}>
-          <Text style={s.footerText}>Already have an account? </Text>
-          <Text style={[s.footerText, s.footerLink]}>Sign in</Text>
+          <Text style={s.footerText}>{t('auth.toSignIn')} </Text>
+          <Text style={[s.footerText, s.footerLink]}>{t('auth.toSignInLink')}</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>

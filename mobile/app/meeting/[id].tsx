@@ -5,8 +5,11 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { api } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Fonts } from '@/constants/fonts';
 import type { ColorScheme } from '@/constants/colors';
 import type { Meeting, Transcript, Summary, MeetingStatus, ActionItem } from '@/lib/api';
 
@@ -18,13 +21,13 @@ function createStyles(colors: ColorScheme) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.bg },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg, padding: 24 },
-    errorText: { color: colors.error, fontSize: 15, textAlign: 'center', marginBottom: 16 },
+    errorText: { color: colors.error, fontSize: 15, fontFamily: Fonts.body, textAlign: 'center', marginBottom: 16 },
     retryBtn: {
       backgroundColor: colors.bgSurface, borderRadius: 8, paddingVertical: 10,
       paddingHorizontal: 20, borderWidth: 1, borderColor: colors.border,
     },
-    retryText: { color: colors.text, fontSize: 14 },
-    backLinkText: { color: colors.primary, fontSize: 14 },
+    retryText: { color: colors.text, fontSize: 14, fontFamily: Fonts.bodyMedium },
+    backLinkText: { color: colors.primary, fontSize: 14, fontFamily: Fonts.bodyMedium },
     header: {
       flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
       paddingTop: 52, paddingBottom: 8, paddingHorizontal: 16,
@@ -32,23 +35,23 @@ function createStyles(colors: ColorScheme) {
       borderBottomWidth: 1, borderBottomColor: colors.border,
     },
     backBtn: { padding: 4 },
-    backText: { color: colors.primary, fontSize: 17 },
+    backText: { color: colors.primary, fontSize: 17, fontFamily: Fonts.body },
     headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
     shareBtn: { padding: 4 },
-    shareText: { color: colors.primary, fontSize: 14 },
+    shareText: { color: colors.primary, fontSize: 14, fontFamily: Fonts.bodyMedium },
     regenerateBtn: { padding: 4 },
-    regenerateText: { color: colors.textMuted, fontSize: 13 },
+    regenerateText: { color: colors.textMuted, fontSize: 13, fontFamily: Fonts.bodyMedium },
     deleteBtn: {
       flexDirection: 'row', alignItems: 'center', gap: 6,
       backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.error + '44',
       borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6,
     },
-    deleteText: { color: colors.error, fontSize: 13, fontWeight: '600' },
+    deleteText: { color: colors.error, fontSize: 13, fontFamily: Fonts.bodyMedium },
     titleRow: { padding: 20, paddingBottom: 12 },
-    titleText: { fontSize: 20, fontWeight: '700', color: colors.text },
-    titleHint: { fontSize: 11, color: colors.textMuted, marginTop: 4 },
+    titleText: { fontSize: 22, fontFamily: Fonts.display, color: colors.text },
+    titleHint: { fontSize: 11, fontFamily: Fonts.body, color: colors.textMuted, marginTop: 4 },
     titleInput: {
-      fontSize: 20, fontWeight: '700', color: colors.text,
+      fontSize: 22, fontFamily: Fonts.display, color: colors.text,
       borderBottomWidth: 1, borderBottomColor: colors.primary, paddingBottom: 4,
     },
     processingBanner: {
@@ -57,41 +60,56 @@ function createStyles(colors: ColorScheme) {
       backgroundColor: colors.accent + '22',
       borderRadius: 8, padding: 12,
     },
-    processingText: { color: colors.accent, fontSize: 14 },
+    processingText: { color: colors.accent, fontSize: 14, fontFamily: Fonts.displaySemiBold },
     tabs: {
-      flexDirection: 'row', marginHorizontal: 20,
-      borderBottomWidth: 1, borderBottomColor: colors.border,
+      flexDirection: 'row', marginHorizontal: 20, gap: 8,
+      paddingBottom: 12,
     },
-    tab: { flex: 1, paddingVertical: 12, alignItems: 'center' },
-    tabActive: { borderBottomWidth: 2, borderBottomColor: colors.primary },
-    tabText: { fontSize: 14, color: colors.textMuted, fontWeight: '500' },
+    tab: {
+      flex: 1, paddingVertical: 10, alignItems: 'center',
+      borderRadius: 99, backgroundColor: 'transparent',
+    },
+    tabActive: { backgroundColor: colors.primary + '18' },
+    tabText: { fontSize: 14, color: colors.textMuted, fontFamily: Fonts.bodyMedium },
     tabTextActive: { color: colors.primary },
     scroll: { flex: 1 },
     scrollContent: { padding: 20, paddingBottom: 40 },
-    noContent: { color: colors.textMuted, fontSize: 14, textAlign: 'center', marginTop: 40 },
-    generateCta: { alignItems: 'center', paddingTop: 60, paddingHorizontal: 24 },
-    generateTitle: { fontSize: 18, fontWeight: '700', color: colors.text, textAlign: 'center', marginBottom: 10 },
-    generateBody: { fontSize: 14, color: colors.textMuted, textAlign: 'center', lineHeight: 20, marginBottom: 28 },
+    noContent: { color: colors.textMuted, fontSize: 14, fontFamily: Fonts.body, textAlign: 'center', marginTop: 40 },
+    generateCta: {
+      alignItems: 'center', paddingVertical: 32, paddingHorizontal: 24,
+      backgroundColor: colors.bgSurface,
+      borderRadius: 16, borderWidth: 1.5, borderColor: colors.primary,
+      marginTop: 24,
+    },
+    generateTitle: {
+      fontSize: 18, fontFamily: Fonts.display, color: colors.text,
+      textAlign: 'center', marginBottom: 10,
+    },
+    generateBody: {
+      fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted,
+      textAlign: 'center', lineHeight: 20, marginBottom: 24,
+    },
     generateButton: {
       backgroundColor: colors.primary, borderRadius: 10,
-      paddingVertical: 14, paddingHorizontal: 32,
+      paddingVertical: 14, paddingHorizontal: 32, alignSelf: 'stretch', alignItems: 'center',
     },
-    generateButtonText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+    generateButtonText: { color: '#fff', fontSize: 15, fontFamily: Fonts.displaySemiBold },
     sectionTitle: {
-      fontSize: 12, fontWeight: '700', color: colors.textMuted,
-      textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10,
+      fontSize: 13, fontFamily: Fonts.displaySemiBold, color: colors.textMuted,
+      textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6,
     },
-    bodyText: { fontSize: 15, color: colors.text, lineHeight: 22 },
+    sectionRule: { height: 1, backgroundColor: colors.border, marginBottom: 10 },
+    bodyText: { fontSize: 15, fontFamily: Fonts.body, color: colors.text, lineHeight: 22 },
     bulletRow: { flexDirection: 'row', marginBottom: 6 },
     bullet: { color: colors.primary, marginRight: 8, fontSize: 15 },
-    bulletText: { fontSize: 15, color: colors.text, lineHeight: 22 },
-    actionMeta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
+    bulletText: { fontSize: 15, fontFamily: Fonts.body, color: colors.text, lineHeight: 22 },
+    actionMeta: { fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted, marginTop: 2 },
     quote: {
-      fontSize: 14, color: colors.textMuted, fontStyle: 'italic',
+      fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted, fontStyle: 'italic',
       borderLeftWidth: 3, borderLeftColor: colors.primary,
       paddingLeft: 12, marginBottom: 8,
     },
-    transcriptText: { fontSize: 15, color: colors.text, lineHeight: 24 },
+    transcriptText: { fontSize: 15, fontFamily: Fonts.body, color: colors.text, lineHeight: 24 },
   });
 }
 
@@ -101,6 +119,7 @@ export default function MeetingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const s = useMemo(() => createStyles(colors), [colors]);
 
   const [meeting, setMeeting] = useState<Meeting | null>(null);
@@ -129,7 +148,7 @@ export default function MeetingDetailScreen() {
         if (s.status === 'fulfilled') setSummary(s.value);
       }
     } catch (e: unknown) {
-      setLoadError((e as Error).message ?? 'Failed to load recording.');
+      setLoadError((e as Error).message ?? t('meeting.loadError'));
     } finally {
       setLoading(false);
     }
@@ -158,7 +177,7 @@ export default function MeetingDetailScreen() {
       const updated = await api.meetings.update(id, { title: titleDraft.trim() });
       setMeeting(updated);
     } catch (e: unknown) {
-      Alert.alert('Error', (e as Error).message);
+      Alert.alert(t('common.error'), (e as Error).message);
     }
     setEditingTitle(false);
   }
@@ -170,7 +189,7 @@ export default function MeetingDetailScreen() {
       const url = `https://summarex.app/shared/${token}`;
       await Share.share({ message: url, url });
     } catch (e: unknown) {
-      Alert.alert('Error', (e as Error).message);
+      Alert.alert(t('common.error'), (e as Error).message);
     } finally {
       setSharing(false);
     }
@@ -183,7 +202,7 @@ export default function MeetingDetailScreen() {
       setSummary(null);
       setMeeting((prev) => prev ? { ...prev, status: 'summarizing' } : prev);
     } catch (e: unknown) {
-      Alert.alert('Error', (e as Error).message);
+      Alert.alert(t('common.error'), (e as Error).message);
     } finally {
       setRegenerating(false);
     }
@@ -191,12 +210,12 @@ export default function MeetingDetailScreen() {
 
   function handleDelete() {
     Alert.alert(
-      'Delete recording',
-      'This will permanently delete the recording, transcript, and summary. This cannot be undone.',
+      t('meeting.deleteTitle'),
+      t('meeting.deleteBody'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             setDeleting(true);
@@ -205,7 +224,7 @@ export default function MeetingDetailScreen() {
               router.back();
             } catch (e: unknown) {
               setDeleting(false);
-              Alert.alert('Error', (e as Error).message);
+              Alert.alert(t('common.error'), (e as Error).message);
             }
           },
         },
@@ -224,12 +243,12 @@ export default function MeetingDetailScreen() {
   if (loadError || !meeting) {
     return (
       <View style={s.center}>
-        <Text style={s.errorText}>{loadError ?? 'Recording not found.'}</Text>
+        <Text style={s.errorText}>{loadError ?? t('meeting.notFound')}</Text>
         <TouchableOpacity style={s.retryBtn} onPress={() => { setLoading(true); load(); }}>
-          <Text style={s.retryText}>Retry</Text>
+          <Text style={s.retryText}>{t('common.retry')}</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
-          <Text style={s.backLinkText}>← Back</Text>
+          <Text style={s.backLinkText}>← {t('common.back')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -237,21 +256,20 @@ export default function MeetingDetailScreen() {
 
   const isProcessing = PROCESSING.has(meeting.status);
   const isDone = meeting.status === 'done';
-  const isTranscribed = meeting.status === 'transcribed';
 
   return (
     <View style={s.container}>
       {/* Header */}
       <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
-          <Text style={s.backText}>‹ Back</Text>
+          <Text style={s.backText}>‹ {t('common.back')}</Text>
         </TouchableOpacity>
         <View style={s.headerRight}>
           {sharing ? (
             <ActivityIndicator size="small" color={colors.textMuted} style={{ marginRight: 8 }} />
           ) : (
             <TouchableOpacity onPress={handleShare} style={s.shareBtn}>
-              <Text style={s.shareText}>Share</Text>
+              <Text style={s.shareText}>{t('common.share')}</Text>
             </TouchableOpacity>
           )}
           {isDone && (
@@ -262,7 +280,7 @@ export default function MeetingDetailScreen() {
             >
               {regenerating
                 ? <ActivityIndicator size="small" color={colors.textMuted} />
-                : <Text style={s.regenerateText}>Regenerate</Text>
+                : <Text style={s.regenerateText}>{t('meeting.regenerate')}</Text>
               }
             </TouchableOpacity>
           )}
@@ -271,7 +289,7 @@ export default function MeetingDetailScreen() {
               ? <ActivityIndicator size="small" color={colors.error} />
               : <Ionicons name="trash-outline" size={18} color={colors.error} />
             }
-            <Text style={s.deleteText}>Delete</Text>
+            <Text style={s.deleteText}>{t('common.delete')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -294,8 +312,10 @@ export default function MeetingDetailScreen() {
             style={{ flex: 1 }}
             hitSlop={{ top: 8, bottom: 8, left: 0, right: 0 }}
           >
-            <Text style={s.titleText} numberOfLines={2}>{meeting.title || 'Untitled recording'}</Text>
-            <Text style={s.titleHint}>Tap to edit</Text>
+            <Text style={s.titleText} numberOfLines={2}>
+              {meeting.title || t('recordings.untitled')}
+            </Text>
+            <Text style={s.titleHint}>{t('meeting.tapToEdit')}</Text>
           </Pressable>
         )}
       </View>
@@ -303,10 +323,11 @@ export default function MeetingDetailScreen() {
       {/* Processing banner */}
       {isProcessing && (
         <View style={s.processingBanner}>
-          <ActivityIndicator color={colors.accent} size="small" style={{ marginRight: 10 }} />
+          <ActivityIndicator color={colors.primary} size="small" style={{ marginRight: 10 }} />
           <Text style={s.processingText}>
-            {meeting.status === 'queued' ? 'Queued for processing…' :
-             meeting.status === 'transcribing' ? 'Transcribing audio…' : 'Generating summary…'}
+            {meeting.status === 'queued' ? t('meeting.processingQueued') :
+             meeting.status === 'transcribing' ? t('meeting.processingTranscribing') :
+             t('meeting.processingSummarizing')}
           </Text>
         </View>
       )}
@@ -315,7 +336,7 @@ export default function MeetingDetailScreen() {
       {meeting.status === 'error' && (
         <View style={[s.processingBanner, { backgroundColor: colors.error + '22' }]}>
           <Text style={[s.processingText, { color: colors.error }]}>
-            {meeting.error_message ?? 'Processing failed.'}
+            {meeting.error_message ?? t('meeting.errorTitle')}
           </Text>
         </View>
       )}
@@ -328,13 +349,17 @@ export default function MeetingDetailScreen() {
               style={[s.tab, tab === 'summary' && s.tabActive]}
               onPress={() => setTab('summary')}
             >
-              <Text style={[s.tabText, tab === 'summary' && s.tabTextActive]}>Summary</Text>
+              <Text style={[s.tabText, tab === 'summary' && s.tabTextActive]}>
+                {t('meeting.summary')}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[s.tab, tab === 'transcript' && s.tabActive]}
               onPress={() => setTab('transcript')}
             >
-              <Text style={[s.tabText, tab === 'transcript' && s.tabTextActive]}>Transcript</Text>
+              <Text style={[s.tabText, tab === 'transcript' && s.tabTextActive]}>
+                {t('meeting.transcript')}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -346,9 +371,10 @@ export default function MeetingDetailScreen() {
                 onGenerate={handleRegenerate}
                 generating={regenerating}
                 s={s}
+                t={t}
               />
             )}
-            {tab === 'transcript' && <TranscriptTab transcript={transcript} s={s} />}
+            {tab === 'transcript' && <TranscriptTab transcript={transcript} s={s} t={t} />}
           </ScrollView>
         </>
       )}
@@ -362,55 +388,55 @@ function SummaryTab({
   onGenerate,
   generating,
   s,
+  t,
 }: {
   summary: Summary | null;
   status: MeetingStatus;
   onGenerate: () => void;
   generating: boolean;
   s: Styles;
+  t: TFunction;
 }) {
   if (!summary && status === 'transcribed') {
     return (
       <View style={s.generateCta}>
-        <Text style={s.generateTitle}>Ready for a summary?</Text>
-        <Text style={s.generateBody}>
-          Turn this transcript into decisions, action items, and key quotes.
-        </Text>
+        <Text style={s.generateTitle}>{t('meeting.generateSummaryTitle')}</Text>
+        <Text style={s.generateBody}>{t('meeting.generateSummaryBody')}</Text>
         <TouchableOpacity style={s.generateButton} onPress={onGenerate} disabled={generating}>
           {generating
             ? <ActivityIndicator color="#fff" />
-            : <Text style={s.generateButtonText}>Generate Summary</Text>
+            : <Text style={s.generateButtonText}>{t('meeting.generateSummary')}</Text>
           }
         </TouchableOpacity>
       </View>
     );
   }
-  if (!summary) return <Text style={s.noContent}>Summary not available yet.</Text>;
+  if (!summary) return <Text style={s.noContent}>{t('meeting.summaryNotAvailable')}</Text>;
 
   return (
     <View style={{ gap: 20 }}>
-      <Section title="Overview" s={s}>
+      <Section title={t('meeting.overview')} s={s}>
         <Text style={s.bodyText}>{summary.overview}</Text>
       </Section>
       {summary.decisions.length > 0 && (
-        <Section title="Decisions" s={s}>
+        <Section title={t('meeting.decisions')} s={s}>
           {summary.decisions.map((d, i) => <BulletItem key={i} text={d} s={s} />)}
         </Section>
       )}
       {summary.action_items.length > 0 && (
-        <Section title="Action Items" s={s}>
+        <Section title={t('meeting.actionItems')} s={s}>
           {summary.action_items.map((a, i) => (
             <ActionBullet key={i} item={a} s={s} />
           ))}
         </Section>
       )}
       {summary.topics.length > 0 && (
-        <Section title="Topics" s={s}>
+        <Section title={t('meeting.topics')} s={s}>
           <Text style={s.bodyText}>{summary.topics.join(', ')}</Text>
         </Section>
       )}
       {summary.key_quotes.length > 0 && (
-        <Section title="Key Quotes" s={s}>
+        <Section title={t('meeting.keyQuotes')} s={s}>
           {summary.key_quotes.map((q, i) => (
             <Text key={i} style={s.quote}>"{q}"</Text>
           ))}
@@ -420,8 +446,8 @@ function SummaryTab({
   );
 }
 
-function TranscriptTab({ transcript, s }: { transcript: Transcript | null; s: Styles }) {
-  if (!transcript) return <Text style={s.noContent}>Transcript not available yet.</Text>;
+function TranscriptTab({ transcript, s, t }: { transcript: Transcript | null; s: Styles; t: TFunction }) {
+  if (!transcript) return <Text style={s.noContent}>{t('meeting.transcriptNotAvailable')}</Text>;
   return <Text style={s.transcriptText}>{transcript.full_text}</Text>;
 }
 
@@ -429,6 +455,7 @@ function Section({ title, children, s }: { title: string; children: React.ReactN
   return (
     <View>
       <Text style={s.sectionTitle}>{title}</Text>
+      <View style={s.sectionRule} />
       {children}
     </View>
   );

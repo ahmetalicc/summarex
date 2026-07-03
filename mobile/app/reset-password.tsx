@@ -11,20 +11,23 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Fonts } from '@/constants/fonts';
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const s = useMemo(() => StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.bg },
     inner: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
-    title: { fontSize: 28, fontWeight: '700', color: colors.primary, textAlign: 'center', marginBottom: 8 },
-    subtitle: { fontSize: 15, color: colors.textMuted, textAlign: 'center', marginBottom: 40 },
+    title: { fontSize: 28, fontFamily: Fonts.display, color: colors.primary, textAlign: 'center', marginBottom: 8 },
+    subtitle: { fontSize: 15, fontFamily: Fonts.body, color: colors.textMuted, textAlign: 'center', marginBottom: 40 },
     input: {
       backgroundColor: colors.bgSurface,
       borderWidth: 1,
@@ -34,6 +37,7 @@ export default function ResetPasswordScreen() {
       paddingVertical: 14,
       color: colors.text,
       fontSize: 16,
+      fontFamily: Fonts.body,
       marginBottom: 16,
     },
     button: {
@@ -43,7 +47,7 @@ export default function ResetPasswordScreen() {
       alignItems: 'center',
       marginTop: 8,
     },
-    buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+    buttonText: { color: '#fff', fontSize: 16, fontFamily: Fonts.displaySemiBold },
   }), [colors]);
 
   async function handleUpdate() {
@@ -52,10 +56,10 @@ export default function ResetPasswordScreen() {
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
     if (error) {
-      Alert.alert('Error', error.message);
+      Alert.alert(t('common.error'), error.message);
     } else {
-      Alert.alert('Password updated', 'You can now sign in with your new password.', [
-        { text: 'OK', onPress: () => router.replace('/(auth)/sign-in') },
+      Alert.alert(t('auth.passwordUpdatedTitle'), t('auth.passwordUpdatedBody'), [
+        { text: t('common.ok'), onPress: () => router.replace('/(auth)/sign-in') },
       ]);
     }
   }
@@ -63,12 +67,12 @@ export default function ResetPasswordScreen() {
   return (
     <KeyboardAvoidingView style={s.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={s.inner}>
-        <Text style={s.title}>New password</Text>
-        <Text style={s.subtitle}>Choose a strong password for your account.</Text>
+        <Text style={s.title}>{t('auth.newPasswordTitle')}</Text>
+        <Text style={s.subtitle}>{t('auth.newPasswordSubtitle')}</Text>
 
         <TextInput
           style={s.input}
-          placeholder="New password"
+          placeholder={t('auth.newPasswordPlaceholder')}
           placeholderTextColor={colors.textMuted}
           secureTextEntry
           value={password}
@@ -79,7 +83,7 @@ export default function ResetPasswordScreen() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={s.buttonText}>Update Password</Text>
+            <Text style={s.buttonText}>{t('auth.updatePassword')}</Text>
           )}
         </TouchableOpacity>
       </View>
