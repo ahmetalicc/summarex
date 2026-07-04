@@ -75,7 +75,6 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="confirm" />
         <Stack.Screen name="reset-password" />
-        <Stack.Screen name="upload" options={{ presentation: 'modal', headerShown: false }} />
         <Stack.Screen name="meeting/[id]" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />

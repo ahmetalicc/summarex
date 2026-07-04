@@ -45,11 +45,26 @@
     "passwordUpdatedTitle": "Password updated",
     "passwordUpdatedBody": "You can now sign in with your new password."
   },
+  "tabs": {
+    "home": "Home",
+    "transcribe": "Transcribe",
+    "summarize": "Summarize",
+    "profile": "Profile"
+  },
+  "transcribe": {
+    "pageTitle": "Transcribe Audio",
+    "pageSubtitle": "Get an accurate transcript of any recording."
+  },
+  "summarize": {
+    "pageTitle": "Summarize Audio",
+    "pageSubtitle": "Transform audio into structured insights."
+  },
   "recordings": {
     "title": "Recordings",
+    "recentTitle": "Recordings",
     "searchPlaceholder": "Search recordings…",
     "emptyTitle": "No recordings yet",
-    "emptySubtitle": "Tap the + button to upload your first audio file.",
+    "emptySubtitle": "Record or upload an audio file to get started.",
     "untitled": "Untitled recording",
     "statusQueued": "Queued",
     "statusTranscribing": "Transcribing…",
@@ -72,7 +87,8 @@
     "resume": "Resume",
     "stop": "Stop",
     "discard": "Discard",
-    "saveRecording": "Save Recording",
+    "saveRecording": "Save & Process",
+    "recordingReady": "Recording ready",
     "saving": "Uploading…",
     "titlePlaceholder": "Recording title (optional)",
     "chooseFile": "Choose audio file",
@@ -97,6 +113,10 @@
     "processingQueued": "Queued for processing…",
     "processingTranscribing": "Transcribing audio…",
     "processingSummarizing": "Generating summary…",
+    "stepUploaded": "Uploaded",
+    "stepTranscribing": "Transcribe",
+    "stepSummarizing": "Summarize",
+    "stepDone": "Done",
     "generateSummaryTitle": "Ready for a summary?",
     "generateSummary": "Generate Summary",
     "generateSummaryBody": "Turn this transcript into a structured summary with key points, decisions, and action items.",

@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -21,10 +22,12 @@ export default function TabLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: {
-          backgroundColor: colors.bgSurface,
+          backgroundColor: colors.bgSurface + 'F5',
+          borderTopWidth: 0.5,
           borderTopColor: colors.border,
-          height: 58,
-          paddingBottom: 8,
+          height: Platform.OS === 'ios' ? 82 : 64,
+          paddingBottom: Platform.OS === 'ios' ? 24 : 8,
+          elevation: 0,
         },
         tabBarLabelStyle: { fontSize: 11, fontFamily: Fonts.bodyMedium },
       }}
@@ -32,14 +35,28 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: t('recordings.title'),
-          tabBarIcon: ({ focused, color }) => tabIcon('mic', focused, color as string),
+          title: t('tabs.home'),
+          tabBarIcon: ({ focused, color }) => tabIcon('home', focused, color as string),
+        }}
+      />
+      <Tabs.Screen
+        name="transcribe"
+        options={{
+          title: t('tabs.transcribe'),
+          tabBarIcon: ({ focused, color }) => tabIcon('document-text', focused, color as string),
+        }}
+      />
+      <Tabs.Screen
+        name="summarize"
+        options={{
+          title: t('tabs.summarize'),
+          tabBarIcon: ({ focused, color }) => tabIcon('sparkles', focused, color as string),
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: t('profile.title'),
+          title: t('tabs.profile'),
           tabBarIcon: ({ focused, color }) => tabIcon('person', focused, color as string),
         }}
       />

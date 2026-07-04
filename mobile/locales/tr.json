@@ -45,11 +45,26 @@
     "passwordUpdatedTitle": "Şifre güncellendi",
     "passwordUpdatedBody": "Artık yeni şifrenle giriş yapabilirsin."
   },
+  "tabs": {
+    "home": "Ana Sayfa",
+    "transcribe": "Yazıya Dök",
+    "summarize": "Özetle",
+    "profile": "Profil"
+  },
+  "transcribe": {
+    "pageTitle": "Sesi Yazıya Dök",
+    "pageSubtitle": "Herhangi bir kaydın doğru transkriptini al."
+  },
+  "summarize": {
+    "pageTitle": "Sesi Özetle",
+    "pageSubtitle": "Sesi yapılandırılmış içgörülere dönüştür."
+  },
   "recordings": {
     "title": "Kayıtlar",
+    "recentTitle": "Kayıtlar",
     "searchPlaceholder": "Kayıtlarda ara…",
     "emptyTitle": "Henüz kayıt yok",
-    "emptySubtitle": "İlk ses dosyanı yüklemek için + butonuna dokun.",
+    "emptySubtitle": "Başlamak için ses kaydet ya da bir dosya yükle.",
     "untitled": "Başlıksız kayıt",
     "statusQueued": "Sırada",
     "statusTranscribing": "Metne dönüştürülüyor…",
@@ -72,7 +87,8 @@
     "resume": "Devam et",
     "stop": "Durdur",
     "discard": "Vazgeç",
-    "saveRecording": "Kaydı Kaydet",
+    "saveRecording": "Kaydet ve İşle",
+    "recordingReady": "Kayıt hazır",
     "saving": "Yükleniyor…",
     "titlePlaceholder": "Kayıt başlığı (isteğe bağlı)",
     "chooseFile": "Ses dosyası seç",
@@ -97,6 +113,10 @@
     "processingQueued": "İşlem için sırada…",
     "processingTranscribing": "Ses metne dönüştürülüyor…",
     "processingSummarizing": "Özet oluşturuluyor…",
+    "stepUploaded": "Yüklendi",
+    "stepTranscribing": "Yazıya dök",
+    "stepSummarizing": "Özetle",
+    "stepDone": "Tamamlandı",
     "generateSummaryTitle": "Özete hazır mısın?",
     "generateSummary": "Özet Çıkar",
     "generateSummaryBody": "Bu transkripti kilit noktalar, kararlar ve aksiyon maddeleriyle yapılandırılmış özete dönüştür.",
