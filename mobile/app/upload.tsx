@@ -158,8 +158,14 @@ export default function UploadScreen() {
     } else {
       stopTimer();
       await audioRecorder.stop();
-      const uri = audioRecorder.uri;
-      setRecordedUri(uri ?? null);
+      await new Promise((r) => setTimeout(r, 150));
+      const capturedUri = audioRecorder.uri;
+      if (!capturedUri) {
+        Alert.alert(t('common.error'), t('newRecording.noAudioCaptured'));
+        setRecState('idle');
+        return;
+      }
+      setRecordedUri(capturedUri);
       setRecState('stopped');
     }
   }
@@ -235,7 +241,7 @@ export default function UploadScreen() {
     setFileUploading(true);
     setProgress(0);
     try {
-      await uploadMeeting(file.uri, file.name, file.mimeType, setProgress, mode);
+      await uploadMeeting(file.uri, file.mimeType, setProgress, mode);
       router.back();
     } catch (e: unknown) {
       const err = e as Error & { status?: number };

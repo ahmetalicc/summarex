@@ -1,3 +1,4 @@
+import { File, UploadType } from 'expo-file-system';
 import { supabase } from './supabase';
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://summarex-backend.onrender.com';
@@ -29,47 +30,51 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export async function uploadMeeting(
+// Uploads a local file:// URI as multipart/form-data via the native uploader.
+// XHR + FormData silently fails on some devices with expo-audio file URIs;
+// File.upload streams from disk and handles them reliably.
+async function uploadAudioFile(
+  uri: string,
+  mimeType: string,
+  fields: Record<string, string>,
+  onProgress?: (pct: number) => void
+): Promise<Meeting> {
+  const headers = await authHeaders();
+  const file = new File(uri);
+  const result = await file.upload(`${BASE_URL}/api/v1/meetings/upload`, {
+    httpMethod: 'POST',
+    uploadType: UploadType.MULTIPART,
+    fieldName: 'file',
+    mimeType,
+    headers,
+    parameters: fields,
+    onProgress: onProgress
+      ? ({ bytesSent, totalBytes }) => {
+          if (totalBytes > 0) onProgress(Math.min(100, Math.round((bytesSent / totalBytes) * 100)));
+        }
+      : undefined,
+  });
+
+  if (result.status < 200 || result.status >= 300) {
+    let detail = `HTTP ${result.status}`;
+    try { detail = (JSON.parse(result.body) as { detail?: string }).detail ?? detail; } catch {}
+    const err = new Error(detail) as Error & { status: number };
+    err.status = result.status;
+    throw err;
+  }
+  return JSON.parse(result.body) as Meeting;
+}
+
+export function uploadMeeting(
   fileUri: string,
-  fileName: string,
   mimeType: string,
   onProgress?: (pct: number) => void,
   mode: 'summary' | 'transcript' = 'summary'
 ): Promise<Meeting> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  if (!token) throw new Error('Not authenticated');
-
-  return new Promise((resolve, reject) => {
-    const formData = new FormData();
-    formData.append('file', { uri: fileUri, name: fileName, type: mimeType } as unknown as Blob);
-    formData.append('mode', mode);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${BASE_URL}/api/v1/meetings/upload`);
-    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
-    };
-
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(JSON.parse(xhr.responseText) as Meeting);
-      } else {
-        let detail = `HTTP ${xhr.status}`;
-        try { detail = JSON.parse(xhr.responseText).detail ?? detail; } catch {}
-        const err = new Error(detail) as Error & { status: number };
-        err.status = xhr.status;
-        reject(err);
-      }
-    };
-    xhr.onerror = () => reject(new Error('Network error'));
-    xhr.send(formData);
-  });
+  return uploadAudioFile(fileUri, mimeType, { mode }, onProgress);
 }
 
-export async function recordMeeting(params: {
+export function recordMeeting(params: {
   uri: string;
   mimeType: string;
   title?: string;
@@ -78,39 +83,10 @@ export async function recordMeeting(params: {
   onProgress?: (pct: number) => void;
 }): Promise<Meeting> {
   const { uri, mimeType, title, mode, durationSeconds, onProgress } = params;
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  if (!token) throw new Error('Not authenticated');
-
-  return new Promise((resolve, reject) => {
-    const formData = new FormData();
-    formData.append('file', { uri, name: `recording.${mimeType.split('/')[1] ?? 'm4a'}`, type: mimeType } as unknown as Blob);
-    formData.append('mode', mode);
-    if (title) formData.append('title', title);
-    if (durationSeconds != null) formData.append('duration_seconds', String(durationSeconds));
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${BASE_URL}/api/v1/meetings/upload`);
-    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
-    };
-
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(JSON.parse(xhr.responseText) as Meeting);
-      } else {
-        let detail = `HTTP ${xhr.status}`;
-        try { detail = JSON.parse(xhr.responseText).detail ?? detail; } catch {}
-        const err = new Error(detail) as Error & { status: number };
-        err.status = xhr.status;
-        reject(err);
-      }
-    };
-    xhr.onerror = () => reject(new Error('Network error'));
-    xhr.send(formData);
-  });
+  const fields: Record<string, string> = { mode };
+  if (title) fields.title = title;
+  if (durationSeconds != null) fields.duration_seconds = String(Math.round(durationSeconds));
+  return uploadAudioFile(uri, mimeType, fields, onProgress);
 }
 
 export const api = {
