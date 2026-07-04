@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Fonts } from '@/constants/fonts';
 
 interface BrandProps {
   size?: 'sm' | 'md' | 'lg';
@@ -19,7 +20,7 @@ export function Brand({ size = 'md' }: BrandProps) {
   const s = useMemo(() => StyleSheet.create({
     row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     img: {},
-    text: { fontWeight: '700', letterSpacing: -0.5 },
+    text: { fontFamily: Fonts.display, letterSpacing: -0.5 },
     textDark: { color: colors.text },
     textGreen: { color: colors.primary },
   }), [colors]);
