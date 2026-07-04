@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, useColorScheme } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
@@ -17,6 +17,8 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import type { Session } from '@supabase/supabase-js';
 
 export default function RootLayout() {
+  const systemScheme = useColorScheme();
+  const bootColors = Colors[systemScheme === 'light' ? 'light' : 'dark'];
   const [session, setSession] = useState<Session | null>(null);
   const [initialized, setInitialized] = useState(false);
   const router = useRouter();
@@ -62,8 +64,8 @@ export default function RootLayout() {
 
   if (!initialized) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.dark.bg }}>
-        <ActivityIndicator color={Colors.dark.primary} />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: bootColors.bg }}>
+        <ActivityIndicator color={bootColors.primary} />
       </View>
     );
   }

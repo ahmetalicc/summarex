@@ -5,6 +5,7 @@ import {
 import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { supabase } from '@/lib/supabase';
 import { api } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -14,6 +15,27 @@ import type { Entitlement } from '@/lib/api';
 
 function formatReset(iso: string, locale: string): string {
   return new Date(iso).toLocaleDateString(locale, { month: 'short', day: 'numeric' });
+}
+
+function UsageBar({ pct, color, trackColor }: { pct: number; color: string; trackColor: string }) {
+  const width = useSharedValue(0);
+
+  useEffect(() => {
+    width.value = withSpring(pct, { damping: 20, stiffness: 90 });
+  }, [pct, width]);
+
+  const fillStyle = useAnimatedStyle(() => ({ width: `${width.value}%` }));
+
+  return (
+    <View
+      style={{
+        marginTop: 12, height: 6, borderRadius: 3,
+        backgroundColor: trackColor, overflow: 'hidden',
+      }}
+    >
+      <Animated.View style={[{ height: 6, borderRadius: 3, backgroundColor: color }, fillStyle]} />
+    </View>
+  );
 }
 
 function RowItem({ label, rightText, onPress, colors }: {
@@ -26,7 +48,7 @@ function RowItem({ label, rightText, onPress, colors }: {
         flexDirection: 'row', alignItems: 'center',
         backgroundColor: colors.bgSurface,
         borderWidth: 1, borderColor: colors.border,
-        borderRadius: 12, paddingHorizontal: 16, paddingVertical: 15,
+        borderRadius: 12, paddingHorizontal: 16, paddingVertical: 17,
         marginBottom: 8,
       }}
     >
@@ -57,14 +79,19 @@ export default function SettingsScreen() {
       borderWidth: 1, borderColor: colors.border,
       borderRadius: 16, padding: 16,
     },
+    avatarRing: {
+      width: 64, height: 64, borderRadius: 32,
+      borderWidth: 2, borderColor: colors.primary,
+      alignItems: 'center', justifyContent: 'center',
+    },
     avatar: {
-      width: 52, height: 52, borderRadius: 26,
+      width: 56, height: 56, borderRadius: 28,
       backgroundColor: colors.primary,
       alignItems: 'center', justifyContent: 'center',
     },
     avatarText: { color: '#FFFFFF', fontSize: 22, fontFamily: Fonts.display },
     accountInfo: { flex: 1 },
-    email: { color: colors.text, fontSize: 15, fontFamily: Fonts.displaySemiBold },
+    email: { color: colors.text, fontSize: 16, fontFamily: Fonts.displaySemiBold },
     planBadge: {
       alignSelf: 'flex-start',
       paddingHorizontal: 10, paddingVertical: 3, borderRadius: 99,
@@ -72,7 +99,7 @@ export default function SettingsScreen() {
     },
     planBadgeFree: { backgroundColor: colors.textMuted + '22' },
     planBadgePro: { backgroundColor: colors.primary + '22' },
-    planBadgeText: { fontSize: 11, fontFamily: Fonts.bodyMedium, fontWeight: '700' },
+    planBadgeText: { fontSize: 11, fontFamily: Fonts.display, textTransform: 'uppercase', letterSpacing: 0.5 },
     planBadgeTextFree: { color: colors.textMuted },
     planBadgeTextPro: { color: colors.primary },
 
@@ -90,11 +117,6 @@ export default function SettingsScreen() {
     usageHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     usageTitle: { fontSize: 14, fontFamily: Fonts.displaySemiBold, color: colors.text },
     usageReset: { fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted },
-    barTrack: {
-      marginTop: 12, height: 6, borderRadius: 3,
-      backgroundColor: colors.border, overflow: 'hidden',
-    },
-    barFill: { height: 6, borderRadius: 3 },
     usageBottomRow: {
       flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
       marginTop: 8,
@@ -102,8 +124,8 @@ export default function SettingsScreen() {
     usageBottomText: { fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted },
 
     upgradeCard: {
-      backgroundColor: colors.bgSurface,
-      borderWidth: 1, borderColor: colors.primary + '44',
+      backgroundColor: colors.primary + '15',
+      borderWidth: 1.5, borderColor: colors.primary,
       borderRadius: 16, padding: 20,
     },
     upgradeHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
@@ -166,8 +188,10 @@ export default function SettingsScreen() {
     <ScrollView style={s.container} contentContainerStyle={s.content}>
       {/* Account */}
       <View style={s.accountCard}>
-        <View style={s.avatar}>
-          <Text style={s.avatarText}>{initial}</Text>
+        <View style={s.avatarRing}>
+          <View style={s.avatar}>
+            <Text style={s.avatarText}>{initial}</Text>
+          </View>
         </View>
         <View style={s.accountInfo}>
           <Text style={s.email}>{email ?? ''}</Text>
@@ -190,9 +214,7 @@ export default function SettingsScreen() {
             </Text>
           )}
         </View>
-        <View style={s.barTrack}>
-          <View style={[s.barFill, { width: `${pct}%`, backgroundColor: barColor }]} />
-        </View>
+        <UsageBar pct={pct} color={barColor} trackColor={colors.border} />
         <View style={s.usageBottomRow}>
           <Text style={s.usageBottomText}>
             {t('profile.minUsed', { used: entitlement ? Math.round(entitlement.minutes_used) : 0 })}
