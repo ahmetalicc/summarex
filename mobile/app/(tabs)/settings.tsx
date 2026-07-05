@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView,
 } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withDelay } from 'react-native-reanimated';
 import { supabase } from '@/lib/supabase';
 import { api } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -20,9 +21,13 @@ function formatReset(iso: string, locale: string): string {
 function UsageBar({ pct, color, trackColor }: { pct: number; color: string; trackColor: string }) {
   const width = useSharedValue(0);
 
-  useEffect(() => {
-    width.value = withSpring(pct, { damping: 20, stiffness: 90 });
-  }, [pct, width]);
+  // Refill from 0 on every screen focus, not just mount
+  useFocusEffect(
+    useCallback(() => {
+      width.value = 0;
+      width.value = withDelay(300, withSpring(pct, { damping: 20, stiffness: 120 }));
+    }, [pct, width])
+  );
 
   const fillStyle = useAnimatedStyle(() => ({ width: `${width.value}%` }));
 

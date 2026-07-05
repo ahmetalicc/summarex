@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import {
   View, Text, StyleSheet, RefreshControl, Alert, TextInput, Pressable,
 } from 'react-native';
@@ -9,7 +9,7 @@ import { hapticImpact } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 import Animated, {
   useSharedValue, useAnimatedStyle, withSpring, withTiming,
-  withRepeat, withSequence, cancelAnimation,
+  withRepeat, withSequence, cancelAnimation, FadeInDown,
 } from 'react-native-reanimated';
 import { api } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -50,6 +50,33 @@ function formatDate(iso: string, locale: string): string {
 
 type Styles = ReturnType<typeof createStyles>;
 
+const IN_PROGRESS_STATUSES: MeetingStatus[] = ['queued', 'transcribing', 'summarizing'];
+
+function StatusDot({ color, inProgress, s }: { color: string; inProgress: boolean; s: Styles }) {
+  const pulse = useSharedValue(1);
+
+  useEffect(() => {
+    if (inProgress) {
+      pulse.value = withRepeat(
+        withSequence(
+          withTiming(0.3, { duration: 800 }),
+          withTiming(1, { duration: 800 })
+        ),
+        -1,
+        true
+      );
+    } else {
+      cancelAnimation(pulse);
+      pulse.value = 1;
+    }
+    return () => cancelAnimation(pulse);
+  }, [inProgress, pulse]);
+
+  const dotStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
+
+  return <Animated.View style={[s.statusDot, { backgroundColor: color }, dotStyle]} />;
+}
+
 function MeetingCard({
   meeting, statusColor, statusLabel, meta, onPress, s,
 }: {
@@ -75,7 +102,11 @@ function MeetingCard({
         onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); }}
         onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 300 }); }}
       >
-        <View style={[s.statusDot, { backgroundColor: statusColor }]} />
+        <StatusDot
+          color={statusColor}
+          inProgress={IN_PROGRESS_STATUSES.includes(meeting.status)}
+          s={s}
+        />
         <View style={s.cardBody}>
           <Text style={s.cardTitle} numberOfLines={1}>
             {meeting.title || t('recordings.untitled')}
@@ -125,6 +156,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
+  const hasAnimated = useRef(false);
 
   const STATUS_COLOR = useMemo(() => statusColors(colors), [colors]);
   const s = useMemo(() => createStyles(colors), [colors]);
@@ -143,6 +175,12 @@ export default function HomeScreen() {
   }
 
   useFocusEffect(useCallback(() => { load(); }, []));
+
+  // Stagger the card entry animation only on the first data load —
+  // re-animating on every refresh is jarring.
+  useEffect(() => {
+    if (!loading && meetings.length > 0) hasAnimated.current = true;
+  }, [loading, meetings]);
 
   useEffect(() => {
     const hasInProgress = meetings.some(
@@ -208,15 +246,19 @@ export default function HomeScreen() {
         ListHeaderComponent={
           <Text style={s.sectionHeader}>{t('recordings.recentTitle')}</Text>
         }
-        renderItem={({ item }) => (
-          <MeetingCard
-            meeting={item}
-            statusColor={STATUS_COLOR[item.status]}
-            statusLabel={t(STATUS_KEY[item.status])}
-            meta={`${formatDate(item.created_at, language)}${item.duration_seconds ? `  ·  ${formatDuration(item.duration_seconds)}` : ''}`}
-            onPress={() => router.push(`/meeting/${item.id}` as never)}
-            s={s}
-          />
+        renderItem={({ item, index }) => (
+          <Animated.View
+            entering={hasAnimated.current ? undefined : FadeInDown.delay(index * 60).springify().damping(18)}
+          >
+            <MeetingCard
+              meeting={item}
+              statusColor={STATUS_COLOR[item.status]}
+              statusLabel={t(STATUS_KEY[item.status])}
+              meta={`${formatDate(item.created_at, language)}${item.duration_seconds ? `  ·  ${formatDuration(item.duration_seconds)}` : ''}`}
+              onPress={() => router.push(`/meeting/${item.id}` as never)}
+              s={s}
+            />
+          </Animated.View>
         )}
       />
     );

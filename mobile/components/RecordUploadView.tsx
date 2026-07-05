@@ -33,6 +33,11 @@ const ACCEPTED_TYPES = [
 ];
 const MAX_BYTES = 500 * 1024 * 1024; // 500 MB — server enforces its own limit
 const MIC_SIZE = 96;
+// Pulse rings are pre-sized with static borderRadius (exactly half of width) and
+// animate opacity only — scale transforms distort borderRadius on Android,
+// which rendered the ring as an octagon.
+const RING_1 = MIC_SIZE + 28; // 124px
+const RING_2 = MIC_SIZE + 56; // 152px
 
 type Mode = 'summary' | 'transcript';
 type Tab = 'record' | 'upload';
@@ -83,37 +88,6 @@ function WaveBar({ active, color, index }: { active: boolean; color: string; ind
   );
 }
 
-function PulseRing({ color }: { color: string }) {
-  const progress = useSharedValue(0);
-
-  useEffect(() => {
-    progress.value = withRepeat(
-      withTiming(1, { duration: 1200, easing: Easing.out(Easing.quad) }),
-      -1
-    );
-    return () => cancelAnimation(progress);
-  }, [progress]);
-
-  const style = useAnimatedStyle(() => ({
-    transform: [{ scale: 1 + progress.value * (136 / MIC_SIZE - 1) }],
-    opacity: 1 - progress.value,
-  }));
-
-  return (
-    <Animated.View
-      pointerEvents="none"
-      style={[
-        {
-          position: 'absolute',
-          width: MIC_SIZE, height: MIC_SIZE, borderRadius: MIC_SIZE / 2,
-          borderWidth: 2, borderColor: color + '50',
-        },
-        style,
-      ]}
-    />
-  );
-}
-
 export function RecordUploadView({ mode }: { mode: Mode }) {
   const router = useRouter();
   const { colors } = useTheme();
@@ -136,6 +110,35 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
   const [title, setTitle] = useState('');
   const [recordSaving, setRecordSaving] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const ring1Opacity = useSharedValue(0);
+  const ring2Opacity = useSharedValue(0);
+
+  useEffect(() => {
+    if (recState === 'recording') {
+      ring1Opacity.value = withRepeat(
+        withSequence(
+          withTiming(0.7, { duration: 600 }),
+          withTiming(0, { duration: 600 })
+        ), -1, false
+      );
+      ring2Opacity.value = withRepeat(
+        withSequence(
+          withTiming(0, { duration: 300 }),
+          withTiming(0.4, { duration: 600 }),
+          withTiming(0, { duration: 600 })
+        ), -1, false
+      );
+    } else {
+      cancelAnimation(ring1Opacity);
+      cancelAnimation(ring2Opacity);
+      ring1Opacity.value = withTiming(0, { duration: 200 });
+      ring2Opacity.value = withTiming(0, { duration: 200 });
+    }
+  }, [recState, ring1Opacity, ring2Opacity]);
+
+  const ring1Style = useAnimatedStyle(() => ({ opacity: ring1Opacity.value }));
+  const ring2Style = useAnimatedStyle(() => ({ opacity: ring2Opacity.value }));
 
   useEffect(() => {
     (async () => {
@@ -364,7 +367,8 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
         )}
 
         <View style={s.micArea}>
-          {isRecording && <PulseRing color={colors.error} />}
+          <Animated.View pointerEvents="none" style={[s.pulseRing1, ring1Style]} />
+          <Animated.View pointerEvents="none" style={[s.pulseRing2, ring2Style]} />
           <TouchableOpacity
             style={[
               s.micButton,
@@ -539,6 +543,20 @@ function createStyles(colors: ColorScheme) {
     micArea: {
       width: MIC_SIZE, height: MIC_SIZE,
       alignItems: 'center', justifyContent: 'center',
+    },
+    pulseRing1: {
+      position: 'absolute',
+      width: RING_1, height: RING_1,
+      borderRadius: RING_1 / 2, // MUST stay exactly half — never animate borderRadius
+      borderWidth: 2,
+      borderColor: colors.error,
+    },
+    pulseRing2: {
+      position: 'absolute',
+      width: RING_2, height: RING_2,
+      borderRadius: RING_2 / 2,
+      borderWidth: 1.5,
+      borderColor: colors.error,
     },
     micButton: {
       width: MIC_SIZE, height: MIC_SIZE, borderRadius: MIC_SIZE / 2,
