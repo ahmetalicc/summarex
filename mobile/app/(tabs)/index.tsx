@@ -15,7 +15,6 @@ import { api } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import type { ColorScheme } from '@/constants/colors';
-import { Brand } from '@/components/Brand';
 import type { Meeting, MeetingStatus } from '@/lib/api';
 
 const STATUS_KEY: Record<MeetingStatus, string> = {
@@ -226,22 +225,18 @@ export default function HomeScreen() {
   return (
     <View style={s.container}>
       <View style={s.header}>
-        <View style={s.brandRow}>
-          <Brand size="md" />
+        <View style={s.headerTop}>
+          <Text style={s.headerTitle}>Summarex</Text>
         </View>
-        <Text style={s.tagline}>{t('common.tagline')}</Text>
-        <View style={s.searchWrap}>
-          <Ionicons name="search-outline" size={16} color={colors.textMuted} />
-          <TextInput
-            style={s.searchInput}
-            placeholder={t('recordings.searchPlaceholder')}
-            placeholderTextColor={colors.textMuted}
-            value={search}
-            onChangeText={setSearch}
-            clearButtonMode="while-editing"
-            autoCapitalize="none"
-          />
-        </View>
+        <TextInput
+          style={s.searchInput}
+          placeholder={t('recordings.searchPlaceholder')}
+          placeholderTextColor={colors.textMuted}
+          value={search}
+          onChangeText={setSearch}
+          clearButtonMode="while-editing"
+          autoCapitalize="none"
+        />
       </View>
 
       {renderBody()}
@@ -254,25 +249,24 @@ function createStyles(colors: ColorScheme) {
     container: { flex: 1, backgroundColor: colors.bg },
 
     header: {
-      paddingTop: 56, paddingBottom: 20, paddingHorizontal: 20,
+      paddingTop: 56, paddingBottom: 16, paddingHorizontal: 20,
       backgroundColor: colors.bgSurface,
       borderBottomWidth: 0.5, borderBottomColor: colors.border,
     },
-    brandRow: { alignItems: 'center' },
-    tagline: {
-      fontFamily: Fonts.body, fontSize: 13, color: colors.textMuted,
-      textAlign: 'center', marginTop: 4,
-    },
-    searchWrap: {
-      flexDirection: 'row', alignItems: 'center', gap: 8,
-      marginTop: 16,
-      backgroundColor: colors.bg,
-      borderRadius: 12, borderWidth: 1, borderColor: colors.border,
-      paddingHorizontal: 14,
+    headerTop: { marginBottom: 14 },
+    headerTitle: {
+      fontFamily: Fonts.display,
+      fontSize: 28,
+      color: colors.text,
+      letterSpacing: -0.5,
     },
     searchInput: {
-      flex: 1, paddingVertical: 11,
-      fontSize: 15, fontFamily: Fonts.body, color: colors.text,
+      backgroundColor: colors.bg,
+      borderWidth: 1, borderColor: colors.border,
+      borderRadius: 12,
+      paddingHorizontal: 14, paddingVertical: 11,
+      fontFamily: Fonts.body, fontSize: 15,
+      color: colors.text,
     },
 
     sectionHeader: {
