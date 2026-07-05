@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import Animated, {
   useSharedValue, useAnimatedStyle, withSpring, withTiming,
-  withRepeat, withSequence, cancelAnimation, Easing,
+  withRepeat, withSequence, cancelAnimation, Easing, FadeIn,
 } from 'react-native-reanimated';
 import { api } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -427,18 +427,21 @@ export default function MeetingDetailScreen() {
           </View>
 
           <ScrollView style={s.scroll} contentContainerStyle={s.scrollContent}>
-            {tab === 'summary' && (
-              <SummaryTab
-                summary={summary}
-                status={meeting.status}
-                onGenerate={handleRegenerate}
-                generating={regenerating}
-                colors={colors}
-                s={s}
-                t={t}
-              />
-            )}
-            {tab === 'transcript' && <TranscriptTab transcript={transcript} s={s} t={t} />}
+            {/* key remounts the view on tab switch so FadeIn replays each time */}
+            <Animated.View key={tab} entering={FadeIn.duration(250)}>
+              {tab === 'summary' && (
+                <SummaryTab
+                  summary={summary}
+                  status={meeting.status}
+                  onGenerate={handleRegenerate}
+                  generating={regenerating}
+                  colors={colors}
+                  s={s}
+                  t={t}
+                />
+              )}
+              {tab === 'transcript' && <TranscriptTab transcript={transcript} s={s} t={t} />}
+            </Animated.View>
           </ScrollView>
         </>
       )}

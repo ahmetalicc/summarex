@@ -55,6 +55,25 @@ function formatBytes(bytes: number): string {
     : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+// Android file managers often report 'application/octet-stream' for MP4/M4A —
+// fall back to the extension so the server sees a real audio MIME type.
+function resolveMimeType(name: string, reported: string | undefined): string {
+  if (reported && reported !== 'application/octet-stream') return reported;
+  const ext = name.split('.').pop()?.toLowerCase();
+  const map: Record<string, string> = {
+    mp3: 'audio/mpeg',
+    mp4: 'audio/mp4',
+    m4a: 'audio/x-m4a',
+    wav: 'audio/wav',
+    ogg: 'audio/ogg',
+    webm: 'audio/webm',
+    aac: 'audio/aac',
+    '3gp': 'audio/3gpp',
+    amr: 'audio/amr',
+  };
+  return map[ext ?? ''] ?? 'audio/mpeg';
+}
+
 function WaveBar({ active, color, index }: { active: boolean; color: string; index: number }) {
   const height = useSharedValue(8);
 
@@ -185,16 +204,28 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
     if (recState === 'idle') {
       hapticImpact(ImpactFeedbackStyle.Medium);
       setDurationSecs(0);
-      audioRecorder.record();
+      try {
+        // SDK 56 requires prepareToRecordAsync() before record() — skipping it
+        // leaves recorder.uri null on some Android (Samsung) devices.
+        await audioRecorder.prepareToRecordAsync();
+        audioRecorder.record();
+      } catch (e: unknown) {
+        Alert.alert(t('common.error'), String(e));
+        return;
+      }
       setRecState('recording');
       startTimer();
     } else {
       stopTimer();
       await audioRecorder.stop();
-      await new Promise((r) => setTimeout(r, 150));
+      // Android needs a longer settle window before recorder.uri is populated.
+      await new Promise((r) => setTimeout(r, Platform.OS === 'android' ? 600 : 150));
       const capturedUri = audioRecorder.uri;
       if (!capturedUri) {
-        Alert.alert(t('common.error'), t('newRecording.noAudioCaptured'));
+        const msg = __DEV__
+          ? `URI is null. recorder.uri = ${String(audioRecorder.uri)}`
+          : t('newRecording.noAudioCaptured');
+        Alert.alert(t('common.error'), msg);
         setRecState('idle');
         return;
       }
@@ -253,8 +284,11 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
   }
 
   async function pickFile() {
+    // Android's picker misfilters mixed MIME arrays on some devices — open it
+    // wide there and rely on resolveMimeType + server validation instead.
+    const pickerTypes = Platform.OS === 'android' ? ['*/*'] : ACCEPTED_TYPES;
     const result = await DocumentPicker.getDocumentAsync({
-      type: ACCEPTED_TYPES,
+      type: pickerTypes,
       copyToCacheDirectory: true,
     });
     if (result.canceled) return;
@@ -266,7 +300,7 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
     setFile({
       uri: asset.uri,
       name: asset.name,
-      mimeType: asset.mimeType ?? 'audio/mpeg',
+      mimeType: resolveMimeType(asset.name, asset.mimeType),
       size: asset.size ?? 0,
     });
     setProgress(null);
@@ -351,66 +385,67 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
 
     return (
       <View style={s.recordArea}>
-        {isIdle ? (
-          <Text style={s.recordHint}>{t('newRecording.recordHint')}</Text>
-        ) : (
-          <>
-            <Text style={s.duration}>{formatDuration(durationSecs)}</Text>
-            <View style={[s.waveformBox, { width: screenWidth - 80 }]}>
+        {!isIdle && <Text style={s.duration}>{formatDuration(durationSecs)}</Text>}
+
+        <View style={s.micCard}>
+          {isIdle ? (
+            <Text style={s.recordHint}>{t('newRecording.recordHint')}</Text>
+          ) : (
+            <View style={[s.waveformBox, { width: screenWidth - 88 }]}>
               <View style={s.waveformRow}>
                 {Array.from({ length: 8 }, (_, i) => (
                   <WaveBar key={i} index={i} active={isRecording} color={colors.primary} />
                 ))}
               </View>
             </View>
-          </>
-        )}
+          )}
 
-        <View style={s.micArea}>
-          <Animated.View pointerEvents="none" style={[s.pulseRing1, ring1Style]} />
-          <Animated.View pointerEvents="none" style={[s.pulseRing2, ring2Style]} />
-          <TouchableOpacity
-            style={[
-              s.micButton,
-              isIdle && s.micButtonIdle,
-              isRecording && { borderColor: colors.error, backgroundColor: colors.error + '15' },
-              isPaused && { borderColor: colors.accent, backgroundColor: colors.accent + '15' },
-            ]}
-            onPress={handleMicPress}
-            activeOpacity={0.85}
-            accessibilityLabel={isIdle ? t('newRecording.startRecording') : t('newRecording.stop')}
-          >
-            <Ionicons
-              name={isIdle ? 'mic' : 'stop'}
-              size={40}
-              color={isIdle ? colors.primary : stateColor}
-            />
-          </TouchableOpacity>
-        </View>
+          <View style={s.micArea}>
+            <Animated.View pointerEvents="none" style={[s.pulseRing1, ring1Style]} />
+            <Animated.View pointerEvents="none" style={[s.pulseRing2, ring2Style]} />
+            <TouchableOpacity
+              style={[
+                s.micButton,
+                isIdle && s.micButtonIdle,
+                isRecording && { borderColor: colors.error, backgroundColor: colors.error + '15' },
+                isPaused && { borderColor: colors.accent, backgroundColor: colors.accent + '15' },
+              ]}
+              onPress={handleMicPress}
+              activeOpacity={0.85}
+              accessibilityLabel={isIdle ? t('newRecording.startRecording') : t('newRecording.stop')}
+            >
+              <Ionicons
+                name={isIdle ? 'mic' : 'stop'}
+                size={40}
+                color={isIdle ? colors.primary : stateColor}
+              />
+            </TouchableOpacity>
+          </View>
 
-        {isIdle ? (
-          <Text style={s.tapToStart}>{t('newRecording.startRecording')}</Text>
-        ) : (
-          <Text style={[s.stateLabel, { color: stateColor }]}>
-            {isRecording ? t('newRecording.recording') : t('newRecording.paused')}
-          </Text>
-        )}
-
-        {!isIdle && (
-          <TouchableOpacity
-            style={s.pausePill}
-            onPress={isRecording ? handlePause : handleResume}
-          >
-            <Ionicons
-              name={isRecording ? 'pause-outline' : 'play'}
-              size={14}
-              color={colors.text}
-            />
-            <Text style={s.pausePillText}>
-              {isRecording ? t('newRecording.pause') : t('newRecording.resume')}
+          {isIdle ? (
+            <Text style={s.tapToStart}>{t('newRecording.startRecording')}</Text>
+          ) : (
+            <Text style={[s.stateLabel, { color: stateColor }]}>
+              {isRecording ? t('newRecording.recording') : t('newRecording.paused')}
             </Text>
-          </TouchableOpacity>
-        )}
+          )}
+
+          {!isIdle && (
+            <TouchableOpacity
+              style={s.pausePill}
+              onPress={isRecording ? handlePause : handleResume}
+            >
+              <Ionicons
+                name={isRecording ? 'pause-outline' : 'play'}
+                size={14}
+                color={colors.text}
+              />
+              <Text style={s.pausePillText}>
+                {isRecording ? t('newRecording.pause') : t('newRecording.resume')}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     );
   }
@@ -468,6 +503,16 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
       <View style={s.header}>
         <Text style={s.pageTitle}>{pageTitle}</Text>
         <Text style={s.pageSubtitle}>{pageSubtitle}</Text>
+        <View style={s.modeBadge}>
+          <Ionicons
+            name={mode === 'transcript' ? 'document-text-outline' : 'sparkles-outline'}
+            size={12}
+            color={colors.primary}
+          />
+          <Text style={s.modeBadgeText}>
+            {mode === 'transcript' ? t('tabs.transcribe') : t('tabs.summarize')}
+          </Text>
+        </View>
       </View>
 
       <View style={s.tabSwitcher}>
@@ -504,6 +549,16 @@ function createStyles(colors: ColorScheme) {
     header: { paddingTop: 56, paddingHorizontal: 20 },
     pageTitle: { fontSize: 24, fontFamily: Fonts.display, color: colors.text },
     pageSubtitle: { fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted, marginTop: 4 },
+    modeBadge: {
+      flexDirection: 'row', alignItems: 'center', gap: 4,
+      marginTop: 8, alignSelf: 'flex-start',
+      paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99,
+      backgroundColor: colors.primary + '15',
+    },
+    modeBadgeText: {
+      fontSize: 11, fontFamily: Fonts.bodyMedium,
+      color: colors.primary, textTransform: 'uppercase', letterSpacing: 0.4,
+    },
 
     tabSwitcher: {
       flexDirection: 'row',
@@ -521,7 +576,16 @@ function createStyles(colors: ColorScheme) {
     tabPillTextActive: { color: '#fff' },
 
     // Record tab
-    recordArea: { flex: 1, alignItems: 'center', paddingTop: 60, paddingHorizontal: 20 },
+    recordArea: { flex: 1, alignItems: 'center', paddingTop: 48, paddingHorizontal: 20 },
+    micCard: {
+      width: '100%',
+      backgroundColor: colors.bgSurface,
+      borderRadius: 28,
+      borderWidth: 1, borderColor: colors.border,
+      paddingVertical: 40, paddingHorizontal: 24,
+      alignItems: 'center',
+      marginTop: 24,
+    },
     recordHint: {
       fontSize: 15, fontFamily: Fonts.body, color: colors.textMuted,
       textAlign: 'center', maxWidth: 260, marginBottom: 40,
@@ -541,18 +605,21 @@ function createStyles(colors: ColorScheme) {
       flexDirection: 'row', alignItems: 'center', gap: 4, height: 60,
     },
     micArea: {
-      width: MIC_SIZE, height: MIC_SIZE,
+      width: RING_2, height: RING_2,
       alignItems: 'center', justifyContent: 'center',
     },
     pulseRing1: {
       position: 'absolute',
+      top: (RING_2 - RING_1) / 2,
+      left: (RING_2 - RING_1) / 2,
       width: RING_1, height: RING_1,
-      borderRadius: RING_1 / 2, // MUST stay exactly half — never animate borderRadius
+      borderRadius: RING_1 / 2,
       borderWidth: 2,
       borderColor: colors.error,
     },
     pulseRing2: {
       position: 'absolute',
+      top: 0, left: 0,
       width: RING_2, height: RING_2,
       borderRadius: RING_2 / 2,
       borderWidth: 1.5,

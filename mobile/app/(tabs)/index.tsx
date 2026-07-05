@@ -248,7 +248,7 @@ export default function HomeScreen() {
         }
         renderItem={({ item, index }) => (
           <Animated.View
-            entering={hasAnimated.current ? undefined : FadeInDown.delay(index * 60).springify().damping(18)}
+            entering={hasAnimated.current ? undefined : FadeInDown.delay(index * 80).duration(500).springify().damping(14)}
           >
             <MeetingCard
               meeting={item}
@@ -266,20 +266,24 @@ export default function HomeScreen() {
 
   return (
     <View style={s.container}>
-      <View style={s.header}>
-        <View style={s.headerTop}>
-          <Text style={s.headerTitle}>Summarex</Text>
+      <Animated.View entering={FadeInDown.duration(400).springify()}>
+        <View style={s.header}>
+          <View style={s.headerTop}>
+            <Text style={s.headerTitle}>
+              {'Summa'}<Text style={{ color: colors.primary }}>{'rex'}</Text>
+            </Text>
+          </View>
+          <TextInput
+            style={s.searchInput}
+            placeholder={t('recordings.searchPlaceholder')}
+            placeholderTextColor={colors.textMuted}
+            value={search}
+            onChangeText={setSearch}
+            clearButtonMode="while-editing"
+            autoCapitalize="none"
+          />
         </View>
-        <TextInput
-          style={s.searchInput}
-          placeholder={t('recordings.searchPlaceholder')}
-          placeholderTextColor={colors.textMuted}
-          value={search}
-          onChangeText={setSearch}
-          clearButtonMode="while-editing"
-          autoCapitalize="none"
-        />
-      </View>
+      </Animated.View>
 
       {renderBody()}
     </View>

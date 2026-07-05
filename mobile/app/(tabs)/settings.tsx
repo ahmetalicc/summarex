@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView,
+  View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, Platform,
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
@@ -93,6 +93,15 @@ export default function SettingsScreen() {
       width: 56, height: 56, borderRadius: 28,
       backgroundColor: colors.primary,
       alignItems: 'center', justifyContent: 'center',
+      ...Platform.select({
+        ios: {
+          shadowColor: colors.primary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 12,
+        },
+        android: { elevation: 8 },
+      }),
     },
     avatarText: { color: '#FFFFFF', fontSize: 22, fontFamily: Fonts.display },
     accountInfo: { flex: 1 },
