@@ -20,7 +20,6 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png",
         "backgroundColor": "#2AB48F"
       },
       "package": "com.summarex.app"
