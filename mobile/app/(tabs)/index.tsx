@@ -5,7 +5,7 @@ import {
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import * as Haptics from 'expo-haptics';
+import { hapticImpact } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 import Animated, {
   useSharedValue, useAnimatedStyle, withSpring, withTiming,
@@ -70,7 +70,7 @@ function MeetingCard({
       <Pressable
         style={s.card}
         onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          hapticImpact();
           onPress();
         }}
         onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); }}

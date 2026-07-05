@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as DocumentPicker from 'expo-document-picker';
-import * as Haptics from 'expo-haptics';
+import { hapticImpact, hapticNotification, ImpactFeedbackStyle, NotificationFeedbackType } from '@/lib/haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useAudioRecorder, RecordingPresets, AudioModule } from 'expo-audio';
 import { useTranslation } from 'react-i18next';
@@ -18,8 +18,20 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import type { ColorScheme } from '@/constants/colors';
 
-const ACCEPTED_TYPES = ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/x-m4a', 'audio/aac'];
-const MAX_BYTES = 25 * 1024 * 1024;
+const ACCEPTED_TYPES = [
+  'audio/mpeg',       // MP3
+  'audio/mp4',        // M4A / AAC in MP4 container
+  'audio/x-m4a',      // M4A alternate MIME
+  'audio/wav',
+  'audio/ogg',
+  'audio/webm',
+  'audio/aac',
+  'video/mp4',        // MP4 file selected as video — still audio content
+  'audio/3gpp',       // Android native recording format
+  'audio/amr',        // AMR (some Android devices)
+  '*/*',              // fallback: let the server validate if MIME is unknown
+];
+const MAX_BYTES = 500 * 1024 * 1024; // 500 MB — server enforces its own limit
 const MIC_SIZE = 96;
 
 type Mode = 'summary' | 'transcript';
@@ -168,7 +180,7 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
 
   async function handleMicPress() {
     if (recState === 'idle') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      hapticImpact(ImpactFeedbackStyle.Medium);
       setDurationSecs(0);
       audioRecorder.record();
       setRecState('recording');
@@ -183,7 +195,7 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
         setRecState('idle');
         return;
       }
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      hapticNotification(NotificationFeedbackType.Success);
       setRecordedUri(capturedUri);
       setRecState('stopped');
     }
@@ -213,7 +225,7 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
       Alert.alert(t('newRecording.uploadFailed'), t('newRecording.noAudioCaptured'));
       return;
     }
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    hapticImpact();
     setRecordSaving(true);
     try {
       await recordMeeting({
@@ -223,6 +235,7 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
         mode,
         durationSeconds: durationSecs,
       });
+      hapticNotification(NotificationFeedbackType.Success);
       goHome();
     } catch (e: unknown) {
       const err = e as Error & { status?: number };
@@ -258,11 +271,12 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
 
   async function handleFileUpload() {
     if (!file) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    hapticImpact();
     setFileUploading(true);
     setProgress(0);
     try {
       await uploadMeeting(file.uri, file.mimeType, setProgress, mode);
+      hapticNotification(NotificationFeedbackType.Success);
       goHome();
     } catch (e: unknown) {
       const err = e as Error & { status?: number };
