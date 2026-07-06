@@ -12,10 +12,13 @@ import Animated, {
   withRepeat, withSequence, cancelAnimation, FadeInDown,
 } from 'react-native-reanimated';
 import { api } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import type { ColorScheme } from '@/constants/colors';
 import type { Meeting, MeetingStatus } from '@/lib/api';
+
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
 const STATUS_KEY: Record<MeetingStatus, string> = {
   queued: 'recordings.statusQueued',
@@ -24,6 +27,15 @@ const STATUS_KEY: Record<MeetingStatus, string> = {
   summarizing: 'recordings.statusSummarizing',
   done: 'recordings.statusDone',
   error: 'recordings.statusError',
+};
+
+const STATUS_ICON: Record<MeetingStatus, IoniconsName> = {
+  queued: 'time-outline',
+  transcribing: 'time-outline',
+  transcribed: 'sparkles',
+  summarizing: 'time-outline',
+  done: 'sparkles',
+  error: 'alert-circle-outline',
 };
 
 function statusColors(colors: ColorScheme): Record<MeetingStatus, string> {
@@ -48,37 +60,19 @@ function formatDate(iso: string, locale: string): string {
   return new Date(iso).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+function greetingKey(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'recordings.goodMorning';
+  if (hour < 17) return 'recordings.goodAfternoon';
+  return 'recordings.goodEvening';
+}
+
 type Styles = ReturnType<typeof createStyles>;
 
 const IN_PROGRESS_STATUSES: MeetingStatus[] = ['queued', 'transcribing', 'summarizing'];
 
-function StatusDot({ color, inProgress, s }: { color: string; inProgress: boolean; s: Styles }) {
-  const pulse = useSharedValue(1);
-
-  useEffect(() => {
-    if (inProgress) {
-      pulse.value = withRepeat(
-        withSequence(
-          withTiming(0.3, { duration: 800 }),
-          withTiming(1, { duration: 800 })
-        ),
-        -1,
-        true
-      );
-    } else {
-      cancelAnimation(pulse);
-      pulse.value = 1;
-    }
-    return () => cancelAnimation(pulse);
-  }, [inProgress, pulse]);
-
-  const dotStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
-
-  return <Animated.View style={[s.statusDot, { backgroundColor: color }, dotStyle]} />;
-}
-
 function MeetingCard({
-  meeting, statusColor, statusLabel, meta, onPress, s,
+  meeting, statusColor, meta, onPress, s, colors,
 }: {
   meeting: Meeting;
   statusColor: string;
@@ -86,10 +80,12 @@ function MeetingCard({
   meta: string;
   onPress: () => void;
   s: Styles;
+  colors: ColorScheme;
 }) {
   const { t } = useTranslation();
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const duration = formatDuration(meeting.duration_seconds);
 
   return (
     <Animated.View style={animatedStyle}>
@@ -102,19 +98,22 @@ function MeetingCard({
         onPressIn={() => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); }}
         onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 300 }); }}
       >
-        <StatusDot
-          color={statusColor}
-          inProgress={IN_PROGRESS_STATUSES.includes(meeting.status)}
-          s={s}
-        />
-        <View style={s.cardBody}>
+        <View style={s.cardTopRow}>
           <Text style={s.cardTitle} numberOfLines={1}>
             {meeting.title || t('recordings.untitled')}
           </Text>
-          <Text style={s.cardMeta}>{meta}</Text>
+          <View style={[s.cardModeIcon, { backgroundColor: statusColor + '18' }]}>
+            <Ionicons name={STATUS_ICON[meeting.status]} size={16} color={statusColor} />
+          </View>
         </View>
-        <View style={[s.statusPill, { backgroundColor: statusColor + '18' }]}>
-          <Text style={[s.statusPillText, { color: statusColor }]}>{statusLabel}</Text>
+        <View style={s.cardBottomRow}>
+          <Text style={s.cardDate}>{meta}</Text>
+          {duration !== '' && (
+            <View style={s.cardDuration}>
+              <Ionicons name="time-outline" size={12} color={colors.textMuted} />
+              <Text style={s.cardDurationText}>{duration}</Text>
+            </View>
+          )}
         </View>
       </Pressable>
     </Animated.View>
@@ -139,11 +138,29 @@ function SkeletonCard({ s, skeletonColor }: { s: Styles; skeletonColor: string }
 
   return (
     <View style={s.card}>
-      <View style={s.cardBody}>
+      <View style={s.cardTopRow}>
         <Animated.View style={[s.skeletonTitle, { backgroundColor: skeletonColor }, pulse]} />
-        <Animated.View style={[s.skeletonMeta, { backgroundColor: skeletonColor }, pulse]} />
+        <Animated.View style={[s.skeletonIcon, { backgroundColor: skeletonColor }, pulse]} />
       </View>
-      <Animated.View style={[s.skeletonPill, { backgroundColor: skeletonColor }, pulse]} />
+      <Animated.View style={[s.skeletonMeta, { backgroundColor: skeletonColor }, pulse]} />
+    </View>
+  );
+}
+
+function StatCard({
+  icon, value, label, s, colors,
+}: {
+  icon: IoniconsName;
+  value: string;
+  label: string;
+  s: Styles;
+  colors: ColorScheme;
+}) {
+  return (
+    <View style={s.statCard}>
+      <Ionicons name={icon} size={18} color={colors.primary} />
+      <Text style={s.statValue}>{value}</Text>
+      <Text style={s.statLabel}>{label}</Text>
     </View>
   );
 }
@@ -156,10 +173,16 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
+  const [userInitial, setUserInitial] = useState('?');
   const hasAnimated = useRef(false);
 
   const STATUS_COLOR = useMemo(() => statusColors(colors), [colors]);
   const s = useMemo(() => createStyles(colors), [colors]);
+
+  const totalHours = useMemo(
+    () => (meetings.reduce((acc, m) => acc + (m.duration_seconds ?? 0), 0) / 3600).toFixed(1),
+    [meetings]
+  );
 
   async function load(isRefresh = false, q = search) {
     if (isRefresh) setRefreshing(true);
@@ -175,6 +198,13 @@ export default function HomeScreen() {
   }
 
   useFocusEffect(useCallback(() => { load(); }, []));
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      const email = data.session?.user?.email;
+      setUserInitial(email?.[0]?.toUpperCase() ?? '?');
+    });
+  }, []);
 
   // Stagger the card entry animation only on the first data load —
   // re-animating on every refresh is jarring.
@@ -244,7 +274,10 @@ export default function HomeScreen() {
           />
         }
         ListHeaderComponent={
-          <Text style={s.sectionHeader}>{t('recordings.recentTitle')}</Text>
+          <View style={s.sectionHeaderRow}>
+            <Text style={s.sectionHeader}>{t('recordings.recentTitle')}</Text>
+            <Text style={s.seeAll}>{t('recordings.seeAll')}</Text>
+          </View>
         }
         renderItem={({ item, index }) => (
           <Animated.View
@@ -254,9 +287,10 @@ export default function HomeScreen() {
               meeting={item}
               statusColor={STATUS_COLOR[item.status]}
               statusLabel={t(STATUS_KEY[item.status])}
-              meta={`${formatDate(item.created_at, language)}${item.duration_seconds ? `  ·  ${formatDuration(item.duration_seconds)}` : ''}`}
+              meta={formatDate(item.created_at, language)}
               onPress={() => router.push(`/meeting/${item.id}` as never)}
               s={s}
+              colors={colors}
             />
           </Animated.View>
         )}
@@ -269,10 +303,20 @@ export default function HomeScreen() {
       <Animated.View entering={FadeInDown.duration(400).springify()}>
         <View style={s.header}>
           <View style={s.headerTop}>
-            <Text style={s.headerTitle}>
-              {'Summa'}<Text style={{ color: colors.primary }}>{'rex'}</Text>
+            <Text>
+              <Text style={s.brandText}>{'Summa'}</Text>
+              <Text style={[s.brandText, { color: colors.primary }]}>{'rex'}</Text>
             </Text>
+            <Pressable style={s.avatar} onPress={() => router.push('/(tabs)/settings')}>
+              <Text style={s.avatarText}>{userInitial}</Text>
+            </Pressable>
           </View>
+          <Text style={s.greeting}>{t(greetingKey())}</Text>
+          <Text style={s.headerTitle}>{t('recordings.title')}</Text>
+        </View>
+
+        <View style={s.searchBar}>
+          <Ionicons name="search-outline" size={18} color={colors.textMuted} />
           <TextInput
             style={s.searchInput}
             placeholder={t('recordings.searchPlaceholder')}
@@ -282,6 +326,12 @@ export default function HomeScreen() {
             clearButtonMode="while-editing"
             autoCapitalize="none"
           />
+        </View>
+
+        <View style={s.statsRow}>
+          <StatCard icon="grid-outline" value={meetings.length.toString()} label={t('recordings.statsTotal')} s={s} colors={colors} />
+          <StatCard icon="time-outline" value={totalHours} label={t('recordings.statsHours')} s={s} colors={colors} />
+          <StatCard icon="globe-outline" value="1" label={t('recordings.statsLanguages')} s={s} colors={colors} />
         </View>
       </Animated.View>
 
@@ -295,59 +345,116 @@ function createStyles(colors: ColorScheme) {
     container: { flex: 1, backgroundColor: colors.bg },
 
     header: {
-      paddingTop: 56, paddingBottom: 16, paddingHorizontal: 20,
-      backgroundColor: colors.bgSurface,
-      borderBottomWidth: 0.5, borderBottomColor: colors.border,
+      paddingTop: 56, paddingBottom: 0, paddingHorizontal: 20,
+      backgroundColor: colors.bg,
     },
-    headerTop: { marginBottom: 14 },
+    headerTop: {
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    },
+    brandText: {
+      fontFamily: Fonts.display,
+      fontSize: 17,
+      color: colors.text,
+    },
+    avatar: {
+      width: 40, height: 40, borderRadius: 20,
+      backgroundColor: colors.primary,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    avatarText: {
+      fontSize: 16, fontFamily: Fonts.displaySemiBold, color: '#fff',
+    },
+    greeting: {
+      fontSize: 13, fontFamily: Fonts.body, color: colors.textMuted,
+      marginTop: 20,
+    },
     headerTitle: {
       fontFamily: Fonts.display,
       fontSize: 28,
       color: colors.text,
       letterSpacing: -0.5,
-    },
-    searchInput: {
-      backgroundColor: colors.bg,
-      borderWidth: 1, borderColor: colors.border,
-      borderRadius: 12,
-      paddingHorizontal: 14, paddingVertical: 11,
-      fontFamily: Fonts.body, fontSize: 15,
-      color: colors.text,
+      marginTop: 2,
     },
 
+    searchBar: {
+      marginTop: 16, marginHorizontal: 20, marginBottom: 16,
+      backgroundColor: colors.bgSurface,
+      borderRadius: 14,
+      borderWidth: 1, borderColor: colors.border,
+      paddingHorizontal: 14, paddingVertical: 12,
+      flexDirection: 'row', alignItems: 'center', gap: 8,
+    },
+    searchInput: {
+      flex: 1,
+      fontFamily: Fonts.body, fontSize: 15,
+      color: colors.text,
+      padding: 0,
+    },
+
+    statsRow: {
+      flexDirection: 'row', marginHorizontal: 20, gap: 10,
+    },
+    statCard: {
+      flex: 1,
+      backgroundColor: colors.bgSurface,
+      borderRadius: 16,
+      borderWidth: 1, borderColor: colors.border,
+      paddingVertical: 14, paddingHorizontal: 12,
+      alignItems: 'center',
+    },
+    statValue: {
+      fontSize: 22, fontFamily: Fonts.display, color: colors.text, marginTop: 4,
+    },
+    statLabel: {
+      fontSize: 11, fontFamily: Fonts.body, color: colors.textMuted, marginTop: 2,
+    },
+
+    sectionHeaderRow: {
+      flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    },
     sectionHeader: {
       fontFamily: Fonts.displaySemiBold, fontSize: 13, color: colors.textMuted,
       textTransform: 'uppercase', letterSpacing: 0.8,
       paddingHorizontal: 4, paddingTop: 20, paddingBottom: 10,
     },
-    listContent: { paddingHorizontal: 16, paddingBottom: 24 },
+    seeAll: {
+      fontSize: 13, fontFamily: Fonts.body, color: colors.primary,
+      paddingHorizontal: 4, paddingTop: 20, paddingBottom: 10,
+    },
+    listContent: { paddingHorizontal: 20, paddingBottom: 24 },
 
     card: {
-      flexDirection: 'row', alignItems: 'center',
       backgroundColor: colors.bgSurface,
-      borderRadius: 16, padding: 16, marginBottom: 10,
+      borderRadius: 18, padding: 16, marginBottom: 10,
       borderWidth: 1, borderColor: colors.border,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 2,
     },
-    statusDot: {
-      width: 8, height: 8, borderRadius: 4, marginRight: 10,
+    cardTopRow: {
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10,
     },
-    cardBody: { flex: 1 },
-    cardTitle: { fontSize: 15, fontFamily: Fonts.displaySemiBold, color: colors.text },
-    cardMeta: { fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted, marginTop: 3 },
-    statusPill: {
-      alignSelf: 'flex-start',
-      paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99,
-      marginLeft: 8,
+    cardTitle: { flex: 1, fontSize: 15, fontFamily: Fonts.displaySemiBold, color: colors.text },
+    cardModeIcon: {
+      width: 32, height: 32, borderRadius: 10,
+      alignItems: 'center', justifyContent: 'center',
     },
-    statusPillText: {
-      fontSize: 10, fontFamily: Fonts.bodyMedium, fontWeight: '700',
-      textTransform: 'uppercase', letterSpacing: 0.3,
+    cardBottomRow: {
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      marginTop: 8,
     },
+    cardDate: { fontSize: 11, fontFamily: Fonts.body, color: colors.textMuted },
+    cardDuration: {
+      flexDirection: 'row', alignItems: 'center', gap: 4,
+    },
+    cardDurationText: { fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted },
 
-    skeletonList: { paddingHorizontal: 16, paddingTop: 20 },
+    skeletonList: { paddingHorizontal: 20, paddingTop: 20 },
     skeletonTitle: { height: 14, width: '60%', borderRadius: 7 },
-    skeletonMeta: { height: 10, width: '40%', borderRadius: 5, marginTop: 8 },
-    skeletonPill: { height: 18, width: 60, borderRadius: 99, marginLeft: 8 },
+    skeletonIcon: { width: 32, height: 32, borderRadius: 10 },
+    skeletonMeta: { height: 10, width: '40%', borderRadius: 5, marginTop: 10 },
 
     empty: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: 60 },
     emptyIconWrap: {

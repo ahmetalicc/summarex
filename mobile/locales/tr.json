@@ -60,8 +60,16 @@
     "pageSubtitle": "Sesi yapılandırılmış içgörülere dönüştür."
   },
   "recordings": {
-    "title": "Kayıtlar",
-    "recentTitle": "Kayıtlar",
+    "title": "Kayıtlarınız",
+    "greeting": "İyi günler",
+    "goodMorning": "Günaydın",
+    "goodAfternoon": "İyi günler",
+    "goodEvening": "İyi akşamlar",
+    "statsTotal": "Toplam",
+    "statsHours": "Saat",
+    "statsLanguages": "Dil",
+    "seeAll": "Tümü",
+    "recentTitle": "Son Kayıtlar",
     "searchPlaceholder": "Kayıtlarda ara…",
     "emptyTitle": "Henüz kayıt yok",
     "emptySubtitle": "Başlamak için ses kaydet ya da bir dosya yükle.",

@@ -60,8 +60,16 @@
     "pageSubtitle": "Transform audio into structured insights."
   },
   "recordings": {
-    "title": "Recordings",
-    "recentTitle": "Recordings",
+    "title": "Your recordings",
+    "greeting": "Good afternoon",
+    "goodMorning": "Good morning",
+    "goodAfternoon": "Good afternoon",
+    "goodEvening": "Good evening",
+    "statsTotal": "Total",
+    "statsHours": "Hours",
+    "statsLanguages": "Languages",
+    "seeAll": "See all",
+    "recentTitle": "Recent",
     "searchPlaceholder": "Search recordings…",
     "emptyTitle": "No recordings yet",
     "emptySubtitle": "Record or upload an audio file to get started.",
