@@ -3,44 +3,23 @@ import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
   ActivityIndicator, Alert, TextInput, Pressable, Share,
 } from 'react-native';
+import type { AlertButton } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import Animated, {
-  useSharedValue, useAnimatedStyle, withSpring, withTiming,
-  withRepeat, withSequence, cancelAnimation, Easing, FadeIn,
+  useSharedValue, useAnimatedStyle, withSpring, withTiming, FadeIn,
 } from 'react-native-reanimated';
 import { api } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import type { ColorScheme } from '@/constants/colors';
-import type { Meeting, Transcript, Summary, MeetingStatus, ActionItem } from '@/lib/api';
+import type { Meeting, Transcript, TranscriptSegment, Summary, MeetingStatus, ActionItem } from '@/lib/api';
 
 const PROCESSING = new Set<MeetingStatus>(['queued', 'transcribing', 'summarizing']);
 
 type Tab = 'transcript' | 'summary';
-type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
-
-const STATUS_KEY: Record<MeetingStatus, string> = {
-  queued: 'recordings.statusQueued',
-  transcribing: 'recordings.statusTranscribing',
-  transcribed: 'recordings.statusTranscribed',
-  summarizing: 'recordings.statusSummarizing',
-  done: 'recordings.statusDone',
-  error: 'recordings.statusError',
-};
-
-function statusColors(colors: ColorScheme): Record<MeetingStatus, string> {
-  return {
-    queued: colors.textMuted,
-    transcribing: colors.accent,
-    transcribed: colors.primary,
-    summarizing: colors.accent,
-    done: colors.success,
-    error: colors.error,
-  };
-}
 
 function formatDuration(seconds: number | null): string {
   if (seconds == null) return '';
@@ -53,94 +32,41 @@ function formatDate(iso: string, locale: string): string {
   return new Date(iso).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-function Spinner({ colors }: { colors: ColorScheme }) {
-  const rotation = useSharedValue(0);
-
-  useEffect(() => {
-    rotation.value = withRepeat(
-      withTiming(360, { duration: 900, easing: Easing.linear }),
-      -1
-    );
-    return () => cancelAnimation(rotation);
-  }, [rotation]);
-
-  const style = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotation.value}deg` }],
-  }));
-
-  return (
-    <Animated.View
-      style={[
-        {
-          width: 44, height: 44, borderRadius: 22, borderWidth: 3,
-          borderColor: colors.primary + '25',
-          borderTopColor: colors.primary,
-        },
-        style,
-      ]}
-    />
-  );
+function formatTimestamp(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-function PulsingDot({ color }: { color: string }) {
-  const opacity = useSharedValue(1);
+function ProcessingView({ status, s, t }: { status: MeetingStatus; s: Styles; t: TFunction }) {
+  const fakeProgress = useSharedValue(0);
 
   useEffect(() => {
-    opacity.value = withRepeat(
-      withSequence(
-        withTiming(0.3, { duration: 600 }),
-        withTiming(1, { duration: 600 })
-      ),
-      -1
-    );
-    return () => cancelAnimation(opacity);
-  }, [opacity]);
+    // Fake progress: jump to 75% quickly, then crawl toward 90% while the
+    // backend does the real work.
+    fakeProgress.value = withTiming(0.75, { duration: 2000 });
+    const timer = setTimeout(() => {
+      fakeProgress.value = withTiming(0.9, { duration: 15000 });
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [fakeProgress]);
 
-  const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
-
-  return <Animated.View style={[{ width: 10, height: 10, borderRadius: 5, backgroundColor: color }, style]} />;
-}
-
-function ProgressSteps({ status, colors, t }: { status: MeetingStatus; colors: ColorScheme; t: TFunction }) {
-  const steps = [
-    t('meeting.stepUploaded'),
-    t('meeting.stepTranscribing'),
-    t('meeting.stepSummarizing'),
-    t('meeting.stepDone'),
-  ];
-  const currentIdx = status === 'summarizing' ? 2 : 1;
+  const barStyle = useAnimatedStyle(() => ({ width: `${fakeProgress.value * 100}%` }));
 
   return (
-    <View style={{ marginTop: 24, gap: 14, alignSelf: 'stretch' }}>
-      {steps.map((label, i) => {
-        const completed = i < currentIdx;
-        const current = i === currentIdx;
-        return (
-          <View key={label} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            {current ? (
-              <PulsingDot color={colors.primary} />
-            ) : (
-              <View
-                style={{
-                  width: 10, height: 10, borderRadius: 5,
-                  backgroundColor: completed ? colors.primary : 'transparent',
-                  borderWidth: completed ? 0 : 1.5,
-                  borderColor: colors.border,
-                }}
-              />
-            )}
-            <Text
-              style={{
-                fontSize: 13,
-                fontFamily: completed || current ? Fonts.bodyMedium : Fonts.body,
-                color: completed || current ? colors.primary : colors.textMuted,
-              }}
-            >
-              {label}
-            </Text>
-          </View>
-        );
-      })}
+    <View style={s.processingView}>
+      <View style={s.processingIcon}>
+        <Ionicons name="sparkles" size={36} color="#fff" />
+      </View>
+      <Text style={s.processingTitle}>
+        {status === 'queued' ? t('meeting.processingQueued') :
+         status === 'transcribing' ? t('meeting.processingTranscribing') :
+         t('meeting.processingSummarizing')}
+      </Text>
+      <Text style={s.processingSubtitle}>{t('meeting.processingSubtitle')}</Text>
+      <View style={s.fakeProgressTrack}>
+        <Animated.View style={[s.fakeProgressFill, barStyle]} />
+      </View>
     </View>
   );
 }
@@ -151,7 +77,6 @@ export default function MeetingDetailScreen() {
   const { colors, language } = useTheme();
   const { t } = useTranslation();
   const s = useMemo(() => createStyles(colors), [colors]);
-  const STATUS_COLOR = useMemo(() => statusColors(colors), [colors]);
 
   const [meeting, setMeeting] = useState<Meeting | null>(null);
   const [transcript, setTranscript] = useState<Transcript | null>(null);
@@ -166,7 +91,7 @@ export default function MeetingDetailScreen() {
   const [deleting, setDeleting] = useState(false);
   const [switcherWidth, setSwitcherWidth] = useState(0);
 
-  const indicator = useSharedValue(1); // 0 = transcript, 1 = summary
+  const indicator = useSharedValue(0); // 0 = summary, 1 = transcript
   const indicatorStyle = useAnimatedStyle(() => {
     const innerWidth = (switcherWidth - 6) / 2;
     return {
@@ -177,7 +102,7 @@ export default function MeetingDetailScreen() {
 
   function switchTab(next: Tab) {
     setTab(next);
-    indicator.value = withSpring(next === 'transcript' ? 0 : 1, { damping: 20, stiffness: 250 });
+    indicator.value = withSpring(next === 'summary' ? 0 : 1, { damping: 20, stiffness: 250 });
   }
 
   async function load() {
@@ -285,7 +210,7 @@ export default function MeetingDetailScreen() {
   if (loading) {
     return (
       <View style={s.center}>
-        <Spinner colors={colors} />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -306,16 +231,44 @@ export default function MeetingDetailScreen() {
 
   const isProcessing = PROCESSING.has(meeting.status);
   const isDone = meeting.status === 'done';
-  const statusColor = STATUS_COLOR[meeting.status];
+
+  function openMenu() {
+    const buttons: AlertButton[] = [];
+    if (isDone) buttons.push({ text: t('meeting.regenerate'), onPress: handleRegenerate });
+    buttons.push({ text: t('common.delete'), style: 'destructive', onPress: handleDelete });
+    buttons.push({ text: t('common.cancel'), style: 'cancel' });
+    Alert.alert(meeting!.title || t('recordings.untitled'), undefined, buttons);
+  }
 
   return (
     <View style={s.container}>
-      {/* Header */}
-      <View style={s.header}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backRow} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <Ionicons name="chevron-back" size={18} color={colors.textMuted} />
-          <Text style={s.backText}>{t('meeting.back')}</Text>
+      {/* Top bar */}
+      <View style={s.topBar}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={s.iconButton}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Ionicons name="chevron-back" size={18} color={colors.text} />
         </TouchableOpacity>
+        <View style={s.topBarRight}>
+          <TouchableOpacity onPress={handleShare} disabled={sharing} style={s.iconButton}>
+            {sharing
+              ? <ActivityIndicator size="small" color={colors.text} />
+              : <Ionicons name="share-outline" size={18} color={colors.text} />}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={openMenu} disabled={deleting || regenerating} style={s.iconButton}>
+            <Ionicons name="ellipsis-horizontal" size={18} color={colors.text} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Info card */}
+      <View style={s.infoCard}>
+        <View style={s.aiLabelRow}>
+          <Ionicons name="sparkles" size={12} color={colors.primary} />
+          <Text style={s.aiLabelText}>AI SUMMARY</Text>
+        </View>
 
         {editingTitle ? (
           <TextInput
@@ -339,54 +292,16 @@ export default function MeetingDetailScreen() {
         )}
 
         <View style={s.metaRow}>
-          <View style={[s.metaStatusPill, { backgroundColor: statusColor + '18' }]}>
-            <Text style={[s.metaStatusText, { color: statusColor }]}>{t(STATUS_KEY[meeting.status])}</Text>
-          </View>
-          <Text style={s.metaText}>
-            {formatDate(meeting.created_at, language)}
-            {meeting.duration_seconds ? `  ·  ${formatDuration(meeting.duration_seconds)}` : ''}
-          </Text>
-        </View>
-
-        <View style={s.actionsRow}>
-          <TouchableOpacity onPress={handleShare} disabled={sharing} style={s.actionPill}>
-            {sharing
-              ? <ActivityIndicator size="small" color={colors.textMuted} />
-              : <Ionicons name="share-outline" size={14} color={colors.text} />}
-            <Text style={s.actionPillText}>{t('common.share')}</Text>
-          </TouchableOpacity>
-          {isDone && (
-            <TouchableOpacity onPress={handleRegenerate} disabled={regenerating} style={s.actionPill}>
-              {regenerating
-                ? <ActivityIndicator size="small" color={colors.textMuted} />
-                : <Ionicons name="refresh-outline" size={14} color={colors.text} />}
-              <Text style={s.actionPillText}>{t('meeting.regenerate')}</Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity onPress={handleDelete} disabled={deleting} style={[s.actionPill, s.actionPillDanger]}>
-            {deleting
-              ? <ActivityIndicator size="small" color={colors.error} />
-              : <Ionicons name="trash-outline" size={14} color={colors.error} />}
-            <Text style={[s.actionPillText, { color: colors.error }]}>{t('common.delete')}</Text>
-          </TouchableOpacity>
+          <Ionicons name="time-outline" size={12} color={colors.textMuted} />
+          {meeting.duration_seconds ? (
+            <Text style={s.metaText}>{formatDuration(meeting.duration_seconds)}</Text>
+          ) : null}
+          <Text style={s.metaText}>{formatDate(meeting.created_at, language)}</Text>
         </View>
       </View>
 
       {/* Processing state */}
-      {isProcessing && (
-        <View style={s.processingWrap}>
-          <View style={s.processingCard}>
-            <Spinner colors={colors} />
-            <Text style={s.processingTitle}>
-              {meeting.status === 'queued' ? t('meeting.processingQueued') :
-               meeting.status === 'transcribing' ? t('meeting.processingTranscribing') :
-               t('meeting.processingSummarizing')}
-            </Text>
-            <Text style={s.processingSubtitle}>{t('meeting.processingSubtitle')}</Text>
-            <ProgressSteps status={meeting.status} colors={colors} t={t} />
-          </View>
-        </View>
-      )}
+      {isProcessing && <ProcessingView status={meeting.status} s={s} t={t} />}
 
       {/* Error state */}
       {meeting.status === 'error' && (
@@ -414,14 +329,14 @@ export default function MeetingDetailScreen() {
             {switcherWidth > 0 && (
               <Animated.View style={[s.switcherIndicator, indicatorStyle]} />
             )}
-            <TouchableOpacity style={s.switcherTab} onPress={() => switchTab('transcript')}>
-              <Text style={[s.switcherText, tab === 'transcript' && s.switcherTextActive]}>
-                {t('meeting.transcript')}
-              </Text>
-            </TouchableOpacity>
             <TouchableOpacity style={s.switcherTab} onPress={() => switchTab('summary')}>
               <Text style={[s.switcherText, tab === 'summary' && s.switcherTextActive]}>
                 {t('meeting.summary')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={s.switcherTab} onPress={() => switchTab('transcript')}>
+              <Text style={[s.switcherText, tab === 'transcript' && s.switcherTextActive]}>
+                {t('meeting.transcript')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -440,7 +355,9 @@ export default function MeetingDetailScreen() {
                   t={t}
                 />
               )}
-              {tab === 'transcript' && <TranscriptTab transcript={transcript} s={s} t={t} />}
+              {tab === 'transcript' && (
+                <TranscriptTab transcript={transcript} s={s} t={t} colors={colors} />
+              )}
             </Animated.View>
           </ScrollView>
         </>
@@ -481,23 +398,23 @@ function SummaryTab({
 
   return (
     <View style={{ gap: 24 }}>
-      <Section title={t('meeting.overview')} icon="document-text-outline" s={s}>
+      <Section title={t('meeting.overview')} s={s}>
         <Text style={s.bodyText}>{summary.overview}</Text>
       </Section>
       {summary.decisions.length > 0 && (
-        <Section title={t('meeting.decisions')} icon="git-branch-outline" s={s}>
-          {summary.decisions.map((d, i) => <BulletItem key={i} text={d} s={s} />)}
+        <Section title={t('meeting.decisions')} s={s}>
+          {summary.decisions.map((d, i) => <BulletItem key={i} text={d} colors={colors} s={s} />)}
         </Section>
       )}
       {summary.action_items.length > 0 && (
-        <Section title={t('meeting.actionItems')} icon="checkmark-circle-outline" s={s}>
+        <Section title={t('meeting.actionItems')} s={s}>
           {summary.action_items.map((a, i) => (
-            <ActionBullet key={i} item={a} s={s} />
+            <ActionBullet key={i} item={a} colors={colors} s={s} t={t} />
           ))}
         </Section>
       )}
       {summary.topics.length > 0 && (
-        <Section title={t('meeting.topics')} icon="pricetag-outline" s={s}>
+        <Section title={t('meeting.topics')} s={s}>
           <View style={s.topicsRow}>
             {summary.topics.map((topic, i) => (
               <View key={i} style={s.topicChip}>
@@ -508,12 +425,12 @@ function SummaryTab({
         </Section>
       )}
       {summary.sentiment ? (
-        <Section title={t('meeting.sentiment')} icon="heart-outline" s={s}>
+        <Section title={t('meeting.sentiment')} s={s}>
           <Text style={s.bodyText}>{summary.sentiment}</Text>
         </Section>
       ) : null}
       {summary.key_quotes.length > 0 && (
-        <Section title={t('meeting.keyQuotes')} icon="chatbubble-ellipses-outline" s={s}>
+        <Section title={t('meeting.keyQuotes')} s={s}>
           {summary.key_quotes.map((q, i) => (
             <Text key={i} style={s.quote}>"{q}"</Text>
           ))}
@@ -523,47 +440,105 @@ function SummaryTab({
   );
 }
 
-function TranscriptTab({ transcript, s, t }: { transcript: Transcript | null; s: Styles; t: TFunction }) {
+function TranscriptTab({ transcript, s, t, colors }: {
+  transcript: Transcript | null; s: Styles; t: TFunction; colors: ColorScheme;
+}) {
   if (!transcript) return <Text style={s.noContent}>{t('meeting.transcriptNotAvailable')}</Text>;
+
+  // Prefer segments (speaker + timestamp format) when they exist
+  if (transcript.segments && transcript.segments.length > 0) {
+    return (
+      <View>
+        <Text style={s.sectionTitle}>{t('meeting.fullTranscript')}</Text>
+        <View style={{ marginTop: 16, gap: 16 }}>
+          {transcript.segments.map((seg, i) => (
+            <TranscriptRow key={i} segment={seg} colors={colors} s={s} />
+          ))}
+        </View>
+      </View>
+    );
+  }
+
+  // Fallback: plain text
   return (
-    <Section title={t('meeting.transcript')} icon="document-text-outline" s={s}>
-      <Text style={s.transcriptText}>{transcript.full_text}</Text>
-    </Section>
+    <View>
+      <Text style={s.sectionTitle}>{t('meeting.fullTranscript')}</Text>
+      <Text style={[s.transcriptText, { marginTop: 12 }]}>{transcript.full_text}</Text>
+    </View>
   );
 }
 
-function Section({ title, icon, children, s }: {
-  title: string; icon: IoniconsName; children: React.ReactNode; s: Styles;
+function TranscriptRow({ segment, colors, s }: {
+  segment: TranscriptSegment; colors: ColorScheme; s: Styles;
+}) {
+  return (
+    <View style={{ flexDirection: 'row', gap: 12 }}>
+      <Text style={{
+        fontSize: 12, fontFamily: Fonts.body,
+        color: colors.textMuted, width: 40,
+        paddingTop: 2, fontVariant: ['tabular-nums'],
+      }}>
+        {formatTimestamp(segment.start)}
+      </Text>
+      <View style={{ flex: 1 }}>
+        {segment.speaker && (
+          <Text style={{
+            fontSize: 13, fontFamily: Fonts.displaySemiBold,
+            color: colors.primary, marginBottom: 3,
+          }}>
+            {segment.speaker}
+          </Text>
+        )}
+        <Text style={{ fontSize: 15, fontFamily: Fonts.body, color: colors.text, lineHeight: 22 }}>
+          {segment.text}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+function Section({ title, children, s }: {
+  title: string; children: React.ReactNode; s: Styles;
 }) {
   return (
     <View>
-      <View style={s.sectionHeaderRow}>
-        <Ionicons name={icon} size={14} color={s.sectionTitle.color as string} />
-        <Text style={s.sectionTitle}>{title}</Text>
-      </View>
+      <Text style={s.sectionTitle}>{title}</Text>
       <View style={s.sectionRule} />
       {children}
     </View>
   );
 }
 
-function BulletItem({ text, s }: { text: string; s: Styles }) {
+function BulletItem({ text, colors, s }: { text: string; colors: ColorScheme; s: Styles }) {
   return (
     <View style={s.bulletRow}>
-      <Text style={s.bullet}>•</Text>
+      <Ionicons name="checkmark" size={14} color={colors.primary} style={{ marginRight: 8, marginTop: 4 }} />
       <Text style={s.bulletText}>{text}</Text>
     </View>
   );
 }
 
-function ActionBullet({ item, s }: { item: ActionItem; s: Styles }) {
-  const meta = [item.assignee, item.deadline].filter(Boolean).join(' · ');
+function ActionBullet({ item, colors, s, t }: {
+  item: ActionItem; colors: ColorScheme; s: Styles; t: TFunction;
+}) {
   return (
-    <View style={s.bulletRow}>
-      <Text style={s.bullet}>•</Text>
+    <View style={{ flexDirection: 'row', gap: 12, marginBottom: 12, alignItems: 'flex-start' }}>
+      <View style={{
+        width: 32, height: 32, borderRadius: 16,
+        backgroundColor: colors.primary,
+        alignItems: 'center', justifyContent: 'center',
+        flexShrink: 0,
+      }}>
+        <Text style={{ fontSize: 13, fontFamily: Fonts.displaySemiBold, color: '#fff' }}>
+          {item.assignee?.[0]?.toUpperCase() ?? '?'}
+        </Text>
+      </View>
       <View style={{ flex: 1 }}>
+        <Text style={{ fontSize: 13, fontFamily: Fonts.displaySemiBold, color: colors.primary }}>
+          {item.assignee ?? t('meeting.unassigned')}
+        </Text>
         <Text style={s.bulletText}>{item.task}</Text>
-        {meta ? <Text style={s.actionMeta}>{meta}</Text> : null}
+        {item.deadline ? <Text style={s.actionMeta}>{item.deadline}</Text> : null}
       </View>
     </View>
   );
@@ -581,45 +556,61 @@ function createStyles(colors: ColorScheme) {
     retryText: { color: colors.text, fontSize: 14, fontFamily: Fonts.bodyMedium },
     backLinkText: { color: colors.primary, fontSize: 14, fontFamily: Fonts.bodyMedium },
 
-    header: {
-      paddingTop: 52, paddingHorizontal: 20, paddingBottom: 16,
-      backgroundColor: colors.bgSurface,
-      borderBottomWidth: 0.5, borderBottomColor: colors.border,
-    },
-    backRow: { flexDirection: 'row', alignItems: 'center', gap: 2, marginBottom: 12, alignSelf: 'flex-start' },
-    backText: { fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted },
-    titleText: { fontSize: 22, fontFamily: Fonts.display, color: colors.text },
-    titleInput: {
-      fontSize: 22, fontFamily: Fonts.display, color: colors.text,
-      borderBottomWidth: 1, borderBottomColor: colors.primary, paddingBottom: 4,
-    },
-    metaRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8 },
-    metaStatusPill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99 },
-    metaStatusText: {
-      fontSize: 10, fontFamily: Fonts.bodyMedium, fontWeight: '700',
-      textTransform: 'uppercase', letterSpacing: 0.3,
-    },
-    metaText: { fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted },
-    actionsRow: { flexDirection: 'row', gap: 8, marginTop: 14 },
-    actionPill: {
-      flexDirection: 'row', alignItems: 'center', gap: 5,
-      borderWidth: 1, borderColor: colors.border, borderRadius: 99,
-      paddingHorizontal: 12, paddingVertical: 7,
+    topBar: {
+      paddingTop: 52, paddingHorizontal: 16, paddingBottom: 8,
+      flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
       backgroundColor: colors.bg,
     },
-    actionPillDanger: { borderColor: colors.error + '44' },
-    actionPillText: { fontSize: 12, fontFamily: Fonts.bodyMedium, color: colors.text },
+    topBarRight: { flexDirection: 'row', gap: 8 },
+    iconButton: {
+      width: 36, height: 36, borderRadius: 18,
+      backgroundColor: colors.bgSurface,
+      borderWidth: 1, borderColor: colors.border,
+      alignItems: 'center', justifyContent: 'center',
+    },
+
+    infoCard: {
+      marginHorizontal: 16, marginBottom: 16,
+      backgroundColor: colors.primary + '12',
+      borderRadius: 20,
+      borderWidth: 1, borderColor: colors.primary + '25',
+      padding: 16,
+    },
+    aiLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+    aiLabelText: {
+      fontSize: 11, fontFamily: Fonts.displaySemiBold,
+      color: colors.primary, textTransform: 'uppercase', letterSpacing: 0.8,
+    },
+    titleText: { fontSize: 20, fontFamily: Fonts.display, color: colors.text, marginTop: 8 },
+    titleInput: {
+      fontSize: 20, fontFamily: Fonts.display, color: colors.text, marginTop: 8,
+      borderBottomWidth: 1, borderBottomColor: colors.primary, paddingBottom: 4,
+    },
+    metaRow: { flexDirection: 'row', gap: 12, marginTop: 8, alignItems: 'center' },
+    metaText: { fontSize: 13, fontFamily: Fonts.body, color: colors.textMuted },
+
+    processingView: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+    processingIcon: {
+      width: 88, height: 88, borderRadius: 24,
+      backgroundColor: colors.primary,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    processingTitle: {
+      fontSize: 24, fontFamily: Fonts.display, color: colors.text,
+      marginTop: 24, textAlign: 'center',
+    },
+    processingSubtitle: {
+      fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted,
+      marginTop: 8, textAlign: 'center', maxWidth: 280,
+    },
+    fakeProgressTrack: {
+      marginTop: 32, width: '80%',
+      height: 6, borderRadius: 3, backgroundColor: colors.border,
+      overflow: 'hidden',
+    },
+    fakeProgressFill: { height: '100%', backgroundColor: colors.primary, borderRadius: 3 },
 
     processingWrap: { flex: 1, justifyContent: 'center', padding: 24 },
-    processingCard: {
-      alignItems: 'center',
-      backgroundColor: colors.bgSurface,
-      borderRadius: 20, borderWidth: 1, borderColor: colors.border,
-      padding: 28,
-    },
-    processingTitle: { fontSize: 16, fontFamily: Fonts.displaySemiBold, color: colors.text, marginTop: 20, textAlign: 'center' },
-    processingSubtitle: { fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted, marginTop: 6, textAlign: 'center' },
-
     errorCard: {
       alignItems: 'center',
       backgroundColor: colors.error + '10',
@@ -646,7 +637,7 @@ function createStyles(colors: ColorScheme) {
     },
     switcherIndicator: {
       position: 'absolute', top: 3, bottom: 3,
-      backgroundColor: colors.bgElevated,
+      backgroundColor: colors.primary,
       borderRadius: 10,
       shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.12, shadowRadius: 3,
@@ -654,7 +645,7 @@ function createStyles(colors: ColorScheme) {
     },
     switcherTab: { flex: 1, paddingVertical: 9, alignItems: 'center' },
     switcherText: { fontSize: 14, fontFamily: Fonts.displaySemiBold, color: colors.textMuted },
-    switcherTextActive: { color: colors.text },
+    switcherTextActive: { color: '#fff' },
 
     scroll: { flex: 1 },
     scrollContent: { padding: 20, paddingBottom: 40 },
@@ -686,15 +677,13 @@ function createStyles(colors: ColorScheme) {
     },
     generateButtonText: { color: '#fff', fontSize: 15, fontFamily: Fonts.displaySemiBold },
 
-    sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     sectionTitle: {
-      fontSize: 12, fontFamily: Fonts.displaySemiBold, color: colors.textMuted,
+      fontSize: 12, fontFamily: Fonts.displaySemiBold, color: colors.primary,
       textTransform: 'uppercase', letterSpacing: 0.8,
     },
     sectionRule: { height: 1, backgroundColor: colors.border, marginVertical: 8 },
     bodyText: { fontSize: 15, fontFamily: Fonts.body, color: colors.text, lineHeight: 24 },
     bulletRow: { flexDirection: 'row', marginBottom: 6 },
-    bullet: { color: colors.primary, marginRight: 8, fontSize: 15 },
     bulletText: { fontSize: 15, fontFamily: Fonts.body, color: colors.text, lineHeight: 22 },
     actionMeta: { fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted, marginTop: 2 },
     topicsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
