@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ActivityIndicator,
-  Alert, TextInput, Linking, Platform, ScrollView, useWindowDimensions,
+  Alert, TextInput, Linking, Platform, ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as DocumentPicker from 'expo-document-picker';
@@ -38,10 +38,11 @@ const MIC_SIZE = 96;
 // which rendered the ring as an octagon.
 const RING_1 = MIC_SIZE + 28; // 124px
 const RING_2 = MIC_SIZE + 56; // 152px
+const RECORDING_RED = '#DC2626';
 
 type Mode = 'summary' | 'transcript';
 type Tab = 'record' | 'upload';
-type RecState = 'idle' | 'recording' | 'paused' | 'stopped';
+type RecState = 'idle' | 'recording' | 'stopped';
 
 function formatDuration(totalSeconds: number): string {
   const m = Math.floor(totalSeconds / 60);
@@ -111,7 +112,6 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
   const router = useRouter();
   const { colors } = useTheme();
   const { t } = useTranslation();
-  const { width: screenWidth } = useWindowDimensions();
 
   const [tab, setTab] = useState<Tab>('record');
 
@@ -129,6 +129,10 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
   const [title, setTitle] = useState('');
   const [recordSaving, setRecordSaving] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Every mode-specific surface derives from this one color: transcribe is
+  // orange, summarize is green.
+  const modeColor = mode === 'transcript' ? colors.accent : colors.primary;
 
   const ring1Opacity = useSharedValue(0);
   const ring2Opacity = useSharedValue(0);
@@ -169,7 +173,7 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
     };
   }, []);
 
-  const s = useMemo(() => createStyles(colors), [colors]);
+  const s = useMemo(() => createStyles(colors, modeColor), [colors, modeColor]);
 
   const pageTitle = mode === 'transcript' ? t('transcribe.pageTitle') : t('summarize.pageTitle');
   const pageSubtitle = mode === 'transcript' ? t('transcribe.pageSubtitle') : t('summarize.pageSubtitle');
@@ -233,18 +237,6 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
       setRecordedUri(capturedUri);
       setRecState('stopped');
     }
-  }
-
-  function handlePause() {
-    stopTimer();
-    audioRecorder.pause();
-    setRecState('paused');
-  }
-
-  function handleResume() {
-    audioRecorder.record();
-    startTimer();
-    setRecState('recording');
   }
 
   function handleDiscard() {
@@ -380,70 +372,46 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
 
     const isIdle = recState === 'idle';
     const isRecording = recState === 'recording';
-    const isPaused = recState === 'paused';
-    const stateColor = isRecording ? colors.error : colors.accent;
+    const buttonColor = isRecording ? RECORDING_RED : modeColor;
 
     return (
       <View style={s.recordArea}>
-        {!isIdle && <Text style={s.duration}>{formatDuration(durationSecs)}</Text>}
+        <View style={s.micArea}>
+          <Animated.View pointerEvents="none" style={[s.pulseRing1, ring1Style]} />
+          <Animated.View pointerEvents="none" style={[s.pulseRing2, ring2Style]} />
+          <TouchableOpacity
+            style={[s.micButton, { backgroundColor: buttonColor, shadowColor: buttonColor }]}
+            onPress={handleMicPress}
+            activeOpacity={0.85}
+            accessibilityLabel={isIdle ? t('newRecording.startRecording') : t('newRecording.stop')}
+          >
+            <Ionicons name={isIdle ? 'mic' : 'stop'} size={isIdle ? 36 : 32} color="#fff" />
+          </TouchableOpacity>
+        </View>
 
-        <View style={s.micCard}>
+        <Text style={s.duration}>{formatDuration(durationSecs)}</Text>
+
+        <View style={s.hintCard}>
           {isIdle ? (
-            <Text style={s.recordHint}>{t('newRecording.recordHint')}</Text>
-          ) : (
-            <View style={[s.waveformBox, { width: screenWidth - 88 }]}>
-              <View style={s.waveformRow}>
-                {Array.from({ length: 8 }, (_, i) => (
-                  <WaveBar key={i} index={i} active={isRecording} color={colors.primary} />
+            <>
+              <View style={s.dotsRow}>
+                {Array.from({ length: 18 }, (_, i) => (
+                  <View key={i} style={s.dot} />
                 ))}
               </View>
-            </View>
-          )}
-
-          <View style={s.micArea}>
-            <Animated.View pointerEvents="none" style={[s.pulseRing1, ring1Style]} />
-            <Animated.View pointerEvents="none" style={[s.pulseRing2, ring2Style]} />
-            <TouchableOpacity
-              style={[
-                s.micButton,
-                isIdle && s.micButtonIdle,
-                isRecording && { borderColor: colors.error, backgroundColor: colors.error + '15' },
-                isPaused && { borderColor: colors.accent, backgroundColor: colors.accent + '15' },
-              ]}
-              onPress={handleMicPress}
-              activeOpacity={0.85}
-              accessibilityLabel={isIdle ? t('newRecording.startRecording') : t('newRecording.stop')}
-            >
-              <Ionicons
-                name={isIdle ? 'mic' : 'stop'}
-                size={40}
-                color={isIdle ? colors.primary : stateColor}
-              />
-            </TouchableOpacity>
-          </View>
-
-          {isIdle ? (
-            <Text style={s.tapToStart}>{t('newRecording.startRecording')}</Text>
+              <Text style={s.hintText}>{t('newRecording.recordHint')}</Text>
+            </>
           ) : (
-            <Text style={[s.stateLabel, { color: stateColor }]}>
-              {isRecording ? t('newRecording.recording') : t('newRecording.paused')}
-            </Text>
-          )}
-
-          {!isIdle && (
-            <TouchableOpacity
-              style={s.pausePill}
-              onPress={isRecording ? handlePause : handleResume}
-            >
-              <Ionicons
-                name={isRecording ? 'pause-outline' : 'play'}
-                size={14}
-                color={colors.text}
-              />
-              <Text style={s.pausePillText}>
-                {isRecording ? t('newRecording.pause') : t('newRecording.resume')}
+            <>
+              <View style={s.waveformRow}>
+                {Array.from({ length: 8 }, (_, i) => (
+                  <WaveBar key={i} index={i} active={isRecording} color={modeColor} />
+                ))}
+              </View>
+              <Text style={s.hintText}>
+                {t('newRecording.recording') + ' — ' + t('newRecording.tapToStop')}
               </Text>
-            </TouchableOpacity>
+            </>
           )}
         </View>
       </View>
@@ -454,16 +422,24 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
     return (
       <View style={s.uploadBody}>
         <TouchableOpacity style={s.dropZone} onPress={pickFile} disabled={fileUploading} activeOpacity={0.8}>
-          <Ionicons name="cloud-upload-outline" size={48} color={colors.primary + '80'} />
-          <Text style={s.dropZoneTitle}>
-            {file ? t('newRecording.changeFile') : t('newRecording.chooseFile')}
-          </Text>
+          <View style={s.dropZoneIconWrap}>
+            <Ionicons name="arrow-up-outline" size={24} color={modeColor} />
+          </View>
+          <Text style={s.dropZoneTitle}>{t('newRecording.dropTitle')}</Text>
           <Text style={s.dropZoneHint}>{t('newRecording.fileFormats')}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[s.browseButton, fileUploading && s.buttonDisabled]}
+          onPress={pickFile}
+          disabled={fileUploading}
+        >
+          <Text style={s.browseButtonText}>{t('newRecording.browseFiles')}</Text>
         </TouchableOpacity>
 
         {file && (
           <View style={s.fileCard}>
-            <Ionicons name="musical-notes" size={20} color={colors.primary} />
+            <Ionicons name="musical-notes" size={20} color={modeColor} />
             <Text style={s.fileName} numberOfLines={1}>{file.name}</Text>
             <Text style={s.fileSize}>{formatBytes(file.size)}</Text>
             <Ionicons name="checkmark-circle" size={16} color={colors.success} />
@@ -507,7 +483,7 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
           <Ionicons
             name={mode === 'transcript' ? 'document-text-outline' : 'sparkles-outline'}
             size={12}
-            color={colors.primary}
+            color={modeColor}
           />
           <Text style={s.modeBadgeText}>
             {mode === 'transcript' ? t('tabs.transcribe') : t('tabs.summarize')}
@@ -541,7 +517,7 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
   );
 }
 
-function createStyles(colors: ColorScheme) {
+function createStyles(colors: ColorScheme, modeColor: string) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.bg },
     scrollContent: { flexGrow: 1, paddingBottom: 32 },
@@ -553,11 +529,11 @@ function createStyles(colors: ColorScheme) {
       flexDirection: 'row', alignItems: 'center', gap: 4,
       marginTop: 8, alignSelf: 'flex-start',
       paddingHorizontal: 10, paddingVertical: 4, borderRadius: 99,
-      backgroundColor: colors.primary + '15',
+      backgroundColor: modeColor + '15',
     },
     modeBadgeText: {
       fontSize: 11, fontFamily: Fonts.bodyMedium,
-      color: colors.primary, textTransform: 'uppercase', letterSpacing: 0.4,
+      color: modeColor, textTransform: 'uppercase', letterSpacing: 0.4,
     },
 
     tabSwitcher: {
@@ -571,39 +547,12 @@ function createStyles(colors: ColorScheme) {
       flex: 1, paddingVertical: 10, borderRadius: 10,
       flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
     },
-    tabPillActive: { backgroundColor: colors.primary },
+    tabPillActive: { backgroundColor: modeColor },
     tabPillText: { fontSize: 13, fontFamily: Fonts.bodyMedium, color: colors.textMuted },
     tabPillTextActive: { color: '#fff' },
 
     // Record tab
-    recordArea: { flex: 1, alignItems: 'center', paddingTop: 48, paddingHorizontal: 20 },
-    micCard: {
-      width: '100%',
-      backgroundColor: colors.bgSurface,
-      borderRadius: 28,
-      borderWidth: 1, borderColor: colors.border,
-      paddingVertical: 40, paddingHorizontal: 24,
-      alignItems: 'center',
-      marginTop: 24,
-    },
-    recordHint: {
-      fontSize: 15, fontFamily: Fonts.body, color: colors.textMuted,
-      textAlign: 'center', maxWidth: 260, marginBottom: 40,
-    },
-    duration: {
-      fontSize: 52, fontFamily: Fonts.display, color: colors.text,
-      letterSpacing: -2, fontVariant: ['tabular-nums'],
-      textAlign: 'center', marginBottom: 24,
-    },
-    waveformBox: {
-      height: 80, borderRadius: 16,
-      backgroundColor: colors.primary + '08',
-      alignItems: 'center', justifyContent: 'center',
-      marginBottom: 36,
-    },
-    waveformRow: {
-      flexDirection: 'row', alignItems: 'center', gap: 4, height: 60,
-    },
+    recordArea: { flex: 1, alignItems: 'center', paddingTop: 48 },
     micArea: {
       width: RING_2, height: RING_2,
       alignItems: 'center', justifyContent: 'center',
@@ -625,36 +574,49 @@ function createStyles(colors: ColorScheme) {
       borderWidth: 1.5,
       borderColor: colors.error,
     },
+    // backgroundColor + shadowColor are set inline — they follow the mode color
+    // while idle and switch to red while recording.
     micButton: {
       width: MIC_SIZE, height: MIC_SIZE, borderRadius: MIC_SIZE / 2,
-      borderWidth: 3,
+      borderWidth: 0,
       alignItems: 'center', justifyContent: 'center',
-    },
-    micButtonIdle: {
-      borderColor: colors.primary,
-      backgroundColor: colors.primary + '12',
       ...Platform.select({
         ios: {
-          shadowColor: colors.primary,
           shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.25,
-          shadowRadius: 16,
+          shadowOpacity: 0.35,
+          shadowRadius: 20,
         },
-        android: { elevation: 4 },
+        android: { elevation: 8 },
       }),
     },
-    tapToStart: {
-      fontSize: 13, fontFamily: Fonts.bodyMedium, color: colors.textMuted,
+    duration: {
+      fontSize: 52, fontFamily: Fonts.display, color: colors.text,
+      letterSpacing: -2, fontVariant: ['tabular-nums'],
       textAlign: 'center', marginTop: 16,
     },
-    stateLabel: { fontSize: 13, fontFamily: Fonts.bodyMedium, marginTop: 12, textAlign: 'center' },
-    pausePill: {
-      flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 20,
-      paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20,
-      borderWidth: 1, borderColor: colors.border,
+    hintCard: {
+      alignSelf: 'stretch',
       backgroundColor: colors.bgSurface,
+      borderRadius: 20, borderWidth: 1, borderColor: colors.border,
+      padding: 20, marginTop: 32, marginHorizontal: 20,
+      alignItems: 'center',
     },
-    pausePillText: { fontSize: 13, fontFamily: Fonts.bodyMedium, color: colors.text },
+    dotsRow: {
+      flexDirection: 'row', justifyContent: 'center', gap: 5,
+      marginBottom: 12,
+    },
+    dot: {
+      width: 4, height: 4, borderRadius: 2,
+      backgroundColor: modeColor + '60',
+    },
+    waveformRow: {
+      flexDirection: 'row', alignItems: 'center', gap: 4, height: 60,
+      marginBottom: 12,
+    },
+    hintText: {
+      fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted,
+      textAlign: 'center',
+    },
 
     // Stopped state
     readyCard: {
@@ -665,7 +627,7 @@ function createStyles(colors: ColorScheme) {
     readyHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     readyTitle: { fontSize: 16, fontFamily: Fonts.displaySemiBold, color: colors.text },
     readyDuration: {
-      fontSize: 32, fontFamily: Fonts.display, color: colors.primary,
+      fontSize: 32, fontFamily: Fonts.display, color: modeColor,
       textAlign: 'center', marginVertical: 16,
       fontVariant: ['tabular-nums'],
     },
@@ -682,7 +644,7 @@ function createStyles(colors: ColorScheme) {
     },
     discardButtonText: { color: colors.textMuted, fontSize: 15, fontFamily: Fonts.bodyMedium },
     saveButton: {
-      flex: 1, backgroundColor: colors.primary, borderRadius: 12,
+      flex: 1, backgroundColor: modeColor, borderRadius: 12,
       paddingVertical: 14, alignItems: 'center',
     },
     saveButtonText: { color: '#fff', fontSize: 15, fontFamily: Fonts.displaySemiBold },
@@ -691,34 +653,53 @@ function createStyles(colors: ColorScheme) {
     // Upload tab
     uploadBody: { flex: 1, padding: 20 },
     dropZone: {
-      borderStyle: 'dashed', borderWidth: 1.5, borderColor: colors.border,
-      borderRadius: 20, minHeight: 180,
+      backgroundColor: colors.bgSurface,
+      borderStyle: 'dashed', borderWidth: 1.5, borderColor: modeColor + '60',
+      borderRadius: 20, minHeight: 200,
+      padding: 24,
       alignItems: 'center', justifyContent: 'center',
-      marginBottom: 16, gap: 6,
     },
-    dropZoneTitle: { fontSize: 16, fontFamily: Fonts.displaySemiBold, color: colors.text, marginTop: 8 },
+    dropZoneIconWrap: {
+      width: 56, height: 56, borderRadius: 16,
+      backgroundColor: modeColor + '15',
+      alignItems: 'center', justifyContent: 'center',
+      marginBottom: 16,
+    },
+    dropZoneTitle: {
+      fontSize: 17, fontFamily: Fonts.display, color: colors.text,
+      marginBottom: 6,
+    },
     dropZoneHint: { fontSize: 13, fontFamily: Fonts.body, color: colors.textMuted },
+    browseButton: {
+      backgroundColor: modeColor,
+      borderRadius: 99,
+      paddingHorizontal: 28, paddingVertical: 13,
+      alignSelf: 'center',
+      marginTop: 20,
+    },
+    browseButtonText: { fontSize: 15, fontFamily: Fonts.displaySemiBold, color: '#fff' },
     fileCard: {
       flexDirection: 'row', alignItems: 'center', gap: 10,
       backgroundColor: colors.bgSurface,
       borderWidth: 1, borderColor: colors.border,
-      borderRadius: 12, padding: 14, marginBottom: 16,
+      borderRadius: 12, padding: 14, marginTop: 20,
     },
     fileName: { flex: 1, fontSize: 14, fontFamily: Fonts.bodyMedium, color: colors.text },
     fileSize: { fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted },
-    progressSection: { marginBottom: 16 },
+    progressSection: { marginTop: 16 },
     progressTrack: {
       height: 6, borderRadius: 3, backgroundColor: colors.bg,
       borderWidth: 1, borderColor: colors.border, overflow: 'hidden',
     },
-    progressBar: { height: '100%', backgroundColor: colors.primary, borderRadius: 3 },
+    progressBar: { height: '100%', backgroundColor: modeColor, borderRadius: 3 },
     progressText: {
       fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted,
       textAlign: 'right', marginTop: 6,
     },
     uploadButton: {
-      backgroundColor: colors.primary, borderRadius: 12,
+      backgroundColor: modeColor, borderRadius: 99,
       paddingVertical: 15, alignItems: 'center',
+      marginTop: 16,
     },
     uploadButtonText: { color: '#fff', fontSize: 15, fontFamily: Fonts.displaySemiBold },
 
@@ -733,7 +714,7 @@ function createStyles(colors: ColorScheme) {
       textAlign: 'center', lineHeight: 18,
     },
     settingsButton: {
-      marginTop: 20, backgroundColor: colors.primary,
+      marginTop: 20, backgroundColor: modeColor,
       borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12,
     },
     settingsButtonText: { color: '#fff', fontSize: 14, fontFamily: Fonts.bodyMedium },

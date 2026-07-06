@@ -102,6 +102,9 @@
     "chooseFile": "Choose audio file",
     "changeFile": "Change file",
     "fileFormats": "MP3, M4A, MP4, WAV, OGG · max 500 MB",
+    "dropTitle": "Drop your audio here",
+    "browseFiles": "Browse files",
+    "tapToStop": "tap to stop & process",
     "upload": "Upload",
     "uploading": "Uploading…",
     "permissionTitle": "Microphone permission required",
@@ -116,6 +119,7 @@
   "meeting": {
     "transcript": "Transcript",
     "summary": "Summary",
+    "fullTranscript": "Full Transcript",
     "processing": "Processing…",
     "processingSubtitle": "This usually takes 1–3 minutes.",
     "processingQueued": "Queued for processing…",

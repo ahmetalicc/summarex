@@ -102,6 +102,9 @@
     "chooseFile": "Ses dosyası seç",
     "changeFile": "Dosyayı değiştir",
     "fileFormats": "MP3, M4A, MP4, WAV, OGG · en fazla 500 MB",
+    "dropTitle": "Sesinizi buraya bırakın",
+    "browseFiles": "Dosya seç",
+    "tapToStop": "durdurmak için dokun",
     "upload": "Yükle",
     "uploading": "Yükleniyor…",
     "permissionTitle": "Mikrofon izni gerekli",
@@ -116,6 +119,7 @@
   "meeting": {
     "transcript": "Transkript",
     "summary": "Özet",
+    "fullTranscript": "Tam Transkript",
     "processing": "İşleniyor…",
     "processingSubtitle": "Bu genelde 1–3 dakika sürer.",
     "processingQueued": "İşlem için sırada…",
