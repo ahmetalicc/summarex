@@ -21,18 +21,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   return (
     <div className="flex w-full flex-col gap-1.5">
       {label && (
-        <label htmlFor={inputId} className="text-sm font-medium text-text">
+        <label htmlFor={inputId} className="font-mono text-[11px] font-semibold uppercase tracking-widest text-text-muted">
           {label}
         </label>
       )}
       <div
         className={cn(
-          'flex items-center rounded-xl border bg-bg-surface text-text transition-colors',
-          error ? 'border-error focus-within:border-error' : 'border-border focus-within:border-primary',
-          'focus-within:ring-2 focus-within:ring-primary/30',
+          'flex items-center rounded-xl border bg-bg-surface/60 text-text backdrop-blur transition-all',
+          error
+            ? 'border-error focus-within:border-error focus-within:ring-2 focus-within:ring-error/25'
+            : 'border-border focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/25',
         )}
       >
-        {leftIcon && <span className="pl-3 text-text-muted">{leftIcon}</span>}
+        {leftIcon && <span className="pl-3.5 text-text-muted">{leftIcon}</span>}
         <input
           ref={ref}
           id={inputId}
@@ -40,8 +41,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={hint || error ? `${inputId}-desc` : undefined}
           className={cn(
-            'flex-1 bg-transparent px-3 py-2.5 text-sm placeholder:text-text-muted/70 focus:outline-none',
-            leftIcon && 'pl-2',
+            'flex-1 bg-transparent px-3.5 py-3 text-[15px] placeholder:text-text-muted/60 focus:outline-none',
+            leftIcon && 'pl-2.5',
             className,
           )}
           {...rest}
@@ -50,7 +51,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           <button
             type="button"
             onClick={() => setShow((v) => !v)}
-            className="px-3 text-xs font-medium text-text-muted hover:text-text"
+            className="px-3.5 font-mono text-[11px] font-semibold uppercase tracking-widest text-text-muted transition-colors hover:text-primary"
             aria-label={show ? 'Hide password' : 'Show password'}
           >
             {show ? 'Hide' : 'Show'}

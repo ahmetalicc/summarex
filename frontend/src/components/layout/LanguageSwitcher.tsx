@@ -19,7 +19,7 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
       role="group"
       aria-label="Language"
       className={cn(
-        'inline-flex h-9 items-center rounded-lg border border-border bg-bg-surface p-0.5 text-xs font-semibold',
+        'relative inline-flex h-10 items-center rounded-xl border border-border bg-bg-surface/60 p-1 font-mono text-[11px] font-semibold backdrop-blur',
         className,
       )}
     >
@@ -32,9 +32,9 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
             onClick={() => setLanguage(l.code)}
             aria-pressed={active}
             className={cn(
-              'rounded-md px-2.5 py-1 transition-colors',
+              'relative z-10 rounded-lg px-3 py-1.5 tracking-wider transition-colors',
               active
-                ? 'bg-primary text-bg'
+                ? 'bg-primary text-bg shadow-sm'
                 : 'text-text-muted hover:text-text',
             )}
           >

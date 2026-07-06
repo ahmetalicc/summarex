@@ -21,7 +21,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       aria-label={t('common.toggleTheme')}
       title={t('common.toggleTheme')}
       className={cn(
-        'relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg border border-border bg-bg-surface text-text-muted transition-colors hover:text-text',
+        'relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-border bg-bg-surface/60 text-text-muted backdrop-blur transition-all hover:text-primary hover:border-primary/40',
         className,
       )}
     >
@@ -29,10 +29,10 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
         {isDark ? (
           <motion.span
             key="moon"
-            initial={{ rotate: -90, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            exit={{ rotate: 90, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            initial={{ rotate: -90, opacity: 0, scale: 0.7 }}
+            animate={{ rotate: 0, opacity: 1, scale: 1 }}
+            exit={{ rotate: 90, opacity: 0, scale: 0.7 }}
+            transition={{ duration: 0.25 }}
             className="absolute inset-0 grid place-items-center"
           >
             <MoonIcon />
@@ -40,10 +40,10 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
         ) : (
           <motion.span
             key="sun"
-            initial={{ rotate: 90, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            exit={{ rotate: -90, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            initial={{ rotate: 90, opacity: 0, scale: 0.7 }}
+            animate={{ rotate: 0, opacity: 1, scale: 1 }}
+            exit={{ rotate: -90, opacity: 0, scale: 0.7 }}
+            transition={{ duration: 0.25 }}
             className="absolute inset-0 grid place-items-center"
           >
             <SunIcon />

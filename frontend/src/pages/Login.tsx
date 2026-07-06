@@ -1,15 +1,16 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabaseClient';
 import { env } from '../lib/env';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguageStore } from '../store/languageStore';
-import { Card, CardContent } from '../components/ui/Card';
 import { Brand } from '../components/layout/Brand';
 import { Spinner } from '../components/ui/Spinner';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { HeroWaveform } from '../components/audio/HeroWaveform';
 
 interface LocationState {
   from?: { pathname?: string };
@@ -135,170 +136,222 @@ export default function Login() {
           : t('auth.sendingReset');
 
   return (
-    <section className="mx-auto flex min-h-[calc(100dvh-4rem-4rem)] max-w-md flex-col items-center justify-center gap-6 px-4 py-16 sm:px-6">
+    <section className="relative mx-auto grid min-h-[calc(100dvh-4rem-4rem)] max-w-7xl gap-8 px-4 py-10 sm:px-6 md:py-16 lg:grid-cols-12 lg:gap-12">
       {(isLoading || session) && !isRecovery ? (
-        <Spinner size="lg" className="text-primary" />
+        <div className="col-span-full flex items-center justify-center">
+          <Spinner size="lg" className="text-primary" />
+        </div>
       ) : (
-        <Card className="w-full">
-          <CardContent className="p-7 sm:p-9">
-            <div className="mb-6 flex flex-col items-center gap-3 text-center">
-              <Brand />
-              <h1 className="font-display text-2xl font-bold text-text">
-                {t('auth.welcomeTitle')}
-              </h1>
-              <p className="text-sm text-text-muted">
-                {mode === 'reset' ? t('auth.resetSubtitle') : t('auth.welcomeSubtitle')}
-              </p>
+        <>
+          {/* Left: Marketing panel with waveform */}
+          <aside className="relative hidden overflow-hidden rounded-[2rem] border border-border bg-bg-surface/60 p-10 backdrop-blur-xl lg:col-span-6 lg:flex lg:flex-col lg:justify-between noise-texture">
+            <div aria-hidden className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/25 blur-3xl" />
+            <div aria-hidden className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-accent/20 blur-3xl" />
+            <div aria-hidden className="pointer-events-none absolute inset-x-6 bottom-32 top-40 opacity-40">
+              <HeroWaveform className="h-full" barCount={80} variant="hero" />
             </div>
 
-            {success ? (
-              <div className="flex flex-col gap-4 text-center">
-                <h2 className="font-display text-lg font-semibold text-text">
-                  {success === 'checkEmail'
-                    ? t('auth.checkEmailTitle')
-                    : success === 'resetSent'
-                      ? t('auth.resetSentTitle')
-                      : t('auth.passwordUpdatedTitle')}
-                </h2>
-                <p className="text-sm text-text-muted">
-                  {success === 'checkEmail'
-                    ? t('auth.checkEmailBody')
-                    : success === 'resetSent'
-                      ? t('auth.resetSentBody')
-                      : t('auth.passwordUpdatedBody')}
-                </p>
-                {success === 'passwordUpdated' ? (
-                  <button
-                    type="button"
-                    onClick={() => navigate('/dashboard')}
-                    className="text-sm font-medium text-primary hover:text-primary-hover"
+            <div className="relative">
+              <Brand />
+              <p className="mt-8 font-mono text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
+                Voice · Transcript · Summary
+              </p>
+              <h2
+                className="mt-4 font-display font-bold leading-[1.05] tracking-tight text-text"
+                style={{ fontSize: 'clamp(2.25rem, 3.5vw, 3.25rem)' }}
+              >
+                {t('landing.heroTitle')}
+              </h2>
+            </div>
+
+            <div className="relative mt-auto space-y-4">
+              <div className="rounded-2xl border border-border bg-bg/50 p-4 backdrop-blur">
+                <div className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-text-muted">
+                  <span className="pulse-ring h-1.5 w-1.5 rounded-full bg-primary" />
+                  What you get
+                </div>
+                <ul className="grid gap-2 text-sm text-text">
+                  <li className="flex items-center gap-2.5"><span className="h-1 w-1 rounded-full bg-primary" />{t('landing.demoOverview')}</li>
+                  <li className="flex items-center gap-2.5"><span className="h-1 w-1 rounded-full bg-primary" />{t('landing.demoDecisions')}</li>
+                  <li className="flex items-center gap-2.5"><span className="h-1 w-1 rounded-full bg-accent" />{t('landing.demoActions')}</li>
+                </ul>
+              </div>
+            </div>
+          </aside>
+
+          {/* Right: Form */}
+          <div className="relative flex items-center justify-center lg:col-span-6">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="w-full max-w-md"
+            >
+              <div className="rounded-3xl border border-border bg-bg-surface/80 p-8 backdrop-blur-xl sm:p-10 gradient-border">
+                <div className="mb-8 flex flex-col items-start gap-3 lg:hidden">
+                  <Brand />
+                </div>
+                <div className="mb-8 flex flex-col gap-2">
+                  <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-primary">
+                    {mode === 'signin' ? 'Sign in' : mode === 'signup' ? 'Create account' : mode === 'reset' ? 'Reset password' : 'Recover'}
+                  </p>
+                  <h1
+                    className="font-display font-bold tracking-tight text-text"
+                    style={{ fontSize: 'clamp(1.75rem, 2.5vw, 2.5rem)', lineHeight: 1.05 }}
                   >
-                    {t('auth.continueToDashboard')}
-                  </button>
+                    {t('auth.welcomeTitle')}
+                  </h1>
+                  <p className="text-sm leading-relaxed text-text-muted">
+                    {mode === 'reset' ? t('auth.resetSubtitle') : t('auth.welcomeSubtitle')}
+                  </p>
+                </div>
+
+                {success ? (
+                  <div className="flex flex-col gap-4">
+                    <h2 className="font-display text-xl font-bold text-text">
+                      {success === 'checkEmail'
+                        ? t('auth.checkEmailTitle')
+                        : success === 'resetSent'
+                          ? t('auth.resetSentTitle')
+                          : t('auth.passwordUpdatedTitle')}
+                    </h2>
+                    <p className="text-sm leading-relaxed text-text-muted">
+                      {success === 'checkEmail'
+                        ? t('auth.checkEmailBody')
+                        : success === 'resetSent'
+                          ? t('auth.resetSentBody')
+                          : t('auth.passwordUpdatedBody')}
+                    </p>
+                    {success === 'passwordUpdated' ? (
+                      <Button onClick={() => navigate('/dashboard')} className="mt-2 w-full">
+                        {t('auth.continueToDashboard')}
+                      </Button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => switchMode('signin')}
+                        className="mt-2 text-sm font-medium text-primary transition-colors hover:text-primary-hover"
+                      >
+                        ← {t('auth.backToSignIn')}
+                      </button>
+                    )}
+                  </div>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => switchMode('signin')}
-                    className="text-sm font-medium text-primary hover:text-primary-hover"
-                  >
-                    {t('auth.backToSignIn')}
-                  </button>
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+                    {mode !== 'reset' && (
+                      <Input
+                        label={t('auth.email')}
+                        type="email"
+                        autoComplete="email"
+                        placeholder={t('auth.emailPlaceholder')}
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (error) setError(null);
+                        }}
+                        required
+                      />
+                    )}
+
+                    {showPassword && (
+                      <Input
+                        label={t('auth.password')}
+                        type="password"
+                        passwordToggle
+                        autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                        placeholder={t('auth.passwordPlaceholder')}
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (error) setError(null);
+                        }}
+                        required
+                      />
+                    )}
+
+                    {mode === 'reset' && (
+                      <>
+                        <Input
+                          label={t('auth.newPassword')}
+                          type="password"
+                          passwordToggle
+                          autoComplete="new-password"
+                          value={newPassword}
+                          onChange={(e) => {
+                            setNewPassword(e.target.value);
+                            if (error) setError(null);
+                          }}
+                          required
+                        />
+                        <Input
+                          label={t('auth.confirmPassword')}
+                          type="password"
+                          passwordToggle
+                          autoComplete="new-password"
+                          value={confirmPassword}
+                          onChange={(e) => {
+                            setConfirmPassword(e.target.value);
+                            if (error) setError(null);
+                          }}
+                          required
+                        />
+                      </>
+                    )}
+
+                    {error && (
+                      <div role="alert" className="rounded-lg border border-error/30 bg-error/10 px-3 py-2 text-sm text-error">
+                        {error}
+                      </div>
+                    )}
+
+                    <Button type="submit" size="lg" isLoading={submitting} className="mt-2 w-full">
+                      {submitting ? submitLoadingLabel : submitLabel}
+                    </Button>
+
+                    <div className="flex flex-col items-center gap-3 border-t border-border/60 pt-5 text-sm">
+                      {mode === 'signin' && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => switchMode('forgot')}
+                            className="text-text-muted transition-colors hover:text-text"
+                          >
+                            {t('auth.forgotPassword')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => switchMode('signup')}
+                            className="font-medium text-primary transition-colors hover:text-primary-hover"
+                          >
+                            {t('auth.toSignUp')} →
+                          </button>
+                        </>
+                      )}
+                      {mode === 'signup' && (
+                        <button
+                          type="button"
+                          onClick={() => switchMode('signin')}
+                          className="font-medium text-primary transition-colors hover:text-primary-hover"
+                        >
+                          ← {t('auth.toSignIn')}
+                        </button>
+                      )}
+                      {mode === 'forgot' && (
+                        <button
+                          type="button"
+                          onClick={() => switchMode('signin')}
+                          className="font-medium text-primary transition-colors hover:text-primary-hover"
+                        >
+                          ← {t('auth.backToSignIn')}
+                        </button>
+                      )}
+                    </div>
+                  </form>
                 )}
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-                {mode !== 'reset' && (
-                  <Input
-                    label={t('auth.email')}
-                    type="email"
-                    autoComplete="email"
-                    placeholder={t('auth.emailPlaceholder')}
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (error) setError(null);
-                    }}
-                    required
-                  />
-                )}
-
-                {showPassword && (
-                  <Input
-                    label={t('auth.password')}
-                    type="password"
-                    passwordToggle
-                    autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-                    placeholder={t('auth.passwordPlaceholder')}
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      if (error) setError(null);
-                    }}
-                    required
-                  />
-                )}
-
-                {mode === 'reset' && (
-                  <>
-                    <Input
-                      label={t('auth.newPassword')}
-                      type="password"
-                      passwordToggle
-                      autoComplete="new-password"
-                      value={newPassword}
-                      onChange={(e) => {
-                        setNewPassword(e.target.value);
-                        if (error) setError(null);
-                      }}
-                      required
-                    />
-                    <Input
-                      label={t('auth.confirmPassword')}
-                      type="password"
-                      passwordToggle
-                      autoComplete="new-password"
-                      value={confirmPassword}
-                      onChange={(e) => {
-                        setConfirmPassword(e.target.value);
-                        if (error) setError(null);
-                      }}
-                      required
-                    />
-                  </>
-                )}
-
-                {error && (
-                  <p role="alert" className="text-sm text-error">
-                    {error}
-                  </p>
-                )}
-
-                <Button type="submit" isLoading={submitting} className="w-full">
-                  {submitting ? submitLoadingLabel : submitLabel}
-                </Button>
-
-                <div className="flex flex-col items-center gap-2 pt-1 text-sm">
-                  {mode === 'signin' && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => switchMode('forgot')}
-                        className="text-text-muted hover:text-text"
-                      >
-                        {t('auth.forgotPassword')}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => switchMode('signup')}
-                        className="font-medium text-primary hover:text-primary-hover"
-                      >
-                        {t('auth.toSignUp')}
-                      </button>
-                    </>
-                  )}
-                  {mode === 'signup' && (
-                    <button
-                      type="button"
-                      onClick={() => switchMode('signin')}
-                      className="font-medium text-primary hover:text-primary-hover"
-                    >
-                      {t('auth.toSignIn')}
-                    </button>
-                  )}
-                  {mode === 'forgot' && (
-                    <button
-                      type="button"
-                      onClick={() => switchMode('signin')}
-                      className="font-medium text-primary hover:text-primary-hover"
-                    >
-                      {t('auth.backToSignIn')}
-                    </button>
-                  )}
-                </div>
-              </form>
-            )}
-          </CardContent>
-        </Card>
+            </motion.div>
+          </div>
+        </>
       )}
     </section>
   );
