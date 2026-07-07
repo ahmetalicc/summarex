@@ -93,7 +93,7 @@ export default function Landing() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-border/70 pt-6"
+              className="mt-12 grid max-w-lg grid-cols-3 gap-3 border-t border-border/70 pt-6 sm:gap-6"
             >
               {[
                 { k: 'mp3 · wav · m4a', v: 'Formats' },
@@ -101,7 +101,7 @@ export default function Landing() {
                 { k: '50+', v: 'Languages' },
               ].map((m) => (
                 <div key={m.v}>
-                  <div className="font-display text-lg font-bold text-text">{m.k}</div>
+                  <div className="font-display text-sm font-bold text-text sm:text-lg">{m.k}</div>
                   <div className="mt-0.5 font-mono text-[10px] uppercase tracking-widest text-text-muted">
                     {m.v}
                   </div>
@@ -110,12 +110,12 @@ export default function Landing() {
             </motion.div>
           </div>
 
-          {/* Right: Live waveform card */}
+          {/* Right: Live waveform card — hidden on mobile to prevent overflow */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative lg:col-span-4"
+            className="relative hidden lg:block lg:col-span-4"
           >
             <div className="gradient-border relative overflow-hidden rounded-3xl bg-bg-surface/60 p-6 backdrop-blur-xl">
               <div className="mb-4 flex items-center justify-between">
@@ -138,14 +138,14 @@ export default function Landing() {
                     Transcript
                   </p>
                   <p className="line-clamp-2 text-text">
-                    "...ekip Q3 planlaması için pazartesi 10:00'a toplantı ayarladı..."
+                    {t('landing.heroLiveTranscript')}
                   </p>
                 </div>
                 <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
                   <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-primary">
                     Summary
                   </p>
-                  <p className="text-text">3 karar · 2 aksiyon · 1 açık soru</p>
+                  <p className="text-text">{t('landing.heroLiveSummary')}</p>
                 </div>
               </div>
             </div>

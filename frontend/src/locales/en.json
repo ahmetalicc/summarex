@@ -21,6 +21,8 @@
     "heroEyebrow": "AI-powered audio intelligence",
     "heroTitle": "Hours of audio, summarized in minutes.",
     "heroSubtitle": "Record live or upload a file. Summarex transcribes it, surfaces the key points, and turns long recordings like meetings, lectures, interviews, and podcasts into something you can skim and share.",
+    "heroLiveTranscript": "\"...team scheduled a Monday 10:00 meeting for Q3 planning...\"",
+    "heroLiveSummary": "3 decisions · 2 actions · 1 open question",
     "ctaPrimary": "Try Summarex",
     "ctaSecondary": "See how it works",
     "featuresTitle": "From raw audio to clear next steps.",
