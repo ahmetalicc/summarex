@@ -118,7 +118,17 @@
     "errorEmailInUse": "Bu e-posta ile bir hesap zaten var. Bunun yerine giriş yapmayı dene.",
     "errorWeakPassword": "Şifren çok kısa. En az 6 karakter kullan.",
     "errorEmailNotConfirmed": "Lütfen önce e-postanı onayla. Etkinleştirme bağlantısı için gelen kutunu kontrol et.",
-    "errorGeneric": "Bir şeyler ters gitti. Lütfen birazdan tekrar dene."
+    "errorGeneric": "Bir şeyler ters gitti. Lütfen birazdan tekrar dene.",
+    "resetSubtitle": "Hesabın için yeni bir şifre belirle.",
+    "newPassword": "Yeni şifre",
+    "confirmPassword": "Yeni şifreyi onayla",
+    "updatePasswordButton": "Şifreyi güncelle",
+    "updatingPassword": "Güncelleniyor…",
+    "errorPasswordMismatch": "Şifreler eşleşmiyor.",
+    "passwordUpdatedTitle": "Şifre güncellendi",
+    "passwordUpdatedBody": "Şifren değiştirildi ve giriş yaptın.",
+    "continueToDashboard": "Panele devam et",
+    "resetLinkInvalid": "Bu bağlantı geçersiz veya süresi dolmuş. Lütfen yeni bir sıfırlama bağlantısı isteyin."
   },
   "dashboard": {
     "title": "Kayıtların",
@@ -163,7 +173,7 @@
     "browseFiles": "Dosyalara göz at",
     "invalidFile": "Desteklenmeyen biçim. MP3, WAV, M4A veya WebM kullan.",
     "fileEmpty": "Dosya boş.",
-    "fileTooLarge": "Dosya 100 MB'ı aşıyor. Daha küçük bir dosya dene."
+    "fileTooLarge": "Dosya 25 MB'ı aşıyor. Daha küçük bir dosya dene."
   },
   "summarize": {
     "title": "Sesi özetle",

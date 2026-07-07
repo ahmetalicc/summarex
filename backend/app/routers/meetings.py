@@ -30,7 +30,7 @@ from app.models.transcript import Transcript
 from app.services.audio_service import AudioService
 from app.services.pipeline import run_meeting_pipeline, run_resummarize, run_transcription
 from app.services.supabase_service import SupabaseService
-from app.utils.exceptions import ExternalServiceError, MeetingNotFoundError
+from app.utils.exceptions import ExternalServiceError, MeetingNotFoundError, UsageLimitError
 from app.utils.logging import get_logger
 
 log = get_logger(__name__)
@@ -56,6 +56,18 @@ async def create_meeting_from_audio(
 
     meeting_id = str(uuid.uuid4())
     svc = SupabaseService()
+
+    entitlement = svc.get_entitlement(user_id)
+    limit = entitlement["minutes_limit"]
+    tier = entitlement["tier"]
+    over = entitlement["minutes_used"] >= limit
+    if not over and duration_seconds is not None:
+        over = (entitlement["minutes_used"] + duration_seconds / 60.0) > limit
+    if over:
+        raise UsageLimitError(
+            f"Monthly limit of {limit} minutes reached for your {tier} plan. "
+            "It resets at the start of next month."
+        )
 
     audio_path = svc.upload_audio(user_id, meeting_id, file_bytes, ext)
     try:

@@ -74,6 +74,67 @@ class SupabaseService:
 
     # ── Meetings DB ───────────────────────────────────────────────────────────
 
+    def get_minutes_used_this_month(self, user_id: str) -> float:
+        """Sum duration_seconds for all of this user's meetings since UTC month start, return as minutes."""
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc)
+        start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        try:
+            result = (
+                self._ensure_client()
+                .table("meetings")
+                .select("duration_seconds")
+                .eq("user_id", user_id)
+                .gte("created_at", start.isoformat())
+                .execute()
+            )
+        except Exception as exc:
+            raise ExternalServiceError(f"Failed to sum meeting minutes: {exc}") from exc
+        total_seconds = sum(
+            row["duration_seconds"] for row in result.data if row.get("duration_seconds")
+        )
+        return total_seconds / 60.0
+
+    def get_user_tier(self, user_id: str) -> str:
+        """Return the user's tier. Defaults to 'free' if no profile row exists."""
+        try:
+            result = (
+                self._ensure_client()
+                .table("user_profiles")
+                .select("tier")
+                .eq("user_id", user_id)
+                .limit(1)
+                .execute()
+            )
+        except Exception as exc:
+            raise ExternalServiceError(f"Failed to fetch user tier: {exc}") from exc
+        if result.data:
+            return result.data[0]["tier"]
+        return "free"
+
+    def get_entitlement(self, user_id: str) -> dict:
+        """Return full entitlement snapshot: tier, minutes_used, minutes_limit, resets_at."""
+        from datetime import datetime, timezone
+        from app.config import settings
+        tier = self.get_user_tier(user_id)
+        minutes_used = self.get_minutes_used_this_month(user_id)
+        minutes_limit = (
+            settings.PRO_MONTHLY_MINUTES if tier == "pro" else settings.FREE_MONTHLY_MINUTES
+        )
+        now = datetime.now(timezone.utc)
+        if now.month == 12:
+            resets_at = now.replace(year=now.year + 1, month=1, day=1,
+                                    hour=0, minute=0, second=0, microsecond=0)
+        else:
+            resets_at = now.replace(month=now.month + 1, day=1,
+                                    hour=0, minute=0, second=0, microsecond=0)
+        return {
+            "tier": tier,
+            "minutes_used": round(minutes_used, 2),
+            "minutes_limit": minutes_limit,
+            "resets_at": resets_at.isoformat(),
+        }
+
     def create_meeting(
         self,
         user_id: str,

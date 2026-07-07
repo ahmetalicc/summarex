@@ -6,22 +6,32 @@ export function Footer() {
   const { t } = useTranslation();
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-auto border-t border-border/50 bg-bg-surface/30">
-      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 text-sm text-text-muted sm:flex-row sm:px-6">
-        <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
-          <Brand />
-          <span className="text-xs">© {year} · {t('footer.rights')}</span>
-        </div>
-        <div className="flex items-center gap-5">
-          <Link to="/privacy" className="text-xs transition-colors hover:text-text">
-            {t('footer.privacy')}
-          </Link>
-          <Link to="/terms" className="text-xs transition-colors hover:text-text">
-            {t('footer.terms')}
-          </Link>
-          <Link to="/contact" className="text-xs transition-colors hover:text-text">
-            {t('footer.contact')}
-          </Link>
+    <footer className="mt-auto border-t border-border/60 bg-bg-surface/40 backdrop-blur">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+        <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
+          <div className="flex flex-col gap-3">
+            <Brand />
+            <p className="max-w-xs font-mono text-[11px] uppercase tracking-widest text-text-muted">
+              Voice · Transcript · Summary
+            </p>
+          </div>
+
+          <div className="flex flex-col items-start gap-6 md:items-end">
+            <div className="flex flex-wrap items-center gap-6 text-sm">
+              <Link to="/privacy" className="text-text-muted transition-colors hover:text-primary">
+                {t('footer.privacy')}
+              </Link>
+              <Link to="/terms" className="text-text-muted transition-colors hover:text-primary">
+                {t('footer.terms')}
+              </Link>
+              <Link to="/contact" className="text-text-muted transition-colors hover:text-primary">
+                {t('footer.contact')}
+              </Link>
+            </div>
+            <div className="font-mono text-xs text-text-muted">
+              © {year} · {t('footer.rights')}
+            </div>
+          </div>
         </div>
       </div>
     </footer>

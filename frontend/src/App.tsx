@@ -18,6 +18,7 @@ const SharedMeeting = lazy(() => import('./pages/SharedMeeting'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Contact = lazy(() => import('./pages/Contact'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 const PAGE_TRANSITION = {
@@ -61,6 +62,7 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<PageWrapper><Landing /></PageWrapper>} />
             <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+            <Route path="/reset-password" element={<PageWrapper><ResetPassword /></PageWrapper>} />
             <Route
               path="/dashboard"
               element={

@@ -15,9 +15,11 @@ export function useAuth(): UseAuthValue {
 
   useEffect(() => {
     let cancelled = false;
+    const timeout = setTimeout(() => { if (!cancelled) setIsLoading(false); }, 4000);
 
     void supabase.auth.getSession().then(({ data }) => {
       if (cancelled) return;
+      clearTimeout(timeout);
       setSession(data.session);
       setIsLoading(false);
     });
@@ -29,6 +31,7 @@ export function useAuth(): UseAuthValue {
 
     return () => {
       cancelled = true;
+      clearTimeout(timeout);
       sub.subscription.unsubscribe();
     };
   }, []);

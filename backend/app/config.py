@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:5173"
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
+    FREE_MONTHLY_MINUTES: int = 90
+    PRO_MONTHLY_MINUTES: int = 1200
 
 
 settings = Settings()

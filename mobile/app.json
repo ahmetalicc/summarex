@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "Summarex",
+    "slug": "summarex",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "summarex",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": false,
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#121212"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.summarex.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#2AB48F"
+      },
+      "package": "com.summarex.app"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-localization",
+      "expo-web-browser",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow Summarex to access your microphone to record meetings."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c760219a-2ef3-4c00-9b65-ff40af7f7f76"
+      }
+    }
+  }
+}

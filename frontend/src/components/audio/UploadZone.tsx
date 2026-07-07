@@ -10,7 +10,7 @@ import type { ProcessingMode } from '../../types/meeting';
 
 const ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'webm'] as const;
 const ACCEPT_ATTR = '.mp3,.wav,.m4a,.webm,audio/*';
-const MAX_SIZE_BYTES = 100 * 1024 * 1024;
+const MAX_SIZE_BYTES = 25 * 1024 * 1024;
 
 function getExtension(name: string): string {
   const idx = name.lastIndexOf('.');
@@ -152,7 +152,7 @@ export function UploadZone({ mode = 'summary' }: { mode?: ProcessingMode }) {
           <p className="text-xs text-text-muted">
             {t('recording.acceptHint', {
               extensions: ALLOWED_EXTENSIONS.map((e) => `.${e}`).join(', '),
-              maxMb: 100,
+              maxMb: 25,
             })}
           </p>
           <Button variant="secondary" size="sm" type="button" className="mt-2">

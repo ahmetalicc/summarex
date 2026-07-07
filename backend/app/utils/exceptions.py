@@ -33,3 +33,8 @@ class AudioValidationError(SummarexError):
 class ExternalServiceError(SummarexError):
     status_code = 502
     default_detail = "Upstream service error"
+
+
+class UsageLimitError(SummarexError):
+    status_code = 429
+    default_detail = "Monthly usage limit reached"

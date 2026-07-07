@@ -5,16 +5,20 @@
 @layer base {
   html {
     font-family: theme('fontFamily.body');
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   body {
     @apply bg-bg text-text antialiased;
     min-height: 100dvh;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
   h1,
   h2,
   h3,
   h4 {
     font-family: theme('fontFamily.display');
+    letter-spacing: -0.025em;
   }
   code,
   pre {
@@ -26,31 +30,154 @@
   .light {
     color-scheme: light;
   }
+  /* selection color */
+  ::selection {
+    background: rgb(var(--color-accent) / 0.35);
+    color: rgb(var(--color-text));
+  }
 }
 
-/* CSS custom properties for theme tokens — Tailwind utilities handle dark/light via
-   the `.light` class on <html>; these expose the same tokens for components that
-   need raw CSS access. */
+/* -----------------------------------------------------------
+   Signal Green design tokens
+   ----------------------------------------------------------- */
+
+/* Dark (default) — rich near-black with green undertone */
 :root {
-  --color-bg: 10 15 28;
-  --color-bg-surface: 20 27 45;
-  --color-bg-elevated: 27 34 54;
-  --color-primary: 42 180 143;
-  --color-primary-hover: 28 166 135;
-  --color-accent: 245 166 35;
-  --color-text: 226 232 240;
-  --color-text-muted: 148 163 184;
-  --color-border: 30 41 59;
+  --color-bg: 10 14 13;              /* #0A0E0D */
+  --color-bg-surface: 18 24 22;      /* #121816 */
+  --color-bg-elevated: 26 34 31;     /* #1A221F */
+  --color-primary: 47 213 148;       /* #2FD594 - vibrant emerald */
+  --color-primary-hover: 76 226 168; /* #4CE2A8 */
+  --color-primary-deep: 20 149 100;  /* #149564 - darker green */
+  --color-accent: 198 249 77;        /* #C6F94D - electric lime */
+  --color-accent-hover: 214 253 108; /* #D6FD6C */
+  --color-text: 237 244 240;         /* off-white */
+  --color-text-muted: 142 158 152;   /* muted sage */
+  --color-border: 34 44 40;          /* subtle line */
+  --color-border-strong: 52 66 60;
 }
 
+/* Light — warm cream */
 .light {
-  --color-bg: 250 250 252;
-  --color-bg-surface: 255 255 255;
-  --color-bg-elevated: 244 244 246;
-  --color-primary: 28 166 135;
-  --color-primary-hover: 22 138 112;
-  --color-accent: 217 119 6;
-  --color-text: 15 23 42;
-  --color-text-muted: 71 85 105;
-  --color-border: 226 232 240;
+  --color-bg: 244 243 239;           /* #F4F3EF warm gray */
+  --color-bg-surface: 252 251 247;   /* near cream */
+  --color-bg-elevated: 236 234 227;
+  --color-primary: 20 149 100;       /* #149564 confident deep green */
+  --color-primary-hover: 16 130 85;
+  --color-primary-deep: 12 100 65;
+  --color-accent: 132 195 30;        /* #84C31E darker lime for light bg */
+  --color-accent-hover: 108 168 22;
+  --color-text: 18 25 22;            /* near-black */
+  --color-text-muted: 88 104 96;
+  --color-border: 221 218 210;
+  --color-border-strong: 200 196 186;
+}
+
+/* -----------------------------------------------------------
+   Effects & textures
+   ----------------------------------------------------------- */
+
+/* subtle noise texture */
+.noise-texture {
+  position: relative;
+}
+.noise-texture::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+.light .noise-texture::after {
+  opacity: 0.055;
+  mix-blend-mode: multiply;
+}
+
+/* gradient border card */
+.gradient-border {
+  position: relative;
+  isolation: isolate;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgb(var(--color-primary) / 0.5),
+    rgb(var(--color-border) / 0.4) 40%,
+    transparent 70%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* animated grid */
+.bg-grid {
+  background-image:
+    linear-gradient(rgb(var(--color-border) / 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--color-border) / 0.3) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: -1px -1px;
+}
+
+/* glow */
+.glow-primary {
+  box-shadow:
+    0 0 0 1px rgb(var(--color-primary) / 0.2),
+    0 8px 32px -8px rgb(var(--color-primary) / 0.45);
+}
+.glow-accent {
+  box-shadow:
+    0 0 0 1px rgb(var(--color-accent) / 0.3),
+    0 8px 32px -8px rgb(var(--color-accent) / 0.45);
+}
+
+/* eyebrow label */
+.eyebrow {
+  font-family: theme('fontFamily.mono');
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: rgb(var(--color-text-muted));
+  font-weight: 500;
+}
+
+/* underline decoration */
+.underline-signal {
+  background-image: linear-gradient(90deg, rgb(var(--color-accent)), rgb(var(--color-primary)));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 8px;
+}
+
+/* pulse ring for recording states */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgb(var(--color-primary) / 0.4); }
+  70% { box-shadow: 0 0 0 20px rgb(var(--color-primary) / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(var(--color-primary) / 0); }
+}
+.pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* marquee scroll */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee {
+  animation: marquee 40s linear infinite;
+}
+
+/* fade-slide-in for staggered reveals via CSS */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }

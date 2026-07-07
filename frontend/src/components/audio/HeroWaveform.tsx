@@ -4,9 +4,10 @@ import { cn } from '../../lib/utils';
 interface HeroWaveformProps {
   className?: string;
   barCount?: number;
+  variant?: 'hero' | 'compact';
 }
 
-export function HeroWaveform({ className, barCount = 64 }: HeroWaveformProps) {
+export function HeroWaveform({ className, barCount = 96, variant = 'hero' }: HeroWaveformProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const startRef = useRef<number>(0);
@@ -27,12 +28,13 @@ export function HeroWaveform({ className, barCount = 64 }: HeroWaveformProps) {
       if (startRef.current === 0) startRef.current = now;
       const t = (now - startRef.current) / 1000;
       bars.forEach((bar, i) => {
-        const phase = i * 0.18;
+        const phase = i * 0.14;
         const wave =
-          0.45 +
-          0.35 * Math.sin(t * 1.6 + phase) +
-          0.18 * Math.sin(t * 0.9 + phase * 1.7);
-        const clamped = Math.max(0.08, Math.min(1, wave));
+          0.35 +
+          0.4 * Math.sin(t * 1.7 + phase) +
+          0.22 * Math.sin(t * 0.65 + phase * 1.9) +
+          0.12 * Math.sin(t * 3.1 + phase * 0.5);
+        const clamped = Math.max(0.05, Math.min(1, wave));
         bar.style.transform = `scaleY(${clamped})`;
       });
       rafRef.current = window.requestAnimationFrame(tick);
@@ -43,13 +45,18 @@ export function HeroWaveform({ className, barCount = 64 }: HeroWaveformProps) {
     };
   }, [barCount]);
 
+  const barClass =
+    variant === 'hero'
+      ? 'block h-full w-[3px] rounded-full will-change-transform bg-gradient-to-t from-primary/20 via-primary to-accent'
+      : 'block h-full w-[2px] rounded-full will-change-transform bg-primary/70';
+
   return (
     <div
       ref={containerRef}
       aria-hidden
       className={cn(
-        'pointer-events-none flex h-full w-full items-center justify-center gap-[3px]',
-        '[mask-image:linear-gradient(90deg,transparent,#000_18%,#000_82%,transparent)]',
+        'pointer-events-none flex items-center justify-center gap-[3px]',
+        '[mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]',
         className,
       )}
     >
@@ -58,7 +65,7 @@ export function HeroWaveform({ className, barCount = 64 }: HeroWaveformProps) {
           key={i}
           data-bar
           style={{ transformOrigin: '50% 50%' }}
-          className="block h-24 w-[3px] rounded-full bg-gradient-to-b from-primary via-primary/60 to-primary-hover/40 opacity-70 will-change-transform"
+          className={barClass}
         />
       ))}
     </div>

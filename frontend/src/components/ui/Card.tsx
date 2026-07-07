@@ -4,12 +4,14 @@ import { cn } from '../../lib/utils';
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
   glass?: boolean;
   hoverable?: boolean;
+  gradient?: boolean;
   children: ReactNode;
 }
 
 export function Card({
   glass = false,
   hoverable = false,
+  gradient = false,
   className,
   children,
   ...rest
@@ -17,9 +19,11 @@ export function Card({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-border',
+        'relative rounded-3xl border border-border',
         glass ? 'bg-bg-surface/60 backdrop-blur-xl' : 'bg-bg-surface',
-        hoverable && 'transition-transform duration-300 hover:-translate-y-1 hover:border-primary/40',
+        gradient && 'gradient-border',
+        hoverable &&
+          'transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-[0_20px_60px_-20px_rgb(var(--color-primary)/0.3)]',
         className,
       )}
       {...rest}
@@ -34,11 +38,11 @@ export function CardHeader({ className, ...rest }: HTMLAttributes<HTMLDivElement
 }
 
 export function CardTitle({ className, ...rest }: HTMLAttributes<HTMLHeadingElement>) {
-  return <h3 className={cn('text-lg font-semibold text-text', className)} {...rest} />;
+  return <h3 className={cn('font-display text-xl font-semibold text-text', className)} {...rest} />;
 }
 
 export function CardDescription({ className, ...rest }: HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn('text-sm text-text-muted', className)} {...rest} />;
+  return <p className={cn('text-sm leading-relaxed text-text-muted', className)} {...rest} />;
 }
 
 export function CardContent({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
