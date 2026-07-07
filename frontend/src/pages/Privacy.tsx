@@ -23,7 +23,7 @@ export default function Privacy() {
         {t('privacy.betaBanner')}
       </div>
       <header className="mb-12 border-b border-border/60 pb-8">
-        <p className="eyebrow mb-3">Legal · Privacy</p>
+        <p className="eyebrow mb-3">{t('privacy.eyebrow')}</p>
         <h1
           className="font-display font-bold tracking-tight text-text"
           style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 1 }}

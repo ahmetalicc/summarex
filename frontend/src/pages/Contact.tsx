@@ -15,7 +15,7 @@ export default function Contact() {
   return (
     <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
       <header className="mb-14 border-b border-border/60 pb-8">
-        <p className="eyebrow mb-3">Get in touch</p>
+        <p className="eyebrow mb-3">{t('contactPage.eyebrow')}</p>
         <h1
           className="font-display font-bold tracking-tight text-text"
           style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', lineHeight: 1 }}
@@ -42,7 +42,7 @@ export default function Contact() {
             {CONTACT_EMAIL}
           </p>
           <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-text-muted transition-colors group-hover:text-primary">
-            Send message
+            {t('contactPage.sendMessage')}
             <span className="transition-transform group-hover:translate-x-0.5">→</span>
           </div>
         </a>
@@ -63,7 +63,7 @@ export default function Contact() {
             {t('contactPage.instagram')}
           </p>
           <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-text-muted transition-colors group-hover:text-accent">
-            Follow us
+            {t('contactPage.followUs')}
             <span className="transition-transform group-hover:translate-x-0.5">→</span>
           </div>
         </a>
