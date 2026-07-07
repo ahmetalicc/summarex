@@ -18,19 +18,27 @@ export default function Privacy() {
   }, [t]);
 
   return (
-    <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-      <div className="mb-8 rounded-lg border border-accent/30 bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+    <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
+      <div className="mb-10 rounded-2xl border border-accent/40 bg-accent/10 px-5 py-4 text-sm font-medium text-accent backdrop-blur">
         {t('privacy.betaBanner')}
       </div>
-      <h1 className="font-display text-3xl font-bold text-text">{t('privacy.pageTitle')}</h1>
-      <p className="mt-2 text-sm text-text-muted">{t('privacy.lastUpdated')}</p>
-      <div className="mt-10 space-y-8">
+      <header className="mb-12 border-b border-border/60 pb-8">
+        <p className="eyebrow mb-3">Legal · Privacy</p>
+        <h1
+          className="font-display font-bold tracking-tight text-text"
+          style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 1 }}
+        >
+          {t('privacy.pageTitle')}
+        </h1>
+        <p className="mt-4 font-mono text-xs uppercase tracking-widest text-text-muted">{t('privacy.lastUpdated')}</p>
+      </header>
+      <div className="space-y-10">
         {SECTIONS.map((s) => (
           <div key={s}>
-            <h2 className="font-display text-xl font-semibold text-text">
+            <h2 className="font-display text-2xl font-bold text-text">
               {t(`privacy.${s}.heading`)}
             </h2>
-            <p className="mt-2 leading-relaxed text-text-muted">{t(`privacy.${s}.body`)}</p>
+            <p className="mt-3 text-[15px] leading-relaxed text-text-muted">{t(`privacy.${s}.body`)}</p>
           </div>
         ))}
       </div>

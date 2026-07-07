@@ -55,12 +55,16 @@ export default function Dashboard() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
-      <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <header className="mb-10 flex flex-col gap-6 border-b border-border/60 pb-8 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-display text-3xl font-bold text-text sm:text-4xl">
+          <p className="eyebrow mb-3">Your library</p>
+          <h1
+            className="font-display font-bold tracking-tight text-text"
+            style={{ fontSize: 'clamp(2.25rem, 4vw, 3.75rem)', lineHeight: 1 }}
+          >
             {t('dashboard.title')}
           </h1>
-          <p className="mt-1 text-sm text-text-muted">{t('dashboard.subtitle')}</p>
+          <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-text-muted">{t('dashboard.subtitle')}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link to="/summarize">
@@ -76,7 +80,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <div className="mb-6 max-w-md">
+      <div className="mb-8 max-w-md">
         <Input
           placeholder={t('dashboard.searchPlaceholder')}
           value={searchInput}

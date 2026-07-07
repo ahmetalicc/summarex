@@ -101,21 +101,21 @@ export function MeetingCard({ meeting }: MeetingCardProps) {
           onKeyDown={handleKeyDown}
           aria-disabled={!isClickable}
           className={cn(
-            'group relative flex h-full flex-col gap-4 p-5 transition-shadow',
+            'group relative flex h-full flex-col gap-4 p-6 transition-all',
             isClickable
-              ? 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 hover:shadow-[0_0_0_1px_rgba(0,212,170,0.25)]'
+              ? 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60'
               : 'cursor-default opacity-80',
           )}
         >
           <div className="flex items-start justify-between gap-3">
-            <h3 className="line-clamp-1 text-base font-semibold text-text">
+            <h3 className="line-clamp-2 font-display text-base font-semibold leading-snug text-text">
               {displayTitle(meeting.title, t)}
             </h3>
             <button
               type="button"
               onClick={openConfirm}
               aria-label={t('dashboard.deleteConfirmAction')}
-              className="opacity-0 transition-opacity hover:text-error group-hover:opacity-100 focus:opacity-100 focus:outline-none"
+              className="shrink-0 rounded-lg p-1 text-text-muted opacity-0 transition-all hover:bg-error/10 hover:text-error group-hover:opacity-100 focus:opacity-100 focus:outline-none"
             >
               <TrashIcon width={16} height={16} />
             </button>
@@ -128,9 +128,9 @@ export function MeetingCard({ meeting }: MeetingCardProps) {
             {isActive && <Spinner size="sm" className="text-text-muted" />}
           </div>
 
-          <div className="mt-auto flex items-center justify-between text-xs text-text-muted">
+          <div className="mt-auto flex items-center justify-between border-t border-border/60 pt-3 font-mono text-[11px] uppercase tracking-wider text-text-muted">
             <span>{createdAt}</span>
-            <span className="font-mono tabular-nums">
+            <span className="tabular-nums text-primary">
               {formatDuration(meeting.duration_seconds)}
             </span>
           </div>

@@ -8,28 +8,38 @@ import type { ProcessingMode } from '../../types/meeting';
 export function AudioCapture({ mode }: { mode: ProcessingMode }) {
   const { t } = useTranslation();
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <Card glass className="flex flex-col">
-        <div className="flex items-center gap-3 border-b border-border/60 px-6 py-4">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary/10 text-primary">
-            <MicIcon width={18} height={18} />
+    <div className="grid gap-5 md:grid-cols-2">
+      <Card gradient className="flex flex-col overflow-hidden">
+        <div className="flex items-center gap-4 border-b border-border/70 px-7 py-5">
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/15 text-primary">
+            <MicIcon width={20} height={20} />
           </span>
           <div>
-            <h2 className="text-sm font-semibold text-text">{t('recording.recordTab')}</h2>
-            <p className="text-xs text-text-muted">{t('recording.recordHint')}</p>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
+              01 · Record
+            </p>
+            <h2 className="mt-0.5 font-display text-base font-semibold text-text">
+              {t('recording.recordTab')}
+            </h2>
+            <p className="mt-0.5 text-xs text-text-muted">{t('recording.recordHint')}</p>
           </div>
         </div>
         <AudioRecorder mode={mode} />
       </Card>
 
-      <Card glass className="flex flex-col">
-        <div className="flex items-center gap-3 border-b border-border/60 px-6 py-4">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-accent/15 text-accent">
-            <UploadIcon width={18} height={18} />
+      <Card gradient className="flex flex-col overflow-hidden">
+        <div className="flex items-center gap-4 border-b border-border/70 px-7 py-5">
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-accent/20 text-accent">
+            <UploadIcon width={20} height={20} />
           </span>
           <div>
-            <h2 className="text-sm font-semibold text-text">{t('recording.uploadTab')}</h2>
-            <p className="text-xs text-text-muted">{t('recording.uploadHint')}</p>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">
+              02 · Upload
+            </p>
+            <h2 className="mt-0.5 font-display text-base font-semibold text-text">
+              {t('recording.uploadTab')}
+            </h2>
+            <p className="mt-0.5 text-xs text-text-muted">{t('recording.uploadHint')}</p>
           </div>
         </div>
         <UploadZone mode={mode} />

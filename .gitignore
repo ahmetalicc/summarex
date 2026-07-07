@@ -27,3 +27,16 @@ build/
 # Editor
 .vscode/
 .idea/
+
+# Emergent platform (local preview only)
+.emergent/
+memory/
+test_reports/
+test_result.md
+frontend/yarn.lock
+.env.*
+*.env
+credentials.json
+*.pem
+*.key
+.credentials

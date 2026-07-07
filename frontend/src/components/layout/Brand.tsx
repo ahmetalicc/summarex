@@ -13,7 +13,7 @@ export function Brand({ className, to = '/' }: BrandProps) {
     <Link
       to={to}
       className={cn(
-        'group inline-flex items-center gap-2 text-text transition-colors',
+        'group inline-flex items-center gap-2.5 text-text transition-opacity hover:opacity-90',
         className,
       )}
       aria-label={t('common.brand')}
@@ -24,9 +24,9 @@ export function Brand({ className, to = '/' }: BrandProps) {
         aria-hidden="true"
         width={32}
         height={32}
-        className="h-8 w-8 rounded-xl shadow-[0_2px_12px_-6px_rgba(42,180,143,0.22)]"
+        className="h-8 w-8 rounded-xl ring-1 ring-primary/20 shadow-[0_2px_16px_-6px_rgb(var(--color-primary)/0.5)]"
       />
-      <span className="font-display text-lg font-semibold tracking-tight">
+      <span className="font-display text-xl font-bold tracking-tight">
         Summa<span className="text-primary">rex</span>
       </span>
     </Link>
