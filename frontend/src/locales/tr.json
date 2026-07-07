@@ -60,6 +60,9 @@
         "tag": "Ses → Transkript"
       }
     },
+    "demoEyebrow": "Demo · Gerçek Çıktı",
+    "demoSample": "Örnek · Ekip toplantısı · 03:24",
+    "finalCtaEyebrow": "Hazır olduğunda buradayız",
     "demoTitle": "Yapay zekâ aslında sana ne veriyor.",
     "demoSubtitle": "Diğer tarafta seni neyin beklediğini gösteren gerçekçi bir örnek.",
     "demoTranscriptLabel": "Transkript",
@@ -291,13 +294,17 @@
   },
   "contactPage": {
     "pageTitle": "İletişim",
+    "eyebrow": "İletişime geç",
     "intro": "Sorunuz, geri bildiriminiz mi var ya da yardıma mı ihtiyacınız var? Bize ulaşın, en kısa sürede dönüş yapalım.",
     "emailLabel": "E-posta",
+    "sendMessage": "Mesaj gönder",
     "socialLabel": "Bizi takip edin",
+    "followUs": "Takip et",
     "instagram": "Instagram"
   },
   "privacy": {
     "pageTitle": "Gizlilik Politikası",
+    "eyebrow": "Hukuki · Gizlilik",
     "lastUpdated": "Son güncelleme: 13 Haziran 2026",
     "betaBanner": "Beta. Taslak içerik, hukuki tavsiye değildir",
     "intro": {
@@ -327,6 +334,7 @@
   },
   "terms": {
     "pageTitle": "Kullanım Şartları",
+    "eyebrow": "Hukuki · Şartlar",
     "lastUpdated": "Son güncelleme: 7 Haziran 2026",
     "betaBanner": "Beta. Taslak içerik, hukuki tavsiye değildir",
     "intro": {

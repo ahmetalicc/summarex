@@ -24,7 +24,7 @@ export function Brand({ className, to = '/' }: BrandProps) {
         aria-hidden="true"
         width={32}
         height={32}
-        className="h-8 w-8 rounded-xl ring-1 ring-primary/20 shadow-[0_2px_16px_-6px_rgb(var(--color-primary)/0.5)]"
+        className="h-8 w-8 rounded-xl bg-bg-elevated shadow-[0_2px_16px_-6px_rgb(var(--color-primary)/0.5)]"
       />
       <span className="font-display text-xl font-bold tracking-tight">
         Summa<span className="text-primary">rex</span>

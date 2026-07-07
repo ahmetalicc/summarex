@@ -60,6 +60,9 @@
         "tag": "Audio → Transcript"
       }
     },
+    "demoEyebrow": "Demo · Real Output",
+    "demoSample": "Sample · Team standup · 03:24",
+    "finalCtaEyebrow": "Ready when you are",
     "demoTitle": "What the AI actually gives you.",
     "demoSubtitle": "A real-looking example so you know what to expect on the other side.",
     "demoTranscriptLabel": "Transcript",
@@ -291,13 +294,17 @@
   },
   "contactPage": {
     "pageTitle": "Contact",
+    "eyebrow": "Get in touch",
     "intro": "Have a question, feedback, or need help? Reach out and we'll get back to you as soon as we can.",
     "emailLabel": "Email",
+    "sendMessage": "Send message",
     "socialLabel": "Follow us",
+    "followUs": "Follow us",
     "instagram": "Instagram"
   },
   "privacy": {
     "pageTitle": "Privacy Policy",
+    "eyebrow": "Legal · Privacy",
     "lastUpdated": "Last updated: 2026-06-13",
     "betaBanner": "Beta. Placeholder content, not legal advice",
     "intro": {
@@ -327,6 +334,7 @@
   },
   "terms": {
     "pageTitle": "Terms of Service",
+    "eyebrow": "Legal · Terms",
     "lastUpdated": "Last updated: 2026-06-07",
     "betaBanner": "Beta. Placeholder content, not legal advice",
     "intro": {

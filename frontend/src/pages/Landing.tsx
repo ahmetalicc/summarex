@@ -250,7 +250,7 @@ export default function Landing() {
       <section ref={demoRef} className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6">
         <div className="mb-14 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-2xl">
-            <p className="eyebrow mb-3">DEMO · REAL OUTPUT</p>
+            <p className="eyebrow mb-3">{t('landing.demoEyebrow')}</p>
             <h2
               className="font-display font-bold tracking-tight text-text"
               style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', lineHeight: 1 }}
@@ -261,7 +261,7 @@ export default function Landing() {
           </div>
           <div className="flex items-center gap-2 rounded-full border border-border bg-bg-surface/50 px-4 py-2 font-mono text-xs text-text-muted backdrop-blur">
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            <span>Sample · Team standup · 03:24</span>
+            <span>{t('landing.demoSample')}</span>
           </div>
         </div>
 
@@ -437,7 +437,7 @@ export default function Landing() {
           </div>
 
           <div className="relative">
-            <span className="eyebrow">READY WHEN YOU ARE</span>
+            <span className="eyebrow">{t('landing.finalCtaEyebrow')}</span>
             <h2
               className="mt-4 font-display font-bold leading-[1.05] tracking-tight text-text"
               style={{ fontSize: 'clamp(2rem, 5vw, 4.5rem)' }}
