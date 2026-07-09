@@ -5,12 +5,13 @@ timestamps), so we don't probe files locally and we don't depend on FFmpeg in th
 """
 from app.utils.exceptions import AudioValidationError
 
-ALLOWED_EXTENSIONS = {"mp3", "wav", "m4a", "webm", "ogg", "oga", "opus"}
+ALLOWED_EXTENSIONS = {"mp3", "wav", "m4a", "mp4", "webm", "ogg", "oga", "opus"}
 MAX_SIZE_BYTES = 25 * 1024 * 1024  # 25 MB
 CONTENT_TYPES = {
     "mp3": "audio/mpeg",
     "wav": "audio/wav",
     "m4a": "audio/mp4",
+    "mp4": "video/mp4",
     "webm": "audio/webm",
     "ogg": "audio/ogg",
     "oga": "audio/ogg",

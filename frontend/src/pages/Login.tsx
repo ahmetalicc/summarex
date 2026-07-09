@@ -136,7 +136,7 @@ export default function Login() {
           : t('auth.sendingReset');
 
   return (
-    <section className="relative mx-auto grid min-h-[calc(100dvh-4rem-4rem)] max-w-7xl content-center gap-8 px-4 py-10 sm:px-6 md:py-16 lg:grid-cols-12 lg:gap-12">
+    <section className="relative mx-auto flex min-h-[100dvh] max-w-7xl flex-col justify-center gap-8 px-4 py-10 sm:px-6 md:py-16 lg:grid lg:grid-cols-12 lg:content-center lg:gap-12">
       {(isLoading || session) && !isRecovery ? (
         <div className="col-span-full flex items-center justify-center">
           <Spinner size="lg" className="text-primary" />
@@ -180,7 +180,7 @@ export default function Login() {
           </aside>
 
           {/* Right: Form */}
-          <div className="relative flex items-center justify-center lg:col-span-6">
+          <div className="relative flex w-full items-center justify-center lg:col-span-6">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}

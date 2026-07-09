@@ -8,8 +8,8 @@ import { FilePlusIcon, UploadIcon } from '../layout/Icons';
 import { useUploadAudio } from '../../hooks/useAudioUpload';
 import type { ProcessingMode } from '../../types/meeting';
 
-const ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'webm', 'ogg', 'oga', 'opus'] as const;
-const ACCEPT_ATTR = '.mp3,.wav,.m4a,.webm,.ogg,.oga,.opus,audio/*';
+const ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'mp4', 'webm', 'ogg', 'oga', 'opus'] as const;
+const ACCEPT_ATTR = '.mp3,.wav,.m4a,.mp4,.webm,.ogg,.oga,.opus,audio/*';
 const MAX_SIZE_BYTES = 25 * 1024 * 1024;
 
 const MIME_EXTENSION_MAP: Record<string, string> = {
@@ -19,6 +19,7 @@ const MIME_EXTENSION_MAP: Record<string, string> = {
   'audio/wave': 'wav',
   'audio/mp4': 'm4a',
   'audio/x-m4a': 'm4a',
+  'video/mp4': 'mp4',
   'audio/webm': 'webm',
   'audio/ogg': 'ogg',
   'audio/opus': 'opus',

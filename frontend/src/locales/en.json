@@ -201,7 +201,7 @@
     "dragHere": "Drop your audio here",
     "acceptHint": "Supports {{extensions}} · up to {{maxMb}} MB",
     "browseFiles": "Browse files",
-    "invalidFile": "Unsupported format. Use MP3, WAV, M4A, OGG, OGA, OPUS, or WebM.",
+    "invalidFile": "Unsupported format. Use MP3, WAV, M4A, MP4, OGG, OGA, OPUS, or WebM.",
     "fileEmpty": "The file is empty.",
     "fileTooLarge": "That file is over 25 MB. Try a smaller one."
   },

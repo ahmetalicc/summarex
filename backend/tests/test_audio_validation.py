@@ -4,7 +4,7 @@ from app.utils.exceptions import AudioValidationError
 
 
 def test_accepts_valid_extensions():
-    for filename in ["meeting.mp3", "voice.wav", "clip.m4a", "rec.webm", "note.ogg", "voice.opus"]:
+    for filename in ["meeting.mp3", "voice.wav", "clip.m4a", "clip.mp4", "rec.webm", "note.ogg", "voice.opus"]:
         assert AudioService.validate(filename, 1024) == filename.rsplit(".", 1)[1]
 
 
