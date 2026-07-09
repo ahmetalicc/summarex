@@ -8,7 +8,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import * as Clipboard from 'expo-clipboard';
 import Animated, {
   useSharedValue, useAnimatedStyle, withTiming, FadeIn,
 } from 'react-native-reanimated';
@@ -187,10 +186,18 @@ export default function MeetingDetailScreen() {
       return;
     }
 
-    await Clipboard.setStringAsync(text);
-    hapticNotification(NotificationFeedbackType.Success);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      // expo-clipboard works in dev/production builds but not in Expo Go.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const Clipboard = require('expo-clipboard') as typeof import('expo-clipboard');
+      await Clipboard.setStringAsync(text);
+      hapticNotification(NotificationFeedbackType.Success);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for Expo Go: open share sheet so user can copy from there.
+      await Share.share({ message: text });
+    }
   }
 
   async function handleRegenerate() {
