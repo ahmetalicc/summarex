@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 from app.lib.supabase import get_service_client
 from app.services.audio_service import AudioService
-from app.utils.exceptions import ExternalServiceError
+from app.utils.exceptions import ExternalServiceError, SummarexError
 from app.utils.logging import get_logger
 
 log = get_logger(__name__)
@@ -452,3 +452,57 @@ class SupabaseService:
             "transcript": transcript,
             "summary": summary,
         }
+
+    # ── Account deletion ──────────────────────────────────────────────────────
+
+    def delete_user_account(self, user_id: str) -> None:
+        """Permanently delete all of a user's data and their auth account.
+
+        1. Remove every meeting's audio object from Storage (idempotent — audio
+           already purged post-pipeline 404s and is ignored).
+        2. Delete all meeting rows (cascades to transcripts/summaries/shared_links).
+        3. Best-effort remove the user_profiles row.
+        4. Delete the Supabase auth user via the service-role admin API.
+
+        Raises ExternalServiceError if the DB cleanup fails (502) and SummarexError
+        (500) if the auth admin delete fails after data was already removed.
+        """
+        client = self._ensure_client()
+
+        try:
+            result = (
+                client.table("meetings")
+                .select("id, audio_url")
+                .eq("user_id", user_id)
+                .execute()
+            )
+        except Exception as exc:
+            raise ExternalServiceError(f"Failed to fetch meetings for deletion: {exc}") from exc
+
+        for row in result.data or []:
+            audio_url = row.get("audio_url")
+            if audio_url:
+                self.delete_audio(audio_url)  # idempotent — logs and ignores 404s
+
+        try:
+            client.table("meetings").delete().eq("user_id", user_id).execute()
+        except Exception as exc:
+            raise ExternalServiceError(f"Failed to delete meetings: {exc}") from exc
+
+        # Profile cleanup is best-effort — a leftover profile row must not block
+        # account deletion (and may already cascade from the auth user delete).
+        try:
+            client.table("user_profiles").delete().eq("user_id", user_id).execute()
+        except Exception as exc:
+            log.warning("Failed to delete user_profiles for %s (ignored): %s", user_id, exc)
+
+        try:
+            client.auth.admin.delete_user(user_id)
+        except Exception as exc:
+            log.exception("Auth admin delete_user failed for %s", user_id)
+            raise SummarexError(
+                "Your recordings were removed but deleting the account failed. "
+                "Please contact support."
+            ) from exc
+
+        log.info("Deleted account and all data for user %s", user_id)

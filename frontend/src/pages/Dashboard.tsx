@@ -57,7 +57,7 @@ export default function Dashboard() {
     <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
       <header className="mb-10 flex flex-col gap-6 border-b border-border/60 pb-8 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="eyebrow mb-3">Your library</p>
+          <p className="eyebrow mb-3">{t('dashboard.eyebrow')}</p>
           <h1
             className="font-display font-bold tracking-tight text-text"
             style={{ fontSize: 'clamp(2.25rem, 4vw, 3.75rem)', lineHeight: 1 }}

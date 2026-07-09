@@ -203,6 +203,11 @@
     "signOut": "Çıkış Yap",
     "signOutConfirmTitle": "Çıkış Yap",
     "signOutConfirmBody": "Çıkış yapmak istediğinden emin misin?",
+    "deleteAccount": "Hesabı sil",
+    "deleteAccountConfirmTitle": "Hesabı sil?",
+    "deleteAccountConfirmBody": "Hesabın ve tüm kayıtların kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+    "deleteAccountConfirmAction": "Sil",
+    "deleteAccountError": "Hesap silinemedi. Lütfen tekrar dene.",
     "comingSoon": "Yakında",
     "languageComingSoonBody": "Çok dil desteği yakında geliyor."
   },

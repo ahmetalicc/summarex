@@ -11,7 +11,7 @@ from app.utils.exceptions import SummarexError
 
 configure_logging(settings.LOG_LEVEL)
 
-from app.routers import meetings, transcription, summary, share, health, entitlement  # noqa: E402
+from app.routers import meetings, transcription, summary, share, health, entitlement, user  # noqa: E402
 
 log = get_logger(__name__)
 
@@ -34,6 +34,7 @@ app.include_router(summary.router, prefix="/api/v1")
 app.include_router(share.router, prefix="/api/v1")
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(entitlement.router, prefix="/api/v1")
+app.include_router(user.router, prefix="/api/v1")
 
 
 @app.exception_handler(SummarexError)

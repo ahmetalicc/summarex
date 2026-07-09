@@ -97,6 +97,25 @@ export default function SettingsScreen() {
     ]);
   }
 
+  function handleDeleteAccount() {
+    Alert.alert(t('profile.deleteAccountConfirmTitle'), t('profile.deleteAccountConfirmBody'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('profile.deleteAccountConfirmAction'),
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await api.user.deleteAccount();
+            // Signing out flips the auth session; the root layout redirects to auth.
+            await supabase.auth.signOut();
+          } catch (e: unknown) {
+            Alert.alert(t('common.error'), (e as Error).message || t('profile.deleteAccountError'));
+          }
+        },
+      },
+    ]);
+  }
+
   function openLink(url: string) { WebBrowser.openBrowserAsync(url); }
 
   const isPro = entitlement?.tier === 'pro';
@@ -210,8 +229,14 @@ export default function SettingsScreen() {
 
         {/* Sign out */}
         <View style={{ marginTop: Spacing.xl }}>
-          <Button label={t('profile.signOut')} variant="danger" fullWidth leftIcon="log-out-outline" onPress={handleSignOut} />
+          <Button label={t('profile.signOut')} variant="secondary" fullWidth leftIcon="log-out-outline" onPress={handleSignOut} />
         </View>
+
+        {/* Danger zone */}
+        <Pressable style={s.deleteRow} onPress={handleDeleteAccount} hitSlop={{ top: 8, bottom: 8 }}>
+          <Ionicons name="trash-outline" size={16} color={colors.error} />
+          <Text style={s.deleteText}>{t('profile.deleteAccount')}</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -273,6 +298,12 @@ function createStyles(colors: ColorScheme) {
     },
     versionText: { fontSize: 13, fontFamily: Fonts.mono, color: colors.textMuted },
     rowBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
+
+    deleteRow: {
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+      marginTop: Spacing.md, paddingVertical: Spacing.sm,
+    },
+    deleteText: { fontSize: 14, fontFamily: Fonts.bodyMedium, color: colors.error },
   });
 }
 

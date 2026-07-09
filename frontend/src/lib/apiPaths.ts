@@ -10,4 +10,5 @@ export const API_PATHS = {
   meetingRegenerate: (id: string) => `/api/v1/meetings/${id}/regenerate-summary`,
   meetingShare: (id: string) => `/api/v1/meetings/${id}/share`,
   sharedAccess: (token: string) => `/api/v1/shared/${token}`,
+  deleteAccount: '/api/v1/user/me',
 } as const;

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useLanguageStore, type Language } from '../../store/languageStore';
 import { cn } from '../../lib/utils';
 
@@ -11,13 +12,14 @@ const LANGS: { code: Language; label: string }[] = [
 ];
 
 export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
+  const { t } = useTranslation();
   const language = useLanguageStore((s) => s.language);
   const setLanguage = useLanguageStore((s) => s.setLanguage);
 
   return (
     <div
       role="group"
-      aria-label="Language"
+      aria-label={t('common.language')}
       className={cn(
         'relative inline-flex h-10 items-center rounded-xl border border-border bg-bg-surface/60 p-1 font-mono text-[11px] font-semibold backdrop-blur',
         className,

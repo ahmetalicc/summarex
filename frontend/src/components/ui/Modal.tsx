@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/utils';
 
 export type ModalSize = 'sm' | 'md' | 'lg';
@@ -20,6 +21,7 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, children, size = 'md', className }: ModalProps) {
+  const { t } = useTranslation();
   const panelRef = useRef<HTMLDivElement>(null);
   const lastActiveRef = useRef<HTMLElement | null>(null);
 
@@ -58,7 +60,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', className
         >
           <button
             type="button"
-            aria-label="Close modal"
+            aria-label={t('common.close')}
             onClick={onClose}
             className="absolute inset-0 cursor-default bg-black/60 backdrop-blur-sm"
           />
@@ -84,7 +86,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', className
                   type="button"
                   onClick={onClose}
                   className="rounded-md p-1 text-text-muted transition-colors hover:bg-bg-elevated hover:text-text"
-                  aria-label="Close"
+                  aria-label={t('common.close')}
                 >
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18" />

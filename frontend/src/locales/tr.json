@@ -15,7 +15,15 @@
     "toggleTheme": "Tema değiştir",
     "openMenu": "Menüyü aç",
     "closeMenu": "Menüyü kapat",
+    "close": "Kapat",
     "cancel": "Vazgeç"
+  },
+  "account": {
+    "delete": "Hesabı sil",
+    "deleteConfirmTitle": "Hesabımı sil",
+    "deleteConfirmBody": "Bu işlem hesabını, tüm kayıtlarını, transkriptlerini ve özetlerini kalıcı olarak siler. Bu geri alınamaz.",
+    "deleteConfirmAction": "Hesabı sil",
+    "deleteError": "Hesap silinemedi. Lütfen tekrar dene."
   },
   "landing": {
     "heroEyebrow": "Yapay zekâ destekli ses zekâsı",
@@ -142,6 +150,7 @@
     "resetLinkInvalid": "Bu bağlantı geçersiz veya süresi dolmuş. Lütfen yeni bir sıfırlama bağlantısı isteyin."
   },
   "dashboard": {
+    "eyebrow": "Kitaplığın",
     "title": "Kayıtların",
     "subtitle": "Kaydettiğin ya da yüklediğin her kayıt aranabilir ve tekrar açılmaya hazır.",
     "newRecording": "Yeni kayıt",

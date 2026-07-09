@@ -5,10 +5,16 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { cn } from '../../lib/utils';
 import { ChevronDownIcon } from './Icons';
+import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
+import { deleteAccount } from '../../lib/api';
 
 export function UserMenu() {
   const { user, signOut } = useAuth();
   const [open, setOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -37,6 +43,25 @@ export function UserMenu() {
     setOpen(false);
     await signOut();
     navigate('/', { replace: true });
+  };
+
+  const openDeleteConfirm = () => {
+    setOpen(false);
+    setDeleteError(null);
+    setConfirmOpen(true);
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteAccount();
+      await signOut();
+      navigate('/', { replace: true });
+    } catch {
+      setDeleting(false);
+      setDeleteError(t('account.deleteError'));
+    }
   };
 
   return (
@@ -81,9 +106,35 @@ export function UserMenu() {
             >
               {t('common.signOut')}
             </button>
+            <button
+              type="button"
+              onClick={openDeleteConfirm}
+              role="menuitem"
+              className="block w-full border-t border-border/60 px-4 py-2.5 text-left text-sm text-error transition-colors hover:bg-error/10"
+            >
+              {t('account.delete')}
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <Modal
+        isOpen={confirmOpen}
+        onClose={() => { if (!deleting) setConfirmOpen(false); }}
+        title={t('account.deleteConfirmTitle')}
+        size="sm"
+      >
+        <p className="text-sm leading-relaxed text-text-muted">{t('account.deleteConfirmBody')}</p>
+        {deleteError && <p className="mt-3 text-sm text-error">{deleteError}</p>}
+        <div className="mt-6 flex justify-end gap-2">
+          <Button variant="secondary" size="sm" onClick={() => setConfirmOpen(false)} disabled={deleting}>
+            {t('common.cancel')}
+          </Button>
+          <Button variant="danger" size="sm" onClick={handleDeleteAccount} isLoading={deleting}>
+            {t('account.deleteConfirmAction')}
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

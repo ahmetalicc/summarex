@@ -15,7 +15,15 @@
     "toggleTheme": "Toggle theme",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
+    "close": "Close",
     "cancel": "Cancel"
+  },
+  "account": {
+    "delete": "Delete account",
+    "deleteConfirmTitle": "Delete my account",
+    "deleteConfirmBody": "This will permanently delete your account, all recordings, transcripts, and summaries. This cannot be undone.",
+    "deleteConfirmAction": "Delete account",
+    "deleteError": "Couldn't delete your account. Please try again."
   },
   "landing": {
     "heroEyebrow": "AI-powered audio intelligence",
@@ -142,6 +150,7 @@
     "resetLinkInvalid": "This link is invalid or has expired. Please request a new reset link."
   },
   "dashboard": {
+    "eyebrow": "Your library",
     "title": "Your recordings",
     "subtitle": "Every recording you've captured or uploaded, searchable and ready to revisit.",
     "newRecording": "New recording",

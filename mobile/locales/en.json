@@ -203,6 +203,11 @@
     "signOut": "Sign Out",
     "signOutConfirmTitle": "Sign Out",
     "signOutConfirmBody": "Are you sure you want to sign out?",
+    "deleteAccount": "Delete account",
+    "deleteAccountConfirmTitle": "Delete account?",
+    "deleteAccountConfirmBody": "This will permanently delete your account and all recordings. This cannot be undone.",
+    "deleteAccountConfirmAction": "Delete",
+    "deleteAccountError": "Couldn't delete your account. Please try again.",
     "comingSoon": "Coming Soon",
     "languageComingSoonBody": "Multi-language support is coming soon."
   },

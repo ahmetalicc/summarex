@@ -93,6 +93,9 @@ export const api = {
   entitlement: {
     me: () => apiFetch<Entitlement>('/entitlement/me'),
   },
+  user: {
+    deleteAccount: (): Promise<void> => apiFetch('/user/me', { method: 'DELETE' }),
+  },
   meetings: {
     list: (params?: { limit?: number; offset?: number; search?: string }) => {
       const q = new URLSearchParams();

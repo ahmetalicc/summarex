@@ -97,3 +97,7 @@ export function getSharedMeeting(token: string): Promise<PublicMeetingView> {
 export function health(): Promise<{ status: string }> {
   return apiClient.get<{ status: string }>(API_PATHS.health, { auth: 'optional' });
 }
+
+export function deleteAccount(): Promise<null> {
+  return apiClient.delete<null>(API_PATHS.deleteAccount);
+}
