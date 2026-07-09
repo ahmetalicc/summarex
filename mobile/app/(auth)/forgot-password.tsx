@@ -1,14 +1,13 @@
-import { useMemo, useState } from 'react';
-import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, ActivityIndicator, Alert, ScrollView,
-} from 'react-native';
+import { useState } from 'react';
+import { Text, StyleSheet, Alert, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Fonts } from '@/constants/fonts';
-import { Brand } from '@/components/Brand';
+import { Spacing } from '@/constants/tokens';
+import { AuthScaffold } from '@/components/AuthScaffold';
+import { Button, Input } from '@/components/ui';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -16,38 +15,6 @@ export default function ForgotPasswordScreen() {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [focused, setFocused] = useState(false);
-
-  const s = useMemo(() => StyleSheet.create({
-    root: { flex: 1, backgroundColor: colors.bg },
-    scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 48 },
-    brand: { alignItems: 'center', marginBottom: 48 },
-    card: {
-      backgroundColor: colors.bgSurface,
-      borderRadius: 20, padding: 28,
-      borderWidth: 1.5, borderColor: colors.border,
-    },
-    cardTitle: { fontSize: 20, fontFamily: Fonts.display, color: colors.text, marginBottom: 4 },
-    cardSubtitle: { fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted, marginBottom: 24 },
-    field: { marginBottom: 16 },
-    label: { fontSize: 13, fontFamily: Fonts.bodyMedium, color: colors.text, marginBottom: 6 },
-    input: {
-      backgroundColor: colors.bg,
-      borderWidth: 1, borderColor: colors.border,
-      borderRadius: 12, paddingHorizontal: 14, paddingVertical: 14,
-      color: colors.text, fontSize: 15, fontFamily: Fonts.body,
-    },
-    inputFocused: { borderColor: colors.primary },
-    button: {
-      backgroundColor: colors.primary,
-      borderRadius: 12, paddingVertical: 16,
-      alignItems: 'center', marginTop: 8,
-    },
-    buttonText: { color: '#fff', fontSize: 16, fontFamily: Fonts.displaySemiBold },
-    footer: { alignItems: 'center', marginTop: 24 },
-    footerText: { fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted },
-    footerLink: { color: colors.primary, fontFamily: Fonts.bodyMedium },
-  }), [colors]);
 
   async function handleReset() {
     if (!email) return;
@@ -68,42 +35,33 @@ export default function ForgotPasswordScreen() {
   }
 
   return (
-    <KeyboardAvoidingView style={s.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
-        <View style={s.brand}>
-          <Brand size="lg" />
-        </View>
-
-        <View style={s.card}>
-          <Text style={s.cardTitle}>{t('auth.resetTitle')}</Text>
-          <Text style={s.cardSubtitle}>{t('auth.resetSubtitle')}</Text>
-
-          <View style={s.field}>
-            <Text style={s.label}>{t('auth.email')}</Text>
-            <TextInput
-              style={[s.input, focused && s.inputFocused]}
-              placeholder={t('auth.emailPlaceholder')}
-              placeholderTextColor={colors.textMuted}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
-              onSubmitEditing={handleReset}
-              returnKeyType="go"
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-            />
-          </View>
-
-          <TouchableOpacity style={s.button} onPress={handleReset} disabled={loading} activeOpacity={0.85}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={s.buttonText}>{t('auth.sendResetLink')}</Text>}
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity onPress={() => router.back()} style={s.footer}>
-          <Text style={[s.footerText, s.footerLink]}>{t('auth.backToSignIn')}</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    <AuthScaffold
+      eyebrow={t('auth.resetEyebrow')}
+      title={t('auth.resetTitle')}
+      subtitle={t('auth.resetSubtitle')}
+      footer={
+        <Pressable onPress={() => router.replace('/(auth)/sign-in')} hitSlop={8} style={styles.switchRow}>
+          <Text style={[styles.link, { color: colors.primary }]}>{t('auth.backToSignIn')}</Text>
+        </Pressable>
+      }
+    >
+      <Input
+        label={t('auth.email')}
+        leftIcon="mail-outline"
+        placeholder={t('auth.emailPlaceholder')}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        value={email}
+        onChangeText={setEmail}
+        onSubmitEditing={handleReset}
+        returnKeyType="go"
+      />
+      <Button label={t('auth.sendResetLink')} variant="primary" size="lg" fullWidth isLoading={loading} onPress={handleReset} />
+    </AuthScaffold>
   );
 }
+
+const styles = StyleSheet.create({
+  switchRow: { alignItems: 'center', marginTop: Spacing.lg },
+  link: { fontFamily: Fonts.bodySemiBold, fontSize: 14 },
+});
