@@ -4,11 +4,20 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import {
-  SpaceGrotesk_400Regular,
-  SpaceGrotesk_600SemiBold,
-  SpaceGrotesk_700Bold,
-} from '@expo-google-fonts/space-grotesk';
-import { DMSans_400Regular, DMSans_500Medium } from '@expo-google-fonts/dm-sans';
+  BricolageGrotesque_400Regular,
+  BricolageGrotesque_600SemiBold,
+  BricolageGrotesque_700Bold,
+} from '@expo-google-fonts/bricolage-grotesque';
+import {
+  Geist_400Regular,
+  Geist_500Medium,
+  Geist_600SemiBold,
+} from '@expo-google-fonts/geist';
+import {
+  JetBrainsMono_400Regular,
+  JetBrainsMono_500Medium,
+  JetBrainsMono_700Bold,
+} from '@expo-google-fonts/jetbrains-mono';
 import 'react-native-url-polyfill/auto';
 import '@/lib/i18n';
 import { supabase } from '@/lib/supabase';
@@ -26,11 +35,15 @@ export default function RootLayout() {
   const didRedirect = useRef(false);
 
   const [fontsLoaded] = useFonts({
-    'SpaceGrotesk-Regular': SpaceGrotesk_400Regular,
-    'SpaceGrotesk-SemiBold': SpaceGrotesk_600SemiBold,
-    'SpaceGrotesk-Bold': SpaceGrotesk_700Bold,
-    'DMSans-Regular': DMSans_400Regular,
-    'DMSans-Medium': DMSans_500Medium,
+    BricolageGrotesque_400Regular,
+    BricolageGrotesque_600SemiBold,
+    BricolageGrotesque_700Bold,
+    Geist_400Regular,
+    Geist_500Medium,
+    Geist_600SemiBold,
+    JetBrainsMono_400Regular,
+    JetBrainsMono_500Medium,
+    JetBrainsMono_700Bold,
   });
 
   useEffect(() => {

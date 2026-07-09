@@ -8,9 +8,20 @@
     "share": "Paylaş",
     "back": "Geri",
     "error": "Hata",
-    "ok": "Tamam"
+    "ok": "Tamam",
+    "show": "Göster",
+    "hide": "Gizle"
+  },
+  "home": {
+    "eyebrow": "Kitaplığın",
+    "subtitle": "Kayıtların, transkriptlerin ve özetlerin tek bir yerde."
   },
   "auth": {
+    "brandHeadline": "Saatlerce ses,\ndakikalar içinde özet.",
+    "brandEyebrow": "Ses · Transkript · Özet",
+    "signInEyebrow": "Giriş yap",
+    "signUpEyebrow": "Hesap oluştur",
+    "resetEyebrow": "Şifreyi sıfırla",
     "welcomeTitle": "Tekrar hoş geldin",
     "welcomeSubtitle": "Kayıtlarına erişmek için giriş yap.",
     "createTitle": "Hesap oluştur",
@@ -49,7 +60,8 @@
     "home": "Ana Sayfa",
     "transcribe": "Yazıya Dök",
     "summarize": "Özetle",
-    "profile": "Profil"
+    "profile": "Profil",
+    "settings": "Ayarlar"
   },
   "transcribe": {
     "pageTitle": "Sesi Yazıya Dök",
@@ -154,10 +166,15 @@
     "unassigned": "Atanmamış",
     "noDeadline": "Tarih yok",
     "summaryNotAvailable": "Özet henüz hazır değil.",
-    "transcriptNotAvailable": "Transkript henüz hazır değil."
+    "transcriptNotAvailable": "Transkript henüz hazır değil.",
+    "copyWatermarkSummary": "Bu özet Summarex tarafından oluşturuldu",
+    "copyWatermarkTranscript": "Bu transkript Summarex tarafından oluşturuldu"
   },
   "profile": {
     "title": "Profil",
+    "sectionAccount": "HESAP",
+    "sectionPreferences": "TERCİHLER",
+    "theme": "Tema",
     "sectionUsage": "KULLANIM",
     "sectionPro": "PRO",
     "monthlyUsage": "Aylık Kullanım",

@@ -6,7 +6,7 @@ export default function TranscribePage() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
       <header className="mb-12 border-b border-border/60 pb-8">
-        <p className="eyebrow mb-3">Transcribe · Voice → Text</p>
+        <p className="eyebrow mb-3">{t('transcribe.eyebrow')}</p>
         <h1
           className="font-display font-bold tracking-tight text-text"
           style={{ fontSize: 'clamp(2.25rem, 4vw, 3.75rem)', lineHeight: 1 }}
