@@ -1,4 +1,5 @@
 import { forwardRef, useId, useState, type InputHTMLAttributes, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/utils';
 
 interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
@@ -13,6 +14,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   { label, hint, error, leftIcon, passwordToggle, type = 'text', id, className, ...rest },
   ref,
 ) {
+  const { t } = useTranslation();
   const autoId = useId();
   const inputId = id ?? autoId;
   const [show, setShow] = useState(false);
@@ -52,9 +54,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             type="button"
             onClick={() => setShow((v) => !v)}
             className="px-3.5 font-mono text-[11px] font-semibold uppercase tracking-widest text-text-muted transition-colors hover:text-primary"
-            aria-label={show ? 'Hide password' : 'Show password'}
+            aria-label={show ? t('common.hide') : t('common.show')}
           >
-            {show ? 'Hide' : 'Show'}
+            {show ? t('common.hide') : t('common.show')}
           </button>
         )}
       </div>

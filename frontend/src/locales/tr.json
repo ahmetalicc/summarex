@@ -16,7 +16,9 @@
     "openMenu": "Menüyü aç",
     "closeMenu": "Menüyü kapat",
     "close": "Kapat",
-    "cancel": "Vazgeç"
+    "cancel": "Vazgeç",
+    "show": "Göster",
+    "hide": "Gizle"
   },
   "account": {
     "delete": "Hesabı sil",
@@ -104,7 +106,15 @@
     },
     "finalCtaTitle": "Sesi ileri-geri sarmayı bırak. Önemi olanı bul.",
     "finalCtaSubtitle": "Beta sürecinde ücretsiz. Kart bilgisi yok. Kurulum yok.",
-    "finalCtaButton": "Ücretsiz başla"
+    "finalCtaButton": "Ücretsiz başla",
+    "demoLive": "CANLI",
+    "demoAiBadge": "YZ · SCRIBE",
+    "demoTranscriptBadge": "TRANSKRİPT",
+    "demoSummaryBadge": "ÖZET",
+    "demoDoneBadge": "YZ · Tamamlandı",
+    "statsFormats": "Formatlar",
+    "statsMaxUpload": "Maks. yükleme",
+    "statsLanguages": "Diller"
   },
   "auth": {
     "brandEyebrow": "Ses · Transkript · Özet",
@@ -191,7 +201,7 @@
     "dragHere": "Ses dosyanı buraya bırak",
     "acceptHint": "Desteklenen: {{extensions}} · en fazla {{maxMb}} MB",
     "browseFiles": "Dosyalara göz at",
-    "invalidFile": "Desteklenmeyen biçim. MP3, WAV, M4A, OGG veya WebM kullan.",
+    "invalidFile": "Desteklenmeyen biçim. MP3, WAV, M4A, OGG, OGA, OPUS veya WebM kullan.",
     "fileEmpty": "Dosya boş.",
     "fileTooLarge": "Dosya 25 MB'ı aşıyor. Daha küçük bir dosya dene."
   },

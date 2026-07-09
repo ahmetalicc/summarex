@@ -8,13 +8,47 @@ import { FilePlusIcon, UploadIcon } from '../layout/Icons';
 import { useUploadAudio } from '../../hooks/useAudioUpload';
 import type { ProcessingMode } from '../../types/meeting';
 
-const ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'webm', 'ogg', 'opus'] as const;
-const ACCEPT_ATTR = '.mp3,.wav,.m4a,.webm,.ogg,.opus,audio/*';
+const ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'webm', 'ogg', 'oga', 'opus'] as const;
+const ACCEPT_ATTR = '.mp3,.wav,.m4a,.webm,.ogg,.oga,.opus,audio/*';
 const MAX_SIZE_BYTES = 25 * 1024 * 1024;
+
+const MIME_EXTENSION_MAP: Record<string, string> = {
+  'audio/mpeg': 'mp3',
+  'audio/mp3': 'mp3',
+  'audio/wav': 'wav',
+  'audio/wave': 'wav',
+  'audio/mp4': 'm4a',
+  'audio/x-m4a': 'm4a',
+  'audio/webm': 'webm',
+  'audio/ogg': 'ogg',
+  'audio/opus': 'opus',
+};
 
 function getExtension(name: string): string {
   const idx = name.lastIndexOf('.');
   return idx >= 0 ? name.slice(idx + 1).toLowerCase() : '';
+}
+
+function extensionFromMime(mimeType: string): string | null {
+  const normalized = mimeType.split(';')[0].trim().toLowerCase();
+  return MIME_EXTENSION_MAP[normalized] ?? null;
+}
+
+// Android pickers sometimes hand back a File with no extension in its name
+// (e.g. "audio") but a correct MIME type, so fall back to sniffing that.
+function resolveFileExtension(file: File): string | null {
+  const ext = getExtension(file.name);
+  if (ALLOWED_EXTENSIONS.includes(ext as (typeof ALLOWED_EXTENSIONS)[number])) return ext;
+  return extensionFromMime(file.type);
+}
+
+// The backend infers format from the filename extension, so a file accepted
+// via MIME sniffing needs to be renamed before it's uploaded.
+function withExtension(file: File, ext: string): File {
+  const currentExt = getExtension(file.name);
+  if (currentExt === ext) return file;
+  const base = currentExt ? file.name.slice(0, file.name.length - currentExt.length - 1) : file.name;
+  return new File([file], `${base || 'audio'}.${ext}`, { type: file.type, lastModified: file.lastModified });
 }
 
 function formatBytes(bytes: number): string {
@@ -54,36 +88,29 @@ export function UploadZone({ mode = 'summary' }: { mode?: ProcessingMode }) {
   const [isDragging, setIsDragging] = useState(false);
   const uploadMutation = useUploadAudio();
 
-  const validate = useCallback(
-    (candidate: File): string | null => {
-      const ext = getExtension(candidate.name);
-      if (!ALLOWED_EXTENSIONS.includes(ext as (typeof ALLOWED_EXTENSIONS)[number])) {
-        return t('recording.invalidFile');
-      }
-      if (candidate.size <= 0) {
-        return t('recording.fileEmpty');
-      }
-      if (candidate.size > MAX_SIZE_BYTES) {
-        return t('recording.fileTooLarge');
-      }
-      return null;
-    },
-    [t],
-  );
-
   const handleFile = useCallback(
     (candidate: File | null) => {
       if (!candidate) return;
-      const err = validate(candidate);
-      if (err) {
-        setError(err);
+      const ext = resolveFileExtension(candidate);
+      if (!ext) {
+        setError(t('recording.invalidFile'));
+        setFile(null);
+        return;
+      }
+      if (candidate.size <= 0) {
+        setError(t('recording.fileEmpty'));
+        setFile(null);
+        return;
+      }
+      if (candidate.size > MAX_SIZE_BYTES) {
+        setError(t('recording.fileTooLarge'));
         setFile(null);
         return;
       }
       setError(null);
-      setFile(candidate);
+      setFile(withExtension(candidate, ext));
     },
-    [validate],
+    [t],
   );
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {

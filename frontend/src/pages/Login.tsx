@@ -136,7 +136,7 @@ export default function Login() {
           : t('auth.sendingReset');
 
   return (
-    <section className="relative mx-auto grid min-h-[calc(100dvh-4rem-4rem)] max-w-7xl gap-8 px-4 py-10 sm:px-6 md:py-16 lg:grid-cols-12 lg:gap-12">
+    <section className="relative mx-auto grid min-h-[calc(100dvh-4rem-4rem)] max-w-7xl content-center gap-8 px-4 py-10 sm:px-6 md:py-16 lg:grid-cols-12 lg:gap-12">
       {(isLoading || session) && !isRecovery ? (
         <div className="col-span-full flex items-center justify-center">
           <Spinner size="lg" className="text-primary" />
