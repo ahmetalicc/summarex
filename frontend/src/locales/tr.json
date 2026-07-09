@@ -201,7 +201,7 @@
     "dragHere": "Ses dosyanı buraya bırak",
     "acceptHint": "Desteklenen: {{extensions}} · en fazla {{maxMb}} MB",
     "browseFiles": "Dosyalara göz at",
-    "invalidFile": "Desteklenmeyen biçim. MP3, WAV, M4A, OGG, OGA, OPUS veya WebM kullan.",
+    "invalidFile": "Desteklenmeyen biçim. MP3, WAV, M4A, MP4, OGG, OGA, OPUS veya WebM kullan.",
     "fileEmpty": "Dosya boş.",
     "fileTooLarge": "Dosya 25 MB'ı aşıyor. Daha küçük bir dosya dene."
   },
