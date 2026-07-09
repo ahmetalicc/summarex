@@ -16,7 +16,7 @@ export function AudioCapture({ mode }: { mode: ProcessingMode }) {
           </span>
           <div>
             <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
-              01 · Record
+              {`01 · ${t('recording.recordTab')}`}
             </p>
             <h2 className="mt-0.5 font-display text-base font-semibold text-text">
               {t('recording.recordTab')}
@@ -34,7 +34,7 @@ export function AudioCapture({ mode }: { mode: ProcessingMode }) {
           </span>
           <div>
             <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">
-              02 · Upload
+              {`02 · ${t('recording.uploadTab')}`}
             </p>
             <h2 className="mt-0.5 font-display text-base font-semibold text-text">
               {t('recording.uploadTab')}

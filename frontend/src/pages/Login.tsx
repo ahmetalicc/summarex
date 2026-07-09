@@ -154,7 +154,7 @@ export default function Login() {
             <div className="relative">
               <Brand />
               <p className="mt-8 font-mono text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Voice · Transcript · Summary
+                {t('auth.brandEyebrow')}
               </p>
               <h2
                 className="mt-4 font-display font-bold leading-[1.05] tracking-tight text-text"
@@ -168,7 +168,7 @@ export default function Login() {
               <div className="rounded-2xl border border-border bg-bg/50 p-4 backdrop-blur">
                 <div className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-text-muted">
                   <span className="pulse-ring h-1.5 w-1.5 rounded-full bg-primary" />
-                  What you get
+                  {t('auth.whatYouGet')}
                 </div>
                 <ul className="grid gap-2 text-sm text-text">
                   <li className="flex items-center gap-2.5"><span className="h-1 w-1 rounded-full bg-primary" />{t('landing.demoOverview')}</li>
@@ -193,7 +193,7 @@ export default function Login() {
                 </div>
                 <div className="mb-8 flex flex-col gap-2">
                   <p className="font-mono text-[11px] font-semibold uppercase tracking-widest text-primary">
-                    {mode === 'signin' ? 'Sign in' : mode === 'signup' ? 'Create account' : mode === 'reset' ? 'Reset password' : 'Recover'}
+                    {mode === 'signin' ? t('auth.eyebrowSignIn') : mode === 'signup' ? t('auth.eyebrowSignUp') : mode === 'reset' ? t('auth.eyebrowReset') : t('auth.eyebrowRecover')}
                   </p>
                   <h1
                     className="font-display font-bold tracking-tight text-text"

@@ -8,8 +8,8 @@ import { FilePlusIcon, UploadIcon } from '../layout/Icons';
 import { useUploadAudio } from '../../hooks/useAudioUpload';
 import type { ProcessingMode } from '../../types/meeting';
 
-const ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'webm'] as const;
-const ACCEPT_ATTR = '.mp3,.wav,.m4a,.webm,audio/*';
+const ALLOWED_EXTENSIONS = ['mp3', 'wav', 'm4a', 'webm', 'ogg', 'opus'] as const;
+const ACCEPT_ATTR = '.mp3,.wav,.m4a,.webm,.ogg,.opus,audio/*';
 const MAX_SIZE_BYTES = 25 * 1024 * 1024;
 
 function getExtension(name: string): string {

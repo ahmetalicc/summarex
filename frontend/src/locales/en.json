@@ -99,6 +99,12 @@
     "finalCtaButton": "Get started free"
   },
   "auth": {
+    "brandEyebrow": "Voice · Transcript · Summary",
+    "eyebrowSignIn": "Sign in",
+    "eyebrowSignUp": "Create account",
+    "eyebrowReset": "Reset password",
+    "eyebrowRecover": "Recover",
+    "whatYouGet": "What you get",
     "welcomeTitle": "Welcome back",
     "welcomeSubtitle": "Sign in to access your recordings, or create an account in seconds.",
     "email": "Email",
@@ -176,11 +182,13 @@
     "dragHere": "Drop your audio here",
     "acceptHint": "Supports {{extensions}} · up to {{maxMb}} MB",
     "browseFiles": "Browse files",
-    "invalidFile": "Unsupported format. Use MP3, WAV, M4A, or WebM.",
+    "invalidFile": "Unsupported format. Use MP3, WAV, M4A, OGG, or WebM.",
     "fileEmpty": "The file is empty.",
     "fileTooLarge": "That file is over 25 MB. Try a smaller one."
   },
   "summarize": {
+    "eyebrow": "Summarize · Voice → Insights",
+    "existingEyebrow": "Existing transcripts",
     "title": "Summarize audio",
     "subtitle": "Record live or upload a file. Summarex transcribes it and pulls out the key points like decisions, action items, and more.",
     "pickerTitle": "Or summarize an existing transcript",
@@ -189,6 +197,7 @@
     "pickerAction": "Summarize"
   },
   "transcribe": {
+    "eyebrow": "Transcribe · Voice → Text",
     "title": "Transcribe audio",
     "subtitle": "Record live or upload a file to get an accurate, searchable transcript. Add a summary later, whenever you want."
   },

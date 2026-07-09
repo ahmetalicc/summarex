@@ -7,7 +7,7 @@ export default function SummarizePage() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
       <header className="mb-12 border-b border-border/60 pb-8">
-        <p className="eyebrow mb-3">Summarize · Voice → Insights</p>
+        <p className="eyebrow mb-3">{t('summarize.eyebrow')}</p>
         <h1
           className="font-display font-bold tracking-tight text-text"
           style={{ fontSize: 'clamp(2.25rem, 4vw, 3.75rem)', lineHeight: 1 }}
@@ -23,7 +23,7 @@ export default function SummarizePage() {
 
       <div className="mt-16 border-t border-border/60 pt-10">
         <div className="mb-6">
-          <p className="eyebrow mb-2">Existing transcripts</p>
+          <p className="eyebrow mb-2">{t('summarize.existingEyebrow')}</p>
           <h2 className="font-display text-2xl font-bold text-text">
             {t('summarize.pickerTitle')}
           </h2>

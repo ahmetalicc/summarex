@@ -99,6 +99,12 @@
     "finalCtaButton": "Ücretsiz başla"
   },
   "auth": {
+    "brandEyebrow": "Ses · Transkript · Özet",
+    "eyebrowSignIn": "Giriş yap",
+    "eyebrowSignUp": "Hesap oluştur",
+    "eyebrowReset": "Şifreyi güncelle",
+    "eyebrowRecover": "Kurtar",
+    "whatYouGet": "Neler içeriyor",
     "welcomeTitle": "Tekrar hoş geldin",
     "welcomeSubtitle": "Kayıtlarına erişmek için giriş yap ya da saniyeler içinde hesap oluştur.",
     "email": "E-posta",
@@ -176,11 +182,13 @@
     "dragHere": "Ses dosyanı buraya bırak",
     "acceptHint": "Desteklenen: {{extensions}} · en fazla {{maxMb}} MB",
     "browseFiles": "Dosyalara göz at",
-    "invalidFile": "Desteklenmeyen biçim. MP3, WAV, M4A veya WebM kullan.",
+    "invalidFile": "Desteklenmeyen biçim. MP3, WAV, M4A, OGG veya WebM kullan.",
     "fileEmpty": "Dosya boş.",
     "fileTooLarge": "Dosya 25 MB'ı aşıyor. Daha küçük bir dosya dene."
   },
   "summarize": {
+    "eyebrow": "Özetle · Ses → İçgörü",
+    "existingEyebrow": "Mevcut transkriptler",
     "title": "Sesi özetle",
     "subtitle": "Canlı kaydet veya dosya yükle. Summarex sesi metne döker ve kararlar, aksiyon maddeleri ve daha fazlası gibi önemli noktaları çıkarır.",
     "pickerTitle": "Veya mevcut bir transkripti özetle",
@@ -189,6 +197,7 @@
     "pickerAction": "Özetle"
   },
   "transcribe": {
+    "eyebrow": "Yazıya dök · Ses → Metin",
     "title": "Sesi yazıya dök",
     "subtitle": "Canlı kaydet veya dosya yükle; doğru ve aranabilir bir transkript al. Özeti dilediğin zaman sonradan ekleyebilirsin."
   },
