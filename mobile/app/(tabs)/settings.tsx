@@ -259,9 +259,9 @@ function createStyles(colors: ColorScheme) {
     avatarText: { fontSize: 20, fontFamily: Fonts.display, color: colors.primary },
     email: { fontSize: 16, fontFamily: Fonts.displaySemiBold, color: colors.text, marginTop: 4 },
 
-    usageHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    usageHeaderRow: { flexDirection: 'column', alignItems: 'flex-start' },
     usageTitle: { fontSize: 15, fontFamily: Fonts.displaySemiBold, color: colors.text },
-    usageReset: { fontSize: 12, fontFamily: Fonts.mono, color: colors.textMuted },
+    usageReset: { fontSize: 12, fontFamily: Fonts.mono, color: colors.textMuted, marginTop: 2 },
     usageBottomRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: Spacing.sm },
     usageBottomText: { fontSize: 12, fontFamily: Fonts.mono, color: colors.textMuted },
 

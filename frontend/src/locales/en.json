@@ -16,7 +16,9 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "close": "Close",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "show": "Show",
+    "hide": "Hide"
   },
   "account": {
     "delete": "Delete account",
@@ -104,7 +106,15 @@
     },
     "finalCtaTitle": "Stop scrubbing audio. Start finding what matters.",
     "finalCtaSubtitle": "Free during beta. No credit card. No setup.",
-    "finalCtaButton": "Get started free"
+    "finalCtaButton": "Get started free",
+    "demoLive": "LIVE",
+    "demoAiBadge": "AI · SCRIBE",
+    "demoTranscriptBadge": "TRANSCRIPT",
+    "demoSummaryBadge": "SUMMARY",
+    "demoDoneBadge": "AI · Done",
+    "statsFormats": "Formats",
+    "statsMaxUpload": "Max upload",
+    "statsLanguages": "Languages"
   },
   "auth": {
     "brandEyebrow": "Voice · Transcript · Summary",
@@ -191,7 +201,7 @@
     "dragHere": "Drop your audio here",
     "acceptHint": "Supports {{extensions}} · up to {{maxMb}} MB",
     "browseFiles": "Browse files",
-    "invalidFile": "Unsupported format. Use MP3, WAV, M4A, OGG, or WebM.",
+    "invalidFile": "Unsupported format. Use MP3, WAV, M4A, OGG, OGA, OPUS, or WebM.",
     "fileEmpty": "The file is empty.",
     "fileTooLarge": "That file is over 25 MB. Try a smaller one."
   },

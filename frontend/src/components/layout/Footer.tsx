@@ -12,7 +12,7 @@ export function Footer() {
           <div className="flex flex-col gap-3">
             <Brand />
             <p className="max-w-xs font-mono text-[11px] uppercase tracking-widest text-text-muted">
-              Voice · Transcript · Summary
+              {t('auth.brandEyebrow')}
             </p>
           </div>
 

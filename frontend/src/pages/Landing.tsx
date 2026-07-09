@@ -96,9 +96,9 @@ export default function Landing() {
               className="mt-12 grid max-w-lg grid-cols-3 gap-3 border-t border-border/70 pt-6 sm:gap-6"
             >
               {[
-                { k: 'mp3 · wav · m4a', v: 'Formats' },
-                { k: '25 MB', v: 'Max upload' },
-                { k: '50+', v: 'Languages' },
+                { k: 'mp3 · wav · m4a', v: t('landing.statsFormats') },
+                { k: '25 MB', v: t('landing.statsMaxUpload') },
+                { k: '50+', v: t('landing.statsLanguages') },
               ].map((m) => (
                 <div key={m.v}>
                   <div className="font-display text-sm font-bold text-text sm:text-lg">{m.k}</div>
@@ -121,10 +121,10 @@ export default function Landing() {
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="pulse-ring flex h-2.5 w-2.5 rounded-full bg-primary" />
-                  <span className="eyebrow">LIVE · 00:42</span>
+                  <span className="eyebrow">{t('landing.demoLive')} · 00:42</span>
                 </div>
                 <span className="rounded-md bg-accent/20 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-accent">
-                  AI · Scribe
+                  {t('landing.demoAiBadge')}
                 </span>
               </div>
 
@@ -135,7 +135,7 @@ export default function Landing() {
               <div className="mt-4 space-y-2 text-sm">
                 <div className="rounded-lg border border-border bg-bg/40 p-3">
                   <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-text-muted">
-                    Transcript
+                    {t('landing.demoTranscriptBadge')}
                   </p>
                   <p className="line-clamp-2 text-text">
                     {t('landing.heroLiveTranscript')}
@@ -143,7 +143,7 @@ export default function Landing() {
                 </div>
                 <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
                   <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-primary">
-                    Summary
+                    {t('landing.demoSummaryBadge')}
                   </p>
                   <p className="text-text">{t('landing.heroLiveSummary')}</p>
                 </div>
@@ -320,7 +320,7 @@ export default function Landing() {
                       {t('landing.demoSummaryLabel')}
                     </h3>
                   </div>
-                  <Badge variant="success">AI · Done</Badge>
+                  <Badge variant="success">{t('landing.demoDoneBadge')}</Badge>
                 </div>
                 <div className="space-y-5">
                   <div>
