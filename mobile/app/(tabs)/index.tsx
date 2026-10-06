@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, RefreshControl, Alert, Pressable } from 'react-native';
+import { View, Text, StyleSheet, RefreshControl, Alert, Pressable, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { api } from '@/lib/api';
 import { hapticImpact } from '@/lib/haptics';
+import { displayTitle } from '@/lib/meetingTitle';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { Spacing, TAB_BAR_OFFSET } from '@/constants/tokens';
@@ -18,6 +19,10 @@ import { AppHeader } from '@/components/AppHeader';
 import { Button, Card, Input, Badge, EmptyState, Eyebrow } from '@/components/ui';
 import type { ColorScheme } from '@/constants/colors';
 import type { Meeting, MeetingStatus } from '@/lib/api';
+
+const PAGE_SIZE = 50;
+const POLL_MS = 5000;
+const IN_PROGRESS = new Set<MeetingStatus>(['queued', 'transcribing', 'summarizing']);
 
 type BadgeVariant = 'neutral' | 'info' | 'accent' | 'success' | 'warning' | 'error';
 
@@ -53,7 +58,7 @@ function formatDate(iso: string, locale: string): string {
 type Styles = ReturnType<typeof createStyles>;
 
 function MeetingCard({
-  meeting, statusLabel, statusVariant, meta, onPress, onLongPress, s, colors,
+  meeting, statusLabel, statusVariant, meta, onPress, onLongPress, onDelete, s, colors,
 }: {
   meeting: Meeting;
   statusLabel: string;
@@ -61,6 +66,7 @@ function MeetingCard({
   meta: string;
   onPress: () => void;
   onLongPress: () => void;
+  onDelete: () => void;
   s: Styles;
   colors: ColorScheme;
 }) {
@@ -72,13 +78,23 @@ function MeetingCard({
       <Card pressable onPress={onPress} onLongPress={onLongPress}>
         <View style={s.cardTopRow}>
           <Text style={s.cardTitle} numberOfLines={1}>
-            {meeting.title || t('recordings.untitled')}
+            {displayTitle(meeting.title, t)}
           </Text>
           <Badge label={statusLabel} variant={statusVariant} />
         </View>
         <View style={s.cardBottomRow}>
           <Text style={s.cardDate}>{meta}</Text>
-          {duration !== '' && <Text style={s.cardDuration}>{duration}</Text>}
+          <View style={s.cardBottomRight}>
+            {duration !== '' && <Text style={s.cardDuration}>{duration}</Text>}
+            <Pressable
+              onPress={onDelete}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 6 }}
+              accessibilityRole="button"
+              accessibilityLabel={t('recordings.deleteRecording')}
+            >
+              <Ionicons name="trash-outline" size={18} color={colors.textMuted} />
+            </Pressable>
+          </View>
         </View>
       </Card>
     </View>
@@ -121,43 +137,120 @@ export default function HomeScreen() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadMoreFailed, setLoadMoreFailed] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [error, setError] = useState(false);
+  const [focused, setFocused] = useState(false);
   const [search, setSearch] = useState('');
+  // Debounced, trimmed copy of `search`; this is what the list is loaded for.
+  const [query, setQuery] = useState('');
   const hasAnimated = useRef(false);
+
+  // Refs mirror state that async callbacks need the latest value of.
+  const meetingsRef = useRef<Meeting[]>([]);
+  const queryRef = useRef('');
+  const loadedQueryRef = useRef<string | null>(null);
+  const requestRef = useRef(0);
+  const loadingMoreRef = useRef(false);
+  queryRef.current = query;
 
   const s = useMemo(() => createStyles(colors), [colors]);
 
-  async function load(isRefresh = false, q = search) {
-    if (isRefresh) setRefreshing(true);
+  const commit = useCallback((list: Meeting[]) => {
+    meetingsRef.current = list;
+    setMeetings(list);
+  }, []);
+
+  // 'initial' covers mount, refocus, query change and Retry; 'refresh' is
+  // pull-to-refresh; 'poll' is the silent status refresh while jobs run.
+  const loadFirst = useCallback(async (q: string, mode: 'initial' | 'refresh' | 'poll') => {
+    const poll = mode === 'poll';
+    // Polls don't claim the request slot, so they never cancel a user-driven load
+    // (but are dropped if one starts while they're in flight).
+    const seq = poll ? requestRef.current : ++requestRef.current;
+    if (mode === 'refresh') setRefreshing(true);
+    else if (mode === 'initial' && meetingsRef.current.length === 0) setLoading(true);
     try {
-      const data = await api.meetings.list({ limit: 50, search: q || undefined });
-      setMeetings(data);
-    } catch (e: unknown) {
-      if (!isRefresh) Alert.alert(t('common.error'), (e as Error).message);
+      const page = await api.meetings.list({ limit: PAGE_SIZE, search: q || undefined });
+      if (seq !== requestRef.current) return;
+      if (poll) {
+        // Refresh the first page in place without discarding pages loaded via "load more".
+        const ids = new Set(page.map((m) => m.id));
+        const merged = [...page, ...meetingsRef.current.slice(PAGE_SIZE).filter((m) => !ids.has(m.id))];
+        commit(merged);
+        if (merged.length <= PAGE_SIZE) setHasMore(page.length === PAGE_SIZE);
+      } else {
+        commit(page);
+        setHasMore(page.length === PAGE_SIZE);
+        setLoadMoreFailed(false);
+        setError(false);
+        loadedQueryRef.current = q;
+      }
+    } catch {
+      if (poll || seq !== requestRef.current) return;
+      // Don't leave results from a previous search on screen under an error.
+      if (loadedQueryRef.current !== q) commit([]);
+      setError(true);
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (seq === requestRef.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    }
+  }, [commit]);
+
+  async function loadMore() {
+    if (loadingMoreRef.current || !hasMore || loading || refreshing || error) return;
+    const seq = requestRef.current;
+    loadingMoreRef.current = true;
+    setLoadingMore(true);
+    setLoadMoreFailed(false);
+    try {
+      const page = await api.meetings.list({
+        limit: PAGE_SIZE,
+        offset: meetingsRef.current.length,
+        search: queryRef.current || undefined,
+      });
+      if (seq !== requestRef.current) return; // the list was reloaded meanwhile
+      const ids = new Set(meetingsRef.current.map((m) => m.id));
+      commit([...meetingsRef.current, ...page.filter((m) => !ids.has(m.id))]);
+      setHasMore(page.length === PAGE_SIZE);
+    } catch {
+      if (seq === requestRef.current) setLoadMoreFailed(true);
+    } finally {
+      loadingMoreRef.current = false;
+      setLoadingMore(false);
     }
   }
 
-  useFocusEffect(useCallback(() => { load(); }, []));
+  // Single entry point for fetching: runs on mount, whenever the tab regains
+  // focus, and when the debounced query changes (the callback identity changes).
+  useFocusEffect(useCallback(() => {
+    setFocused(true);
+    loadFirst(query, 'initial');
+    return () => setFocused(false);
+  }, [query, loadFirst]));
+
+  useEffect(() => {
+    const next = search.trim();
+    if (next === query) return;
+    const timer = setTimeout(() => setQuery(next), 300);
+    return () => clearTimeout(timer);
+  }, [search, query]);
 
   useEffect(() => {
     if (!loading && meetings.length > 0) hasAnimated.current = true;
   }, [loading, meetings]);
 
-  useEffect(() => {
-    const hasInProgress = meetings.some(
-      (m) => m.status === 'queued' || m.status === 'transcribing' || m.status === 'summarizing'
-    );
-    if (!hasInProgress) return;
-    const timer = setInterval(() => load(), 5000);
-    return () => clearInterval(timer);
-  }, [meetings]);
+  const hasInProgress = useMemo(() => meetings.some((m) => IN_PROGRESS.has(m.status)), [meetings]);
 
+  // Poll only while this tab is focused and something is still processing.
   useEffect(() => {
-    const timer = setTimeout(() => load(false, search), 300);
-    return () => clearTimeout(timer);
-  }, [search]);
+    if (!focused || !hasInProgress) return;
+    const timer = setInterval(() => loadFirst(queryRef.current, 'poll'), POLL_MS);
+    return () => clearInterval(timer);
+  }, [focused, hasInProgress, loadFirst]);
 
   function confirmDelete(meeting: Meeting) {
     Alert.alert(t('meeting.deleteTitle'), t('meeting.deleteBody'), [
@@ -168,7 +261,7 @@ export default function HomeScreen() {
         onPress: async () => {
           try {
             await api.meetings.delete(meeting.id);
-            setMeetings((prev) => prev.filter((m) => m.id !== meeting.id));
+            commit(meetingsRef.current.filter((m) => m.id !== meeting.id));
           } catch (e: unknown) {
             Alert.alert(t('common.error'), (e as Error).message);
           }
@@ -184,6 +277,36 @@ export default function HomeScreen() {
           {Array.from({ length: 5 }, (_, i) => (
             <SkeletonCard key={i} s={s} skeletonColor={colors.bgElevated} />
           ))}
+        </View>
+      );
+    }
+
+    if (meetings.length === 0 && error) {
+      return (
+        <View style={s.emptyWrap}>
+          <EmptyState
+            icon="cloud-offline-outline"
+            title={t('recordings.loadErrorTitle')}
+            subtitle={t('errors.network')}
+            actionLabel={t('common.retry')}
+            actionIcon="refresh-outline"
+            onAction={() => loadFirst(query, 'initial')}
+          />
+        </View>
+      );
+    }
+
+    if (meetings.length === 0 && query !== '') {
+      return (
+        <View style={s.emptyWrap}>
+          <EmptyState
+            icon="search-outline"
+            title={t('recordings.emptySearchTitle')}
+            subtitle={t('recordings.emptySearchSubtitle')}
+            actionLabel={t('recordings.clearSearch')}
+            actionIcon="close-circle-outline"
+            onAction={() => { setSearch(''); setQuery(''); }}
+          />
         </View>
       );
     }
@@ -209,18 +332,42 @@ export default function HomeScreen() {
         data={meetings}
         keyExtractor={(m) => m.id}
         contentContainerStyle={s.listContent}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.6}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={() => load(true)}
+            onRefresh={() => loadFirst(query, 'refresh')}
             tintColor={colors.primary}
           />
         }
         ListHeaderComponent={
-          <View style={s.sectionHeaderRow}>
-            <Eyebrow>{t('recordings.recentTitle')}</Eyebrow>
-            <Text style={s.sectionCount}>{meetings.length}</Text>
+          <View>
+            {error && (
+              <View style={s.errorBanner}>
+                <Ionicons name="alert-circle-outline" size={18} color={colors.error} />
+                <Text style={s.errorBannerText}>{t('recordings.loadErrorTitle')}</Text>
+                <Pressable onPress={() => loadFirst(query, 'initial')} hitSlop={8}>
+                  <Text style={s.errorBannerAction}>{t('common.retry')}</Text>
+                </Pressable>
+              </View>
+            )}
+            <View style={s.sectionHeaderRow}>
+              <Eyebrow>{t('recordings.recentTitle')}</Eyebrow>
+              <Text style={s.sectionCount}>{meetings.length}{hasMore ? '+' : ''}</Text>
+            </View>
           </View>
+        }
+        ListFooterComponent={
+          loadingMore ? (
+            <View style={s.footer}><ActivityIndicator color={colors.primary} /></View>
+          ) : loadMoreFailed ? (
+            <View style={s.footer}>
+              <Button label={t('recordings.loadMore')} variant="secondary" size="sm" onPress={loadMore} />
+            </View>
+          ) : null
         }
         renderItem={({ item, index }) => (
           <Animated.View
@@ -233,6 +380,7 @@ export default function HomeScreen() {
               meta={formatDate(item.created_at, language)}
               onPress={() => router.push(`/meeting/${item.id}` as never)}
               onLongPress={() => { hapticImpact(); confirmDelete(item); }}
+              onDelete={() => confirmDelete(item)}
               s={s}
               colors={colors}
             />
@@ -335,6 +483,7 @@ function createStyles(colors: ColorScheme) {
       flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
       marginTop: Spacing.sm,
     },
+    cardBottomRight: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
     cardDate: { fontSize: 12, fontFamily: Fonts.mono, color: colors.textMuted },
     cardDuration: { fontSize: 12, fontFamily: Fonts.mono, color: colors.primary },
 
@@ -347,6 +496,15 @@ function createStyles(colors: ColorScheme) {
     skeletonTitle: { flex: 1, height: 16, borderRadius: 8, marginRight: 12 },
     skeletonBadge: { width: 72, height: 20, borderRadius: 999 },
     skeletonMeta: { height: 12, width: '45%', borderRadius: 6, marginTop: 14 },
+
+    errorBanner: {
+      flexDirection: 'row', alignItems: 'center', gap: Spacing.xs,
+      backgroundColor: colors.error + '12', borderWidth: 1, borderColor: colors.error + '40',
+      borderRadius: 16, paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, marginBottom: Spacing.sm,
+    },
+    errorBannerText: { flex: 1, fontSize: 13, fontFamily: Fonts.body, color: colors.text },
+    errorBannerAction: { fontSize: 13, fontFamily: Fonts.bodySemiBold, color: colors.primary },
+    footer: { alignItems: 'center', paddingVertical: Spacing.md },
 
     emptyWrap: { flex: 1, justifyContent: 'center', paddingHorizontal: Spacing.lg, paddingBottom: TAB_BAR_OFFSET },
   });
