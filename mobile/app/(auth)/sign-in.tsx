@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, Alert, Pressable } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
+import { authErrorKey, isEmailNotConfirmed } from '@/lib/authErrors';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { Spacing } from '@/constants/tokens';
@@ -13,6 +14,7 @@ export default function SignInScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const { notice } = useLocalSearchParams<{ notice?: string }>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,7 +24,25 @@ export default function SignInScreen() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
-    if (error) Alert.alert(t('auth.signInFailed'), error.message);
+    if (!error) return;
+    if (isEmailNotConfirmed(error)) {
+      Alert.alert(t('auth.signInFailed'), t(authErrorKey(error)), [
+        { text: t('common.ok'), style: 'cancel' },
+        { text: t('auth.resendConfirmation'), onPress: handleResend },
+      ]);
+    } else {
+      Alert.alert(t('auth.signInFailed'), t(authErrorKey(error)));
+    }
+  }
+
+  async function handleResend() {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email.trim(),
+      options: { emailRedirectTo: 'summarex://confirm' },
+    });
+    if (error) Alert.alert(t('common.error'), t(authErrorKey(error)));
+    else Alert.alert(t('auth.confirmationResentTitle'), t('auth.confirmationResentBody'));
   }
 
   return (
@@ -42,6 +62,11 @@ export default function SignInScreen() {
         </View>
       }
     >
+      {notice === 'passwordUpdated' && (
+        <View style={[styles.notice, { borderColor: colors.success, backgroundColor: `rgba(${colors.primaryRgb}, 0.12)` }]}>
+          <Text style={[styles.noticeText, { color: colors.text }]}>{t('auth.passwordUpdatedNotice')}</Text>
+        </View>
+      )}
       <Input
         label={t('auth.email')}
         leftIcon="mail-outline"
@@ -74,4 +99,6 @@ const styles = StyleSheet.create({
   switchRow: { flexDirection: 'row', alignItems: 'center', marginTop: Spacing.xs },
   muted: { fontFamily: Fonts.body, fontSize: 14 },
   link: { fontFamily: Fonts.bodySemiBold, fontSize: 14 },
+  notice: { borderWidth: 1, borderRadius: 12, paddingVertical: Spacing.sm, paddingHorizontal: Spacing.md },
+  noticeText: { fontFamily: Fonts.body, fontSize: 14, lineHeight: 20 },
 });
