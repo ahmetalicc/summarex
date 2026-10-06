@@ -69,7 +69,15 @@
   },
   "summarize": {
     "pageTitle": "Sesi Özetle",
-    "pageSubtitle": "Sesi yapılandırılmış içgörülere dönüştür."
+    "pageSubtitle": "Sesi yapılandırılmış içgörülere dönüştür.",
+    "pickerEyebrow": "Mevcut transkriptler",
+    "pickerTitle": "Veya mevcut bir transkripti özetle",
+    "pickerSubtitle": "Transkriptlerinden birini seç ve özete dönüştür. Sesi yeniden yüklemene gerek yok.",
+    "pickerEmpty": "Özet bekleyen transkript yok. Önce bir sesi yazıya dök, sonra buraya dön.",
+    "pickerAction": "Özetle",
+    "pickerLoadError": "Transkriptlerin yüklenemedi. Bağlantını kontrol edip tekrar dene.",
+    "pickerActionError": "Özet başlatılamadı. Lütfen tekrar dene.",
+    "pickerRateLimited": "Saatlik özet sınırına ulaştın. Lütfen biraz sonra tekrar dene."
   },
   "recordings": {
     "title": "Kayıtlarınız",
