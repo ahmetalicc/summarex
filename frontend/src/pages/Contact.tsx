@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { MailIcon, InstagramIcon } from '../components/layout/Icons';
 
 const CONTACT_EMAIL = 'support@summarex.app';
@@ -8,9 +8,7 @@ const INSTAGRAM_URL = 'https://www.instagram.com/summarex.app';
 export default function Contact() {
   const { t } = useTranslation();
 
-  useEffect(() => {
-    document.title = `${t('contactPage.pageTitle')} — Summarex`;
-  }, [t]);
+  usePageMeta(`${t('contactPage.pageTitle')} — Summarex`);
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
