@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabaseClient';
 import { env } from '../lib/env';
 import { useAuth } from '../hooks/useAuth';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { useLanguageStore } from '../store/languageStore';
 import { Brand } from '../components/layout/Brand';
 import { Spinner } from '../components/ui/Spinner';
@@ -25,6 +26,7 @@ export default function Login() {
   const location = useLocation();
   const { t } = useTranslation();
   const language = useLanguageStore((s) => s.language);
+  usePageMeta(`${t('common.signIn')} — Summarex`);
 
   const [isRecovery, setIsRecovery] = useState(false);
   const [mode, setMode] = useState<Mode>('signin');

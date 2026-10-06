@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const SECTIONS = [
   'intro',
@@ -13,9 +13,7 @@ const SECTIONS = [
 export default function Privacy() {
   const { t } = useTranslation();
 
-  useEffect(() => {
-    document.title = `${t('privacy.pageTitle')} — Summarex`;
-  }, [t]);
+  usePageMeta(`${t('privacy.pageTitle')} — Summarex`);
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20">

@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { HeroWaveform } from '../components/audio/HeroWaveform';
+import { usePageMeta } from '../hooks/usePageMeta';
 import {
   AppleIcon,
   FileTextIcon,
@@ -19,6 +20,7 @@ import {
 export default function Landing() {
   const { t } = useTranslation();
   const demoRef = useRef<HTMLDivElement>(null);
+  usePageMeta('Summarex – AI Audio Transcription & Summaries');
 
   const scrollToDemo = () => {
     demoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
