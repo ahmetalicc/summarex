@@ -65,29 +65,25 @@ async function uploadAudioFile(
   return JSON.parse(result.body) as Meeting;
 }
 
-export function uploadMeeting(
-  fileUri: string,
-  mimeType: string,
-  onProgress?: (pct: number) => void,
-  mode: 'summary' | 'transcript' = 'summary'
-): Promise<Meeting> {
-  return uploadAudioFile(fileUri, mimeType, { mode }, onProgress);
-}
-
-export function recordMeeting(params: {
+export interface UploadMeetingParams {
   uri: string;
   mimeType: string;
   title?: string;
   mode: 'summary' | 'transcript';
   durationSeconds?: number;
   onProgress?: (pct: number) => void;
-}): Promise<Meeting> {
+}
+
+// Shared by picked files and fresh recordings: both hit POST /meetings/upload.
+export function uploadMeeting(params: UploadMeetingParams): Promise<Meeting> {
   const { uri, mimeType, title, mode, durationSeconds, onProgress } = params;
   const fields: Record<string, string> = { mode };
   if (title) fields.title = title;
   if (durationSeconds != null) fields.duration_seconds = String(Math.round(durationSeconds));
   return uploadAudioFile(uri, mimeType, fields, onProgress);
 }
+
+export const recordMeeting = uploadMeeting;
 
 export const api = {
   entitlement: {

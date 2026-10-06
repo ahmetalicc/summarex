@@ -5,6 +5,7 @@ import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { hapticImpact } from '@/lib/haptics';
+import { confirmLeaveRecording } from '@/lib/recordingGuard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import type { ColorScheme } from '@/constants/colors';
@@ -45,7 +46,8 @@ function FloatingTabBar({ state, navigation }: TabBarProps) {
           hapticImpact();
           const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
           if (!focused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
+            // Leaving the Record tab would lose an unsaved recording.
+            confirmLeaveRecording(t, () => navigation.navigate(route.name));
           }
         }
 

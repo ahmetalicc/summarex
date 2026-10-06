@@ -1,18 +1,24 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  View, Text, StyleSheet, ActivityIndicator, Alert, Pressable, Linking, Platform, ScrollView,
+  View, Text, StyleSheet, Alert, Pressable, Linking, Platform, ScrollView, AppState, BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import * as DocumentPicker from 'expo-document-picker';
 import { hapticImpact, hapticNotification, ImpactFeedbackStyle, NotificationFeedbackType } from '@/lib/haptics';
 import { Ionicons } from '@expo/vector-icons';
-import { useAudioRecorder, RecordingPresets, AudioModule } from 'expo-audio';
+import { useAudioRecorder, useAudioRecorderState, setAudioModeAsync, AudioModule } from 'expo-audio';
 import { useTranslation } from 'react-i18next';
 import Animated, {
   useSharedValue, useAnimatedStyle, withTiming, withRepeat, withSequence, cancelAnimation,
 } from 'react-native-reanimated';
-import { uploadMeeting, recordMeeting } from '@/lib/api';
+import { uploadMeeting } from '@/lib/api';
+import {
+  MAX_UPLOAD_BYTES, MAX_UPLOAD_MB, SPEECH_RECORDING_PRESET, RECORDING_STOP_BYTES, RECORDING_WARN_BYTES,
+  estimateRecordingBytes, remainingRecordingSeconds, resolveAudioExtension, ensureUploadableFile,
+  getFileSize, probeDurationSeconds,
+} from '@/lib/audioFiles';
+import { setActiveRecording, hasActiveRecording, confirmLeaveRecording } from '@/lib/recordingGuard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { Spacing, TAB_BAR_OFFSET } from '@/constants/tokens';
@@ -21,23 +27,27 @@ import { HeroWaveform } from '@/components/HeroWaveform';
 import { Button, Card, Input, Eyebrow } from '@/components/ui';
 import type { ColorScheme } from '@/constants/colors';
 
+// Only the server's allow-list; anything else (aac, 3gp, amr…) is rejected
+// client-side in pickFile. Android's picker is opened wide instead (see pickFile).
 const ACCEPTED_TYPES = [
-  'audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/ogg', 'audio/webm',
-  'audio/aac', 'video/mp4', 'audio/3gpp', 'audio/amr', '*/*',
+  'audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/opus', 'video/mp4',
 ];
-const MAX_BYTES = 500 * 1024 * 1024; // 500 MB — server enforces its own limit
 const MIC_SIZE = 72;
 // Pulse rings are pre-sized with static borderRadius (exactly half of width) and
 // animate opacity only — scale transforms distort borderRadius on Android.
 const RING_1 = MIC_SIZE + 24; // 96px
 const RING_2 = MIC_SIZE + 48; // 120px
+// If the recorder reports "not recording" this long after we last asked it to
+// record (and the user didn't pause), the OS took the microphone (call, alarm…).
+const INTERRUPTION_GRACE_MS = 1500;
 
 type Mode = 'summary' | 'transcript';
 type RecState = 'idle' | 'recording' | 'stopped';
+type PickedFile = { uri: string; name: string; mimeType: string; size: number };
 
 function formatDuration(totalSeconds: number): string {
   const m = Math.floor(totalSeconds / 60);
-  const s = totalSeconds % 60;
+  const s = Math.floor(totalSeconds % 60);
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
@@ -47,16 +57,12 @@ function formatBytes(bytes: number): string {
     : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-// Android file managers often report 'application/octet-stream' for MP4/M4A —
-// fall back to the extension so the server sees a real audio MIME type.
-function resolveMimeType(name: string, reported: string | undefined): string {
-  if (reported && reported !== 'application/octet-stream') return reported;
-  const ext = name.split('.').pop()?.toLowerCase();
-  const map: Record<string, string> = {
-    mp3: 'audio/mpeg', mp4: 'audio/mp4', m4a: 'audio/x-m4a', wav: 'audio/wav',
-    ogg: 'audio/ogg', webm: 'audio/webm', aac: 'audio/aac', '3gp': 'audio/3gpp', amr: 'audio/amr',
-  };
-  return map[ext ?? ''] ?? 'audio/mpeg';
+function formatMb(bytes: number): string {
+  return (bytes / (1024 * 1024)).toFixed(1);
+}
+
+function errorMessage(e: unknown): string {
+  return e instanceof Error ? e.message : String(e);
 }
 
 export function RecordUploadView({ mode }: { mode: Mode }) {
@@ -65,25 +71,41 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
   const { t } = useTranslation();
 
   // Upload state
-  const [file, setFile] = useState<{ uri: string; name: string; mimeType: string; size: number } | null>(null);
+  const [file, setFile] = useState<PickedFile | null>(null);
+  const [fileTitle, setFileTitle] = useState('');
+  const [fileDuration, setFileDuration] = useState<number | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [fileUploading, setFileUploading] = useState(false);
+  const durationProbe = useRef<Promise<number | undefined> | null>(null);
 
   // Record state
-  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const audioRecorder = useAudioRecorder(SPEECH_RECORDING_PRESET);
+  const recorderState = useAudioRecorderState(audioRecorder, 250);
   const [recState, setRecState] = useState<RecState>('idle');
+  const [userPaused, setUserPaused] = useState(false);
+  const [interrupted, setInterrupted] = useState(false);
+  const [backgroundLimited, setBackgroundLimited] = useState(false);
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
+  const [recordedMillis, setRecordedMillis] = useState(0);
   const [permissionDenied, setPermissionDenied] = useState(false);
-  const [durationSecs, setDurationSecs] = useState(0);
   const [title, setTitle] = useState('');
   const [recordSaving, setRecordSaving] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [recordError, setRecordError] = useState<string | null>(null);
+  const [recordBusy, setRecordBusy] = useState(false);
+  const warnedRef = useRef(false);
+  const stoppingRef = useRef(false);
 
   const ring1Opacity = useSharedValue(0);
   const ring2Opacity = useSharedValue(0);
 
+  const isRecording = recState === 'recording';
+  const isPaused = isRecording && (userPaused || interrupted);
+  const showMillis = recState === 'idle' ? 0 : isRecording ? recorderState.durationMillis : recordedMillis;
+  const durationSecs = Math.floor(showMillis / 1000);
+
   useEffect(() => {
-    if (recState === 'recording') {
+    if (isRecording && !isPaused) {
       ring1Opacity.value = withRepeat(
         withSequence(withTiming(0.7, { duration: 600 }), withTiming(0, { duration: 600 })), -1, false
       );
@@ -96,20 +118,70 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
       ring1Opacity.value = withTiming(0, { duration: 200 });
       ring2Opacity.value = withTiming(0, { duration: 200 });
     }
-  }, [recState, ring1Opacity, ring2Opacity]);
+  }, [isRecording, isPaused, ring1Opacity, ring2Opacity]);
 
   const ring1Style = useAnimatedStyle(() => ({ opacity: ring1Opacity.value }));
   const ring2Style = useAnimatedStyle(() => ({ opacity: ring2Opacity.value }));
 
+  // After the user returns from system Settings, pick up a newly granted
+  // microphone permission so the "Open Settings" card goes away on its own.
   useEffect(() => {
-    (async () => {
-      const status = await AudioModule.requestRecordingPermissionsAsync();
-      if (!status.granted) setPermissionDenied(true);
-    })();
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, []);
+    if (!permissionDenied) return;
+    const sub = AppState.addEventListener('change', async (next) => {
+      if (next !== 'active') return;
+      const status = await AudioModule.getRecordingPermissionsAsync();
+      if (status.granted) setPermissionDenied(false);
+    });
+    return () => sub.remove();
+  }, [permissionDenied]);
+
+  // Size cap: warn at ~90 % of the server's 25 MB, stop (keeping the file) at 96 %.
+  useEffect(() => {
+    if (!isRecording) return;
+    const bytes = estimateRecordingBytes(audioRecorder.getStatus().durationMillis);
+    if (bytes >= RECORDING_WARN_BYTES && !warnedRef.current) {
+      warnedRef.current = true;
+      hapticNotification(NotificationFeedbackType.Warning);
+    }
+    if (bytes >= RECORDING_STOP_BYTES) void stopRecording(true);
+  }, [recorderState.durationMillis, isRecording]);
+
+  // Detect interruptions (phone call, alarm, another app taking the mic): the
+  // recorder stops reporting isRecording although the user never paused.
+  useEffect(() => {
+    if (!isRecording || userPaused || recorderState.isRecording) {
+      setInterrupted(false);
+      return;
+    }
+    const id = setTimeout(() => {
+      if (!audioRecorder.getStatus().isRecording) setInterrupted(true);
+    }, INTERRUPTION_GRACE_MS);
+    return () => clearTimeout(id);
+  }, [isRecording, userPaused, recorderState.isRecording, audioRecorder]);
+
+  // An unsaved recording (running, or stopped but not uploaded) is lost on leave.
+  const discardRef = useRef<() => Promise<void>>(async () => {});
+  const hasUnsaved = recState !== 'idle';
+  useEffect(() => {
+    if (!hasUnsaved) return;
+    setActiveRecording({ discard: () => discardRef.current() });
+    return () => setActiveRecording(null);
+  }, [hasUnsaved]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== 'android') return;
+      const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+        if (!hasActiveRecording()) return false;
+        confirmLeaveRecording(t, () => {
+          if (router.canGoBack()) router.back();
+          else router.replace('/(tabs)');
+        });
+        return true;
+      });
+      return () => sub.remove();
+    }, [t, router])
+  );
 
   const s = useMemo(() => createStyles(colors), [colors]);
 
@@ -117,38 +189,82 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
   const pageSubtitle = mode === 'transcript' ? t('transcribe.pageSubtitle') : t('summarize.pageSubtitle');
   const modeEyebrow = mode === 'transcript' ? t('tabs.transcribe') : t('tabs.summarize');
 
-  function startTimer() {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => setDurationSecs((d) => d + 1), 1000);
-  }
-  function stopTimer() {
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-  }
-
   function resetAll() {
-    setRecState('idle'); setDurationSecs(0); setTitle('');
-    setRecordedUri(null); setFile(null); setProgress(null);
+    setRecState('idle'); setUserPaused(false); setInterrupted(false); setBackgroundLimited(false);
+    setRecordedMillis(0); setTitle(''); setRecordedUri(null); setRecordError(null);
+    setFile(null); setFileTitle(''); setFileDuration(null); setFileError(null); setProgress(null);
+    durationProbe.current = null;
   }
   function goHome() { resetAll(); router.push('/(tabs)'); }
 
-  async function handleMicPress() {
-    if (recState === 'idle') {
-      setDurationSecs(0);
+  async function resetAudioMode() {
+    try {
+      await setAudioModeAsync({ allowsRecording: false, allowsBackgroundRecording: false });
+    } catch {}
+  }
+
+  // Microphone: ask on the first Record tap. Resolves false (and shows the
+  // "Open Settings" card) only after the user actually denied.
+  async function ensureMicPermission(): Promise<boolean> {
+    let status = await AudioModule.getRecordingPermissionsAsync();
+    if (!status.granted && status.canAskAgain) {
+      status = await AudioModule.requestRecordingPermissionsAsync();
+    }
+    setPermissionDenied(!status.granted);
+    return status.granted;
+  }
+
+  // Android 13+ refuses background recording (foreground service) without the
+  // notification permission; fall back to foreground-only instead of failing.
+  async function canRecordInBackground(): Promise<boolean> {
+    if (Platform.OS !== 'android' || Number(Platform.Version) < 33) return true;
+    try {
+      const status = await AudioModule.requestNotificationPermissionsAsync();
+      return status.granted;
+    } catch {
+      return false;
+    }
+  }
+
+  async function startRecording() {
+    if (!(await ensureMicPermission())) return;
+    const background = await canRecordInBackground();
+    try {
+      await setAudioModeAsync({
+        allowsRecording: true, playsInSilentMode: true, allowsBackgroundRecording: background,
+      });
+      // SDK 56 requires prepareToRecordAsync() before record() — skipping it
+      // leaves recorder.uri null on some Android (Samsung) devices.
       try {
-        // SDK 56 requires prepareToRecordAsync() before record() — skipping it
-        // leaves recorder.uri null on some Android (Samsung) devices.
         await audioRecorder.prepareToRecordAsync();
-        audioRecorder.record();
-      } catch (e: unknown) {
-        Alert.alert(t('common.error'), String(e));
-        return;
+      } catch {
+        // Some encoders reject 22.05 kHz; 44.1 kHz mono at the same bitrate has
+        // the same file size.
+        await audioRecorder.prepareToRecordAsync({ sampleRate: 44100 });
       }
-      hapticNotification(NotificationFeedbackType.Success);
-      setRecState('recording');
-      startTimer();
-    } else {
-      stopTimer();
+      audioRecorder.record();
+    } catch (e: unknown) {
+      await resetAudioMode();
+      Alert.alert(t('common.error'), errorMessage(e));
+      return;
+    }
+    warnedRef.current = false;
+    setBackgroundLimited(!background);
+    setUserPaused(false);
+    setInterrupted(false);
+    setRecordError(null);
+    hapticNotification(NotificationFeedbackType.Success);
+    setRecState('recording');
+  }
+
+  async function stopRecording(auto = false) {
+    if (stoppingRef.current) return;
+    stoppingRef.current = true;
+    setRecordBusy(true);
+    try {
+      const millis = audioRecorder.getStatus().durationMillis;
       await audioRecorder.stop();
+      await resetAudioMode();
       // Android needs a longer settle window before recorder.uri is populated.
       await new Promise((r) => setTimeout(r, Platform.OS === 'android' ? 600 : 150));
       const capturedUri = audioRecorder.uri;
@@ -161,30 +277,89 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
         return;
       }
       hapticImpact(ImpactFeedbackStyle.Medium);
+      setRecordedMillis(millis);
       setRecordedUri(capturedUri);
+      setUserPaused(false);
+      setInterrupted(false);
       setRecState('stopped');
+      if (auto) {
+        Alert.alert(
+          t('newRecording.autoStoppedTitle'),
+          t('newRecording.autoStopped', { max: MAX_UPLOAD_MB })
+        );
+      }
+    } catch (e: unknown) {
+      Alert.alert(t('common.error'), errorMessage(e));
+      setRecState('idle');
+    } finally {
+      stoppingRef.current = false;
+      setRecordBusy(false);
     }
   }
 
-  function handleDiscard() {
-    setRecState('idle'); setDurationSecs(0); setTitle(''); setRecordedUri(null);
+  async function handleMicPress() {
+    if (recordBusy) return;
+    if (recState === 'idle') {
+      setRecordBusy(true);
+      try { await startRecording(); } finally { setRecordBusy(false); }
+    } else if (recState === 'recording') {
+      await stopRecording();
+    }
   }
+
+  async function handlePauseResume() {
+    if (!isPaused) {
+      audioRecorder.pause();
+      setUserPaused(true);
+      return;
+    }
+    try {
+      // The OS may have deactivated the audio session during an interruption.
+      await setAudioModeAsync({
+        allowsRecording: true, playsInSilentMode: true, allowsBackgroundRecording: !backgroundLimited,
+      });
+      audioRecorder.record();
+      setUserPaused(false);
+      setInterrupted(false);
+    } catch (e: unknown) {
+      Alert.alert(t('common.error'), errorMessage(e));
+    }
+  }
+
+  async function handleDiscard() {
+    if (recState === 'recording') {
+      try { await audioRecorder.stop(); } catch {}
+      await resetAudioMode();
+    }
+    setRecState('idle'); setUserPaused(false); setInterrupted(false); setBackgroundLimited(false);
+    setRecordedMillis(0); setTitle(''); setRecordedUri(null); setRecordError(null);
+  }
+  discardRef.current = handleDiscard;
 
   async function handleSaveRecording() {
     if (!recordedUri) {
       Alert.alert(t('newRecording.uploadFailed'), t('newRecording.noAudioCaptured'));
       return;
     }
+    const size = getFileSize(recordedUri);
+    if (size != null && size > MAX_UPLOAD_BYTES) {
+      Alert.alert(t('newRecording.fileTooLargeTitle'), t('newRecording.fileTooLarge'));
+      return;
+    }
     setRecordSaving(true);
+    setRecordError(null);
     try {
-      await recordMeeting({
-        uri: recordedUri, mimeType: 'audio/m4a',
-        title: title.trim() || undefined, mode, durationSeconds: durationSecs,
+      // The preset records m4a; this only copies if the platform dropped the extension.
+      const upload = await ensureUploadableFile(recordedUri, 'recording', 'm4a');
+      await uploadMeeting({
+        uri: upload.uri, mimeType: upload.mimeType,
+        title: title.trim() || undefined, mode, durationSeconds: recordedMillis / 1000,
       });
       hapticNotification(NotificationFeedbackType.Success);
       goHome();
     } catch (e: unknown) {
       const err = e as Error & { status?: number };
+      setRecordError(err.message);
       Alert.alert(err.status === 429 ? t('newRecording.limitReached') : t('newRecording.uploadFailed'), err.message);
     } finally {
       setRecordSaving(false);
@@ -193,39 +368,65 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
 
   async function pickFile() {
     // Android's picker misfilters mixed MIME arrays on some devices — open it
-    // wide there and rely on resolveMimeType + server validation instead.
+    // wide there and rely on resolveAudioExtension instead.
     const pickerTypes = Platform.OS === 'android' ? ['*/*'] : ACCEPTED_TYPES;
     const result = await DocumentPicker.getDocumentAsync({ type: pickerTypes, copyToCacheDirectory: true });
     if (result.canceled) return;
     const asset = result.assets[0];
-    if (asset.size && asset.size > MAX_BYTES) {
+
+    const ext = resolveAudioExtension(asset.name, asset.mimeType);
+    if (!ext) {
+      Alert.alert(t('newRecording.unsupportedFormatTitle'), t('newRecording.unsupportedFormat'));
+      return;
+    }
+    const size = asset.size ?? getFileSize(asset.uri) ?? 0;
+    if (size > MAX_UPLOAD_BYTES) {
       Alert.alert(t('newRecording.fileTooLargeTitle'), t('newRecording.fileTooLarge'));
       return;
     }
-    setFile({
-      uri: asset.uri, name: asset.name,
-      mimeType: resolveMimeType(asset.name, asset.mimeType), size: asset.size ?? 0,
-    });
-    setProgress(null);
+
+    try {
+      // The uploaded filename decides the format server-side, so make sure it
+      // carries the right extension.
+      const upload = await ensureUploadableFile(asset.uri, asset.name, ext);
+      const probe = probeDurationSeconds(upload.uri);
+      durationProbe.current = probe;
+      setFileDuration(null);
+      void probe.then((d) => { if (durationProbe.current === probe) setFileDuration(d ?? null); });
+      setFile({ uri: upload.uri, name: asset.name, mimeType: upload.mimeType, size });
+      setFileError(null);
+      setProgress(null);
+    } catch (e: unknown) {
+      Alert.alert(t('newRecording.uploadFailed'), errorMessage(e));
+    }
+  }
+
+  function clearFile() {
+    setFile(null); setFileTitle(''); setFileDuration(null); setFileError(null); setProgress(null);
+    durationProbe.current = null;
   }
 
   async function handleFileUpload() {
     if (!file) return;
     setFileUploading(true);
+    setFileError(null);
     setProgress(0);
     try {
-      await uploadMeeting(file.uri, file.mimeType, setProgress, mode);
+      const durationSeconds = (await durationProbe.current) ?? undefined;
+      await uploadMeeting({
+        uri: file.uri, mimeType: file.mimeType, title: fileTitle.trim() || undefined,
+        mode, durationSeconds, onProgress: setProgress,
+      });
       hapticNotification(NotificationFeedbackType.Success);
       goHome();
     } catch (e: unknown) {
       const err = e as Error & { status?: number };
+      setFileError(err.message);
       Alert.alert(err.status === 429 ? t('newRecording.limitReached') : t('newRecording.uploadFailed'), err.message);
     } finally {
       setFileUploading(false);
     }
   }
-
-  const isRecording = recState === 'recording';
 
   function renderRecordCard() {
     if (permissionDenied) {
@@ -259,19 +460,28 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
             value={title}
             onChangeText={setTitle}
             editable={!recordSaving}
+            maxLength={120}
             containerStyle={{ marginTop: Spacing.sm }}
           />
+          {recordError && <Text style={s.errorText}>{recordError}</Text>}
           <View style={s.buttonRow}>
             <View style={{ flex: 1 }}>
-              <Button label={t('newRecording.discard')} variant="secondary" fullWidth onPress={handleDiscard} disabled={recordSaving} />
+              <Button label={t('newRecording.discard')} variant="secondary" fullWidth onPress={() => void handleDiscard()} disabled={recordSaving} />
             </View>
             <View style={{ flex: 1 }}>
-              <Button label={t('newRecording.saveRecording')} variant="primary" fullWidth onPress={handleSaveRecording} isLoading={recordSaving} />
+              <Button
+                label={recordError ? t('newRecording.retryUpload') : t('newRecording.saveRecording')}
+                variant="primary" fullWidth onPress={handleSaveRecording} isLoading={recordSaving}
+              />
             </View>
           </View>
         </Card>
       );
     }
+
+    const bytes = estimateRecordingBytes(showMillis);
+    const nearLimit = bytes >= RECORDING_WARN_BYTES;
+    const left = formatDuration(remainingRecordingSeconds(showMillis));
 
     return (
       <Card>
@@ -283,6 +493,7 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
             <Pressable
               style={[s.micButton, { backgroundColor: isRecording ? colors.error : colors.primary, shadowColor: isRecording ? colors.error : colors.primary }]}
               onPress={handleMicPress}
+              disabled={recordBusy}
               accessibilityLabel={isRecording ? t('newRecording.stop') : t('newRecording.startRecording')}
             >
               <Ionicons name={isRecording ? 'stop' : 'mic'} size={isRecording ? 30 : 32} color={colors.bg} />
@@ -292,7 +503,31 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
           <Text style={s.timer}>{formatDuration(durationSecs)}</Text>
 
           {isRecording ? (
-            <HeroWaveform height={40} barCount={48} style={s.recordWave} />
+            <>
+              <Text style={s.recordStatus}>{isPaused ? t('newRecording.paused') : t('newRecording.recording')}</Text>
+              {isPaused ? (
+                <View style={[s.recordWave, { height: 40 }]} />
+              ) : (
+                <HeroWaveform height={40} barCount={48} style={s.recordWave} />
+              )}
+              <Text style={[s.sizeText, nearLimit && { color: colors.error }]}>
+                {t('newRecording.sizeIndicator', { size: formatMb(bytes), max: MAX_UPLOAD_MB, left })}
+              </Text>
+              {nearLimit && (
+                <Text style={s.warnText}>{t('newRecording.sizeWarning', { max: MAX_UPLOAD_MB, left })}</Text>
+              )}
+              {interrupted && <Text style={s.warnText}>{t('newRecording.interrupted')}</Text>}
+              {backgroundLimited && <Text style={s.noteText}>{t('newRecording.backgroundLimited')}</Text>}
+              <View style={{ marginTop: Spacing.md }}>
+                <Button
+                  label={isPaused ? t('newRecording.resume') : t('newRecording.pause')}
+                  variant="secondary"
+                  leftIcon={isPaused ? 'play' : 'pause'}
+                  onPress={() => void handlePauseResume()}
+                  disabled={recordBusy}
+                />
+              </View>
+            </>
           ) : (
             <Text style={s.recordHint}>{t('newRecording.recordHint')}</Text>
           )}
@@ -324,14 +559,28 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
             <Ionicons name="musical-notes" size={20} color={colors.accent} />
             <View style={{ flex: 1 }}>
               <Text style={s.fileName} numberOfLines={1}>{file.name}</Text>
-              <Text style={s.fileSize}>{formatBytes(file.size)}</Text>
+              <Text style={s.fileSize}>
+                {fileDuration != null ? `${formatDuration(fileDuration)} · ` : ''}{formatBytes(file.size)}
+              </Text>
             </View>
             {!fileUploading && (
-              <Pressable onPress={() => { setFile(null); setProgress(null); }} hitSlop={10}>
+              <Pressable onPress={clearFile} hitSlop={10}>
                 <Ionicons name="close" size={20} color={colors.textMuted} />
               </Pressable>
             )}
           </View>
+        )}
+
+        {file && (
+          <Input
+            label={t('newRecording.titlePlaceholder')}
+            placeholder={t('newRecording.titlePlaceholder')}
+            value={fileTitle}
+            onChangeText={setFileTitle}
+            editable={!fileUploading}
+            maxLength={120}
+            containerStyle={{ marginTop: Spacing.md }}
+          />
         )}
 
         {progress !== null && (
@@ -343,9 +592,14 @@ export function RecordUploadView({ mode }: { mode: Mode }) {
           </View>
         )}
 
+        {fileError && <Text style={s.errorText}>{fileError}</Text>}
+
         {file && (
           <View style={{ marginTop: Spacing.md }}>
-            <Button label={t('newRecording.saveRecording')} variant="primary" fullWidth onPress={handleFileUpload} isLoading={fileUploading} />
+            <Button
+              label={fileError ? t('newRecording.retryUpload') : t('newRecording.saveRecording')}
+              variant="primary" fullWidth onPress={handleFileUpload} isLoading={fileUploading}
+            />
           </View>
         )}
       </Card>
@@ -400,6 +654,25 @@ function createStyles(colors: ColorScheme) {
       textAlign: 'center', marginTop: Spacing.md,
     },
     recordWave: { alignSelf: 'stretch', marginTop: Spacing.md },
+    recordStatus: {
+      fontSize: 12, fontFamily: Fonts.mono, color: colors.textMuted,
+      textTransform: 'uppercase', letterSpacing: 1, marginTop: Spacing.xs,
+    },
+    sizeText: {
+      fontSize: 12, fontFamily: Fonts.mono, color: colors.textMuted,
+      textAlign: 'center', marginTop: Spacing.sm,
+    },
+    warnText: {
+      fontSize: 13, fontFamily: Fonts.bodyMedium, color: colors.error,
+      textAlign: 'center', marginTop: Spacing.xs, lineHeight: 18,
+    },
+    noteText: {
+      fontSize: 12, fontFamily: Fonts.body, color: colors.textMuted,
+      textAlign: 'center', marginTop: Spacing.xs, lineHeight: 17,
+    },
+    errorText: {
+      fontSize: 13, fontFamily: Fonts.body, color: colors.error, marginTop: Spacing.sm, lineHeight: 18,
+    },
     recordHint: {
       fontSize: 14, fontFamily: Fonts.body, color: colors.textMuted,
       textAlign: 'center', marginTop: Spacing.md,
