@@ -3,6 +3,7 @@ import { Text, StyleSheet, Alert, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/lib/supabase';
+import { authErrorKey } from '@/lib/authErrors';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { Spacing } from '@/constants/tokens';
@@ -24,7 +25,7 @@ export default function ForgotPasswordScreen() {
     });
     setLoading(false);
     if (error) {
-      Alert.alert(t('common.error'), error.message);
+      Alert.alert(t('common.error'), t(authErrorKey(error)));
     } else {
       Alert.alert(
         t('auth.resetSentTitle'),

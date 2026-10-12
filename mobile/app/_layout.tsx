@@ -23,9 +23,18 @@ import '@/lib/i18n';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/colors';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { AuthLinkProvider, useAuthLink } from '@/contexts/AuthLinkContext';
 import type { Session } from '@supabase/supabase-js';
 
 export default function RootLayout() {
+  return (
+    <AuthLinkProvider>
+      <RootNavigator />
+    </AuthLinkProvider>
+  );
+}
+
+function RootNavigator() {
   const systemScheme = useColorScheme();
   const bootColors = Colors[systemScheme === 'light' ? 'light' : 'dark'];
   const [session, setSession] = useState<Session | null>(null);
@@ -33,6 +42,10 @@ export default function RootLayout() {
   const router = useRouter();
   const segments = useSegments();
   const didRedirect = useRef(false);
+  const authLink = useAuthLink();
+  // A password-reset link signs the user in; keep them on /reset-password instead of bouncing to the tabs.
+  const recovering =
+    authLink.kind === 'recovery' && (authLink.status === 'processing' || authLink.status === 'success');
 
   const [fontsLoaded] = useFonts({
     BricolageGrotesque_400Regular,
@@ -68,10 +81,10 @@ export default function RootLayout() {
     if (!session && !inAuth && !inConfirm && !inReset) {
       didRedirect.current = true;
       router.replace('/(auth)/sign-in');
-    } else if (session && (inAuth || (!didRedirect.current && segs.length === 0))) {
+    } else if (session && !recovering && (inAuth || (!didRedirect.current && segs.length === 0))) {
       router.replace('/(tabs)');
     }
-  }, [initialized, session, segments]);
+  }, [initialized, session, segments, recovering]);
 
   if (!fontsLoaded) return null;
 
