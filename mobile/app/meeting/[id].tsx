@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, ActivityIndicator, Alert, TextInput, Pressable, Share,
 } from 'react-native';
@@ -8,21 +8,38 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import Animated, {
-  useSharedValue, useAnimatedStyle, withTiming, FadeIn,
-} from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { api } from '@/lib/api';
+import { copyText } from '@/lib/clipboard';
+import { displayTitle, isUntitled } from '@/lib/meetingTitle';
 import { hapticImpact, hapticNotification, NotificationFeedbackType } from '@/lib/haptics';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Fonts } from '@/constants/fonts';
 import { Spacing } from '@/constants/tokens';
 import { Card, Badge, Eyebrow, Button } from '@/components/ui';
+import { ShareSheet } from '@/components/ShareSheet';
 import type { ColorScheme } from '@/constants/colors';
 import type { Meeting, Transcript, TranscriptSegment, Summary, MeetingStatus, ActionItem } from '@/lib/api';
 
 const PROCESSING = new Set<MeetingStatus>(['queued', 'transcribing', 'summarizing']);
 
 type Tab = 'transcript' | 'summary';
+
+type BadgeVariant = 'neutral' | 'info' | 'accent' | 'success' | 'warning' | 'error';
+
+const SENTIMENT_VARIANT: Record<string, BadgeVariant> = {
+  productive: 'success',
+  tense: 'error',
+  casual: 'warning',
+  neutral: 'neutral',
+};
+
+const SENTIMENT_KEY: Record<string, string> = {
+  productive: 'meeting.sentimentProductive',
+  tense: 'meeting.sentimentTense',
+  casual: 'meeting.sentimentCasual',
+  neutral: 'meeting.sentimentNeutral',
+};
 
 function formatDuration(seconds: number | null): string {
   if (seconds == null) return '';
@@ -41,20 +58,19 @@ function formatTimestamp(seconds: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-function ProcessingView({ status, s, colors, t }: { status: MeetingStatus; s: Styles; colors: ColorScheme; t: TFunction }) {
-  const fakeProgress = useSharedValue(0);
+const STEP_KEYS = ['meeting.stepUploaded', 'meeting.stepTranscribing', 'meeting.stepSummarizing', 'meeting.stepDone'] as const;
 
-  useEffect(() => {
-    // Fake progress: jump to 75% quickly, then crawl toward 90% while the
-    // backend does the real work.
-    fakeProgress.value = withTiming(0.75, { duration: 2000 });
-    const timer = setTimeout(() => {
-      fakeProgress.value = withTiming(0.9, { duration: 15000 });
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [fakeProgress]);
+// Index of the step currently running; everything before it is finished.
+const ACTIVE_STEP: Record<'queued' | 'transcribing' | 'summarizing', number> = {
+  queued: 1,
+  transcribing: 1,
+  summarizing: 2,
+};
 
-  const barStyle = useAnimatedStyle(() => ({ width: `${fakeProgress.value * 100}%` }));
+function ProcessingView({ status, s, colors, t }: {
+  status: 'queued' | 'transcribing' | 'summarizing'; s: Styles; colors: ColorScheme; t: TFunction;
+}) {
+  const active = ACTIVE_STEP[status];
 
   return (
     <View style={s.processingView}>
@@ -67,8 +83,25 @@ function ProcessingView({ status, s, colors, t }: { status: MeetingStatus; s: St
          t('meeting.processingSummarizing')}
       </Text>
       <Text style={s.processingSubtitle}>{t('meeting.processingSubtitle')}</Text>
-      <View style={s.fakeProgressTrack}>
-        <Animated.View style={[s.fakeProgressFill, barStyle]} />
+      <View style={s.stepList}>
+        {STEP_KEYS.map((key, i) => {
+          const state = i < active ? 'done' : i === active ? 'active' : 'pending';
+          return (
+            <View key={key} style={s.stepRow}>
+              <View style={[
+                s.stepMarker,
+                state === 'done' && s.stepMarkerDone,
+                state === 'active' && s.stepMarkerActive,
+              ]}>
+                {state === 'done' && <Ionicons name="checkmark" size={14} color={colors.bg} />}
+                {state === 'active' && <ActivityIndicator size="small" color={colors.primary} />}
+              </View>
+              <Text style={[s.stepLabel, state === 'active' && s.stepLabelActive, state === 'pending' && s.stepLabelPending]}>
+                {t(key)}
+              </Text>
+            </View>
+          );
+        })}
       </View>
     </View>
   );
@@ -89,8 +122,10 @@ export default function MeetingDetailScreen() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState('');
+  // Submit and blur both fire saveTitle; only the first one per edit session may run.
+  const titleSavedRef = useRef(false);
   const [regenerating, setRegenerating] = useState(false);
-  const [sharing, setSharing] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [isPro, setIsPro] = useState<boolean | null>(null);
   const [copied, setCopied] = useState(false);
@@ -106,7 +141,11 @@ export default function MeetingDetailScreen() {
     try {
       const m = await api.meetings.get(id);
       setMeeting(m);
-      if (m.status === 'done' || m.status === 'transcribed') {
+      if (m.status === 'error') {
+        // An errored meeting can be retried only if its transcript was saved.
+        const tr = await api.meetings.transcript(id).catch(() => null);
+        setTranscript(tr);
+      } else if (m.status === 'done' || m.status === 'transcribed') {
         const [tr, su] = await Promise.allSettled([
           api.meetings.transcript(id),
           api.meetings.summary(id),
@@ -146,55 +185,43 @@ export default function MeetingDetailScreen() {
   }, [meeting?.status]);
 
   async function saveTitle() {
-    if (!meeting || titleDraft.trim() === meeting.title) { setEditingTitle(false); return; }
+    if (titleSavedRef.current) return;
+    titleSavedRef.current = true;
+    const next = titleDraft.trim();
+    // A blank title is ignored (keeps the current one) rather than sent as "".
+    if (!meeting || next === '' || next === meeting.title) { setEditingTitle(false); return; }
+    setEditingTitle(false);
     try {
-      const updated = await api.meetings.update(id, { title: titleDraft.trim() });
+      const updated = await api.meetings.update(id, { title: next });
       setMeeting(updated);
     } catch (e: unknown) {
       Alert.alert(t('common.error'), (e as Error).message);
-    }
-    setEditingTitle(false);
-  }
-
-  async function handleShare() {
-    setSharing(true);
-    try {
-      const { token } = await api.meetings.share.create(id);
-      const url = `https://summarex.app/shared/${token}`;
-      await Share.share({ message: url, url });
-    } catch (e: unknown) {
-      Alert.alert(t('common.error'), (e as Error).message);
-    } finally {
-      setSharing(false);
     }
   }
 
   async function handleCopy() {
     if (!meeting) return;
     hapticImpact();
-    const title = meeting.title || t('recordings.untitled');
+    const title = displayTitle(meeting.title, t);
     const date = formatDate(meeting.created_at, language);
     let text = '';
 
     if (tab === 'summary' && summary) {
       text = buildSummaryCopyText(summary, title, date, t);
-      if (isPro !== true) text += `\n\n—\n${t('meeting.copyWatermarkSummary')}`;
+      // isPro is null while the entitlement is loading: don't watermark until we know the user is free.
+      if (isPro === false) text += `\n\n—\n${t('meeting.copyWatermarkSummary')}`;
     } else if (tab === 'transcript' && transcript) {
       text = buildTranscriptCopyText(transcript, title, date, t);
-      if (isPro !== true) text += `\n\n—\n${t('meeting.copyWatermarkTranscript')}`;
+      if (isPro === false) text += `\n\n—\n${t('meeting.copyWatermarkTranscript')}`;
     } else {
       return;
     }
 
-    try {
-      // expo-clipboard works in dev/production builds but not in Expo Go.
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const Clipboard = require('expo-clipboard') as typeof import('expo-clipboard');
-      await Clipboard.setStringAsync(text);
+    if (await copyText(text)) {
       hapticNotification(NotificationFeedbackType.Success);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
+    } else {
       // Fallback for Expo Go: open share sheet so user can copy from there.
       await Share.share({ message: text });
     }
@@ -211,6 +238,15 @@ export default function MeetingDetailScreen() {
     } finally {
       setRegenerating(false);
     }
+  }
+
+  // Regenerating deletes the current summary and is rate-limited (5/h), so the
+  // menu action asks first. Generating from a transcript-only meeting doesn't.
+  function confirmRegenerate() {
+    Alert.alert(t('meeting.regenerateConfirmTitle'), t('meeting.regenerateConfirmBody'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('meeting.regenerateConfirmAction'), onPress: handleRegenerate },
+    ]);
   }
 
   function handleDelete() {
@@ -258,10 +294,10 @@ export default function MeetingDetailScreen() {
 
   function openMenu() {
     const buttons: AlertButton[] = [];
-    if (meeting!.status === 'done') buttons.push({ text: t('meeting.regenerate'), onPress: handleRegenerate });
+    if (meeting!.status === 'done') buttons.push({ text: t('meeting.regenerate'), onPress: confirmRegenerate });
     buttons.push({ text: t('common.delete'), style: 'destructive', onPress: handleDelete });
     buttons.push({ text: t('common.cancel'), style: 'cancel' });
-    Alert.alert(meeting!.title || t('recordings.untitled'), undefined, buttons);
+    Alert.alert(displayTitle(meeting!.title, t), undefined, buttons);
   }
 
   const showContent = !isProcessing && meeting.status !== 'error';
@@ -290,10 +326,8 @@ export default function MeetingDetailScreen() {
               color={copied ? colors.primary : colors.text}
             />
           </Pressable>
-          <Pressable onPress={handleShare} disabled={sharing} style={s.iconButton}>
-            {sharing
-              ? <ActivityIndicator size="small" color={colors.text} />
-              : <Ionicons name="share-outline" size={18} color={colors.text} />}
+          <Pressable onPress={() => setShareOpen(true)} style={s.iconButton}>
+            <Ionicons name="share-outline" size={18} color={colors.text} />
           </Pressable>
           <Pressable onPress={openMenu} disabled={deleting || regenerating} style={s.iconButton}>
             <Ionicons name="ellipsis-horizontal" size={18} color={colors.text} />
@@ -310,16 +344,22 @@ export default function MeetingDetailScreen() {
             onChangeText={setTitleDraft}
             onBlur={saveTitle}
             onSubmitEditing={saveTitle}
+            placeholder={displayTitle(meeting.title, t)}
+            placeholderTextColor={colors.textMuted}
             autoFocus
             returnKeyType="done"
           />
         ) : (
           <Pressable
-            onPress={() => { setTitleDraft(meeting.title); setEditingTitle(true); }}
+            onPress={() => {
+              titleSavedRef.current = false;
+              setTitleDraft(isUntitled(meeting.title) ? '' : meeting.title);
+              setEditingTitle(true);
+            }}
             hitSlop={{ top: 8, bottom: 8 }}
           >
             <Text style={s.title} numberOfLines={2}>
-              {meeting.title || t('recordings.untitled')}
+              {displayTitle(meeting.title, t)}
             </Text>
           </Pressable>
         )}
@@ -346,7 +386,14 @@ export default function MeetingDetailScreen() {
         </View>
       )}
 
-      {isProcessing && <ProcessingView status={meeting.status} s={s} colors={colors} t={t} />}
+      {isProcessing && (
+        <ProcessingView
+          status={meeting.status as 'queued' | 'transcribing' | 'summarizing'}
+          s={s}
+          colors={colors}
+          t={t}
+        />
+      )}
 
       {meeting.status === 'error' && (
         <View style={s.errorWrap}>
@@ -354,9 +401,18 @@ export default function MeetingDetailScreen() {
             <Ionicons name="warning-outline" size={32} color={colors.error} />
             <Text style={s.errorCardTitle}>{t('meeting.errorTitle')}</Text>
             {meeting.error_message ? <Text style={s.errorCardBody}>{meeting.error_message}</Text> : null}
-            <View style={{ marginTop: Spacing.md }}>
-              <Button label={t('common.retry')} variant="danger" onPress={() => { setLoading(true); load(); }} />
-            </View>
+            {transcript ? (
+              <View style={{ marginTop: Spacing.md }}>
+                <Button
+                  label={t('meeting.tryAgain')}
+                  variant="danger"
+                  onPress={handleRegenerate}
+                  isLoading={regenerating}
+                />
+              </View>
+            ) : (
+              <Text style={[s.errorCardBody, { marginTop: Spacing.sm }]}>{t('meeting.errorNoTranscript')}</Text>
+            )}
           </View>
         </View>
       )}
@@ -380,6 +436,13 @@ export default function MeetingDetailScreen() {
           </Animated.View>
         </ScrollView>
       )}
+
+      <ShareSheet
+        visible={shareOpen}
+        meetingId={id}
+        title={displayTitle(meeting.title, t)}
+        onClose={() => setShareOpen(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -459,7 +522,12 @@ function SummaryTab({
 
       {summary.sentiment ? (
         <SectionCard eyebrow={t('meeting.sentiment')} s={s}>
-          <Text style={s.bodyText}>{summary.sentiment}</Text>
+          <View style={s.sentimentRow}>
+            <Badge
+              label={SENTIMENT_KEY[summary.sentiment] ? t(SENTIMENT_KEY[summary.sentiment]) : summary.sentiment}
+              variant={SENTIMENT_VARIANT[summary.sentiment] ?? 'neutral'}
+            />
+          </View>
         </SectionCard>
       ) : null}
 
@@ -580,11 +648,18 @@ function createStyles(colors: ColorScheme) {
     },
     processingTitle: { fontSize: 28, fontFamily: Fonts.display, color: colors.text, marginTop: Spacing.lg, textAlign: 'center', letterSpacing: -0.5 },
     processingSubtitle: { fontSize: 15, fontFamily: Fonts.body, color: colors.textMuted, marginTop: Spacing.xs, textAlign: 'center', maxWidth: 280 },
-    fakeProgressTrack: {
-      marginTop: Spacing.xl, width: '80%', height: 6, borderRadius: 3,
-      backgroundColor: colors.bgElevated, overflow: 'hidden',
+    stepList: { marginTop: Spacing.xl, gap: Spacing.md, alignSelf: 'center' },
+    stepRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+    stepMarker: {
+      width: 22, height: 22, borderRadius: 11,
+      borderWidth: 1.5, borderColor: colors.borderStrong,
+      alignItems: 'center', justifyContent: 'center',
     },
-    fakeProgressFill: { height: '100%', backgroundColor: colors.primary, borderRadius: 3 },
+    stepMarkerDone: { backgroundColor: colors.primary, borderColor: colors.primary },
+    stepMarkerActive: { borderColor: colors.primary },
+    stepLabel: { fontSize: 15, fontFamily: Fonts.bodyMedium, color: colors.text },
+    stepLabelActive: { color: colors.primary, fontFamily: Fonts.bodySemiBold },
+    stepLabelPending: { color: colors.textMuted },
 
     errorWrap: { flex: 1, justifyContent: 'center', padding: Spacing.lg },
     errorCard: {
@@ -625,6 +700,7 @@ function createStyles(colors: ColorScheme) {
     actionTask: { fontSize: 15, fontFamily: Fonts.body, color: colors.text, lineHeight: 22 },
 
     topicsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.xs },
+    sentimentRow: { flexDirection: 'row' },
 
     quote: {
       fontSize: 15, fontFamily: Fonts.body, color: colors.textMuted, fontStyle: 'italic',
