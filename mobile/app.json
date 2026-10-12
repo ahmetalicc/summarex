@@ -36,7 +36,9 @@
       [
         "expo-audio",
         {
-          "microphonePermission": "Allow Summarex to access your microphone to record meetings."
+          "microphonePermission": "Allow Summarex to access your microphone to record meetings.",
+          "enableBackgroundPlayback": false,
+          "enableBackgroundRecording": true
         }
       ]
     ],
