@@ -91,7 +91,15 @@
   },
   "summarize": {
     "pageTitle": "Summarize Audio",
-    "pageSubtitle": "Transform audio into structured insights."
+    "pageSubtitle": "Transform audio into structured insights.",
+    "pickerEyebrow": "Existing transcripts",
+    "pickerTitle": "Or summarize an existing transcript",
+    "pickerSubtitle": "Pick one of your transcripts and turn it into a summary. No need to re-upload audio.",
+    "pickerEmpty": "No transcripts waiting for a summary. Transcribe some audio first, then come back here.",
+    "pickerAction": "Summarize",
+    "pickerLoadError": "Couldn't load your transcripts. Check your connection and try again.",
+    "pickerActionError": "Couldn't start the summary. Please try again.",
+    "pickerRateLimited": "You've hit the hourly summary limit. Please try again in a little while."
   },
   "recordings": {
     "title": "Your recordings",
